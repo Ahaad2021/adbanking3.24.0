@@ -1,0 +1,30 @@
+<!-- DTD pour le rapport concernant un compte d'epargne -->
+
+<!-- Element root -->
+<!ELEMENT compte_epargne (header, header_contextuel, mouvement*)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- En-tete contextuel -->
+<!ELEMENT header_contextuel (criteres_recherche, infos_synthetiques)>
+
+<!-- Criteres de recherche commun -->
+<!ENTITY % mod_criteres SYSTEM "criteres_recherche.dtd">
+%mod_criteres;
+
+<!-- Informations synthetiques -->
+<!ELEMENT infos_synthetiques (solde)>
+<!ELEMENT solde (#PCDATA)>
+
+<!-- Corps -->
+<!ELEMENT mouvement (date_mouv, num_trans, libel_ope, (mnt_depot|mnt_retrait|mnt_int), nbre_jour_inactivite?, solde)>
+<!ELEMENT date_mouv (#PCDATA)>
+<!ELEMENT num_trans (#PCDATA)>
+<!ELEMENT libel_ope (#PCDATA)>
+<!ELEMENT mnt_depot (#PCDATA)>
+<!ELEMENT mnt_retrait (#PCDATA)>
+<!ELEMENT mnt_int (#PCDATA)>
+<!ELEMENT nbre_jour_inactivite (#PCDATA)>
+<!ELEMENT nbre_ps_mouvementer (#PCDATA)>

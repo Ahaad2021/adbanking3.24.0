@@ -1,0 +1,9 @@
+/var/log/adbanking/*.log {
+    missingok
+    notifempty
+    monthly
+    rotate 6
+    compress
+    delaycompress
+    create 644 apache apache
+}

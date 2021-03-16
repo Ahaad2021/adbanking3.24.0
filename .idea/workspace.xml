@@ -1,0 +1,577 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" readonly="true" id="635460fc-1a26-4058-8dcb-af4be493a4d3" name="Default" comment="" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="rapports_epargne.php" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/web/modules/rapports/rapports_epargne.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="303">
+              <caret line="175" column="0" lean-forward="true" selection-start-line="175" selection-start-column="0" selection-end-line="175" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="xml_epargne.php" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/web/modules/rapports/xml_epargne.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="82">
+              <caret line="166" column="0" lean-forward="true" selection-start-line="166" selection-start-column="0" selection-end-line="166" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="tableSys.php" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/web/lib/misc/tableSys.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="274">
+              <caret line="405" column="81" lean-forward="true" selection-start-line="405" selection-start-column="81" selection-end-line="405" selection-end-column="81" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>dormant_count</find>
+      <find>etat</find>
+      <find>passage_etat_inactif</find>
+      <find>Inactifs</find>
+      <find>Date du rapport</find>
+      <find>145</find>
+      <find>countMat</find>
+      <find>PreleveFraistenueCptbnr</find>
+      <find>sql_setdormant</find>
+      <find>getParamSecurity</find>
+      <find>PreleveFraistenueCpt</find>
+      <find>getComptesDormantsInactifs</find>
+      <find>activerCompteDormant</find>
+      <find>getComptesRetraitPossible</find>
+      <find>getComptesDormants</find>
+      <find>getParametrageEpargne</find>
+      <find>setdormant</find>
+      <find>param_epargne</find>
+      <find>active_compte_sur_transaction</find>
+      <find>Activez les comptes dormants</find>
+      <find>Le nombre de jours sans mouvement pour les comptes inactifs</find>
+      <find>Comptes inactifs / dormants depuis (en jours)</find>
+      <find>Gestionnaire- Tri par agent gestionnaire</find>
+      <find>HTML_GEN_LSB_etat</find>
+      <find>xml_comptes_inactifs</find>
+      <find>Inactif</find>
+      <find>mode_calcul_frais_inactif</find>
+      <find>getLignesCptesInactifs</find>
+    </findStrings>
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/web/modules/parametrage/tables.php" />
+        <option value="$PROJECT_DIR$/web/lib/misc/tableSys.php" />
+        <option value="$PROJECT_DIR$/web/lib/dbProcedures/rapports.php" />
+        <option value="$PROJECT_DIR$/web/modules/rapports/rapports_epargne.php" />
+        <option value="$PROJECT_DIR$/web/modules/rapports/xml_epargne.php" />
+        <option value="$PROJECT_DIR$/web/ad_ma/app/models/Client.php" />
+        <option value="$PROJECT_DIR$/web/batch/traite_epargne.php" />
+        <option value="$PROJECT_DIR$/web/modules/epargne/activer_compte_dormant.php" />
+        <option value="$PROJECT_DIR$/web/lib/dbProcedures/epargne.php" />
+      </list>
+    </option>
+  </component>
+  <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsGulpfileManager">
+    <detection-done>true</detection-done>
+    <sorting>DEFINITION_ORDER</sorting>
+  </component>
+  <component name="PhpWorkspaceProjectConfiguration" backward_compatibility_performed="true" />
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="-8" />
+    <option name="y" value="-8" />
+    <option name="width" value="699" />
+    <option name="height" value="744" />
+  </component>
+  <component name="ProjectView">
+    <navigator currentView="ProjectPane" proportions="" version="1">
+      <flattenPackages />
+      <showMembers />
+      <showModules />
+      <showLibraryContents />
+      <hideEmptyPackages />
+      <abbreviatePackageNames />
+      <autoscrollToSource />
+      <autoscrollFromSource />
+      <sortByType />
+      <manualOrder />
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="Scratches" />
+      <pane id="Scope" />
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="adbanking3.24" type="b2602c69:ProjectViewProjectNode" />
+              <item name="adbanking3.24" type="2a2b976b:PhpTreeStructureProvider$1" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../adbanking3.24.1" />
+    <property name="SearchEverywhereHistoryKey" value="tab&#9;FILE&#9;file://C:/wamp64/www/PHP_DEV/adbanking3.24/web/lib/misc/tableSys.php&#10;xml_e&#9;FILE&#9;file://C:/wamp64/www/PHP_DEV/adbanking3.24/web/modules/rapports/xml_epargne.php&#10;rap&#9;FILE&#9;file://C:/wamp64/www/PHP_DEV/adbanking3.24/web/modules/rapports/rapports_epargne.php&#10;table&#9;FILE&#9;file://C:/wamp64/www/PHP_DEV/adbanking3.24/web/modules/parametrage/tables.php&#10;menu.php&#9;FILE&#9;file://C:/wamp64/www/PHP_DEV/adbanking3.24/web/modules/menus/menu.php&#10;activer&#9;FILE&#9;file://C:/wamp64/www/PHP_DEV/adbanking3.24/web/modules/epargne/activer_compte_dormant.php&#10;rapport&#9;FILE&#9;file://C:/wamp64/www/PHP_DEV/adbanking3.24/web/lib/dbProcedures/rapports.php&#10;epargne&#9;FILE&#9;file://C:/wamp64/www/PHP_DEV/adbanking3.24/web/lib/dbProcedures/epargne.php&#10;traite&#9;FILE&#9;file://C:/wamp64/www/PHP_DEV/adbanking3.24/web/batch/traite_epargne.php&#10;login_&#9;FILE&#9;file://C:/wamp64/www/PHP_DEV/adbanking3.24/web/lib/dbProcedures/login_func.php&#10;epargne.&#9;FILE&#9;file://C:/wamp64/www/PHP_DEV/adbanking3.24/web/lib/dbProcedures/epargne.php&#10;epargne.php&#9;FILE&#9;file://C:/wamp64/www/PHP_DEV/adbanking3.24/web/modules/rapports/rapports_epargne.php&#10;tra&#9;FILE&#9;file://C:/wamp64/www/PHP_DEV/adbanking3.24/web/batch/traite_epargne.php&#10;Client.php&#9;FILE&#9;file://C:/wamp64/www/PHP_DEV/adbanking3.24/web/ad_ma/app/models/Client.php&#10;compte_in&#9;FILE&#9;file://C:/wamp64/www/PHP_DEV/adbanking3.24/web/rapports/xslt/fr_BE/comptes_inactifs.xslt&#10;xml&#9;FILE&#9;file://C:/wamp64/www/PHP_DEV/adbanking3.24/web/modules/rapports/xml_epargne.php&#10;tables&#9;FILE&#9;file://C:/wamp64/www/PHP_DEV/adbanking3.24/web/lib/misc/tableSys.php&#10;rapport.ph&#9;FILE&#9;file://C:/wamp64/www/PHP_DEV/adbanking3.24/web/lib/dbProcedures/rapports.php&#10;xml_epa&#9;FILE&#9;file://C:/wamp64/www/PHP_DEV/adbanking3.24/web/modules/rapports/xml_epargne.php&#10;rapport_eparg&#9;FILE&#9;file://C:/wamp64/www/PHP_DEV/adbanking3.24/web/modules/rapports/rapports_epargne.php&#10;rapport_ep&#9;FILE&#9;file://C:/wamp64/www/PHP_DEV/adbanking3.24/web/images/rapport_epargne.gif&#10;table.php&#9;FILE&#9;file://C:/wamp64/www/PHP_DEV/adbanking3.24/web/lib/dompdf/src/FrameDecorator/Table.php&#10;tableSys&#9;FILE&#9;file://C:/wamp64/www/PHP_DEV/adbanking3.24/web/lib/misc/tableSys.php&#10;rapports.php&#9;FILE&#9;file://C:/wamp64/www/PHP_DEV/adbanking3.24/web/lib/dbProcedures/rapports.php&#10;traite_epar&#9;FILE&#9;file://C:/wamp64/www/PHP_DEV/adbanking3.24/web/batch/traite_epargne.php" />
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="ShelveChangesManager" show_recycled="false">
+    <option name="remove_strategy" value="false" />
+  </component>
+  <component name="SvnConfiguration" cleanupOnStartRun="true">
+    <configuration>C:\Users\rpillay\AppData\Roaming\Subversion</configuration>
+    <supportedVersion>125</supportedVersion>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="635460fc-1a26-4058-8dcb-af4be493a4d3" name="Default" comment="" />
+      <created>1614691165583</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1614691165583</updated>
+      <workItem from="1614691167113" duration="2450000" />
+      <workItem from="1615212970055" duration="116000" />
+      <workItem from="1615284788678" duration="2831000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TimeTrackingManager">
+    <option name="totallyTimeSpent" value="5397000" />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
+    <editor active="true" />
+    <layout>
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24963397" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+    </layout>
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager />
+    <watches-manager />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/web/ad_ma/app/models/Client.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <marker date="1615286373053" expanded="true" signature="594:831" ph="SELECT cli.i... ad_cpt" />
+            <marker date="1615286373053" expanded="true" signature="1287:1386" ph="SELECT * FRO... ad_abonnement" />
+            <marker date="1615286373053" expanded="true" signature="2021:2093" ph="SELECT * FRO... ad_cli" />
+            <marker date="1615286373053" expanded="true" signature="3683:3758" ph="SELECT etat ad_cli" />
+            <marker date="1615286373053" expanded="true" signature="4382:4488" ph="SELECT * FRO... ad_cpt" />
+            <marker date="1615286373053" expanded="true" signature="6901:6935" ph="SELECT count... ad_cli" />
+            <marker date="1615286373053" expanded="true" signature="9308:9380" ph="SELECT * FRO... ad_cli" />
+            <marker date="1615286373053" expanded="true" signature="10101:10208" ph="SELECT count... ad_pers_ext" />
+            <marker date="1615286373053" expanded="true" signature="10319:10483" ph="SELECT count... ad_cli" />
+            <marker date="1615286373053" expanded="true" signature="21117:21189" ph="SELECT * fro... ad_grp_sol" />
+            <marker date="1615286373053" expanded="true" signature="22043:22110" ph="SELECT * fro... ad_cli" />
+            <marker date="1615286373053" expanded="true" signature="22914:22997" ph="SELECT id_me... ad_grp_sol" />
+            <marker date="1615286373053" expanded="true" signature="23699:23789" ph="SELECT * FRO... champs_extras_valeurs_ad_cli" />
+            <marker date="1615286373053" expanded="true" signature="27656:27924" ph="select c.sta... ad_cli" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/db/update3.24/update3.24.0-beta3/updata3.24.0-beta3.sql">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-5460">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/db/update3.24/update3.24.0-beta2/updata3.24.0-beta2.sql">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1921">
+          <caret line="7" column="20" lean-forward="true" selection-start-line="7" selection-start-column="20" selection-end-line="7" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/lib/dompdf/src/FrameDecorator/Table.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/images/rapport_epargne.gif">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/rapports/xslt/fr_BE/comptes_inactifs.xslt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2652">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/lib/dbProcedures/login_func.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="252">
+          <caret line="58" column="3" lean-forward="true" selection-start-line="58" selection-start-column="3" selection-end-line="58" selection-end-column="3" />
+          <folding>
+            <marker date="1614749888249" expanded="true" signature="1444:1540" ph="SELECT pwd=m... ad_log" />
+            <marker date="1614749888249" expanded="true" signature="2451:2531" ph="UPDATE ad_lo... " />
+            <marker date="1614749888249" expanded="true" signature="2872:2929" ph="SELECT count... ad_ses" />
+            <marker date="1614749888249" expanded="true" signature="3308:3348" ph="SELECT statu... ad_agc" />
+            <marker date="1614749888249" expanded="true" signature="3746:3851" ph="SELECT P.con... adsys_profils" />
+            <marker date="1614749888249" expanded="true" signature="4624:4732" ph="SELECT statu... ad_uti" />
+            <marker date="1614749888249" expanded="true" signature="5115:5157" ph="SELECT last_... ad_agc" />
+            <marker date="1614749888249" expanded="true" signature="5455:5512" ph="SELECT login... ad_log" />
+            <marker date="1614749888249" expanded="true" signature="5775:5830" ph="SELECT id,gu... adsys_profils" />
+            <marker date="1614749888249" expanded="true" signature="6237:6315" ph="SELECT login... ad_ses" />
+            <marker date="1614749888249" expanded="true" signature="6740:6803" ph="UPDATE ad_lo... " />
+            <marker date="1614749888249" expanded="true" signature="7016:7141" ph="INSERT INTO ad_ses... " />
+            <marker date="1614749888249" expanded="true" signature="9161:9212" ph="SELECT login... ad_ses" />
+            <marker date="1614749888249" expanded="true" signature="10590:10761" ph="SELECT code_... " />
+            <marker date="1614749888249" expanded="true" signature="11214:11255" ph="SELECT count... devise" />
+            <marker date="1614749888249" expanded="true" signature="11585:11749" ph="SELECT guich... ad_log" />
+            <marker date="1614749888249" expanded="true" signature="12558:12611" ph="SELECT timeo... adsys_profils" />
+            <marker date="1614749888249" expanded="true" signature="13117:13169" ph="SELECT fonct... adsys_profils_axs" />
+            <marker date="1614749888249" expanded="true" signature="13515:13593" ph="SELECT nom, ad_uti" />
+            <marker date="1614749888249" expanded="true" signature="14173:14275" ph="SELECT libel... ad_gui" />
+            <marker date="1614749888249" expanded="true" signature="14935:14992" ph="SELECT id, v... adsys_types_billets" />
+            <marker date="1614749888249" expanded="true" signature="15579:15626" ph="SELECT nom,p... ad_uti" />
+            <marker date="1614749888249" expanded="true" signature="17493:17603" ph="SELECT id_ag... adsys_multi_agence" />
+            <marker date="1614749888249" expanded="true" signature="18691:18743" ph="SELECT adr_i... ad_ses" />
+            <marker date="1614749888249" expanded="true" signature="19445:19542" ph="SELECT cpte_... ad_gui" />
+            <marker date="1614749888249" expanded="true" signature="19833:19942" ph="SELECT solde... ad_cpt_comptable" />
+            <marker date="1614749888249" expanded="true" signature="20885:20926" ph="DELETE FROM " />
+            <marker date="1614749888249" expanded="true" signature="21566:21623" ph="SELECT sess_... ad_ses" />
+            <marker date="1614749888249" expanded="true" signature="22458:22523" ph="UPDATE ad_se... " />
+            <marker date="1614749888249" expanded="true" signature="22835:22891" ph="SELECT * FRO... menus" />
+            <marker date="1614749888249" expanded="true" signature="23382:23402" ph="SELECT * FRO... ecrans" />
+            <marker date="1614749888249" expanded="true" signature="24016:24063" ph="SELECT guich... ad_log" />
+            <marker date="1614749888249" expanded="true" signature="24683:24761" ph="UPDATE ad_gu... " />
+            <marker date="1614749888249" expanded="true" signature="25266:25312" ph="UPDATE ad_gu... " />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/ad_ma/app/models/Client.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="281">
+          <caret line="243" column="19" lean-forward="false" selection-start-line="243" selection-start-column="19" selection-end-line="243" selection-end-column="19" />
+          <folding>
+            <marker date="1615286373053" expanded="true" signature="594:831" ph="SELECT cli.i... ad_cpt" />
+            <marker date="1615286373053" expanded="true" signature="1287:1386" ph="SELECT * FRO... ad_abonnement" />
+            <marker date="1615286373053" expanded="true" signature="2021:2093" ph="SELECT * FRO... ad_cli" />
+            <marker date="1615286373053" expanded="true" signature="3683:3758" ph="SELECT etat ad_cli" />
+            <marker date="1615286373053" expanded="true" signature="4382:4488" ph="SELECT * FRO... ad_cpt" />
+            <marker date="1615286373053" expanded="true" signature="6901:6935" ph="SELECT count... ad_cli" />
+            <marker date="1615286373053" expanded="true" signature="9308:9380" ph="SELECT * FRO... ad_cli" />
+            <marker date="1615286373053" expanded="true" signature="10101:10208" ph="SELECT count... ad_pers_ext" />
+            <marker date="1615286373053" expanded="true" signature="10319:10483" ph="SELECT count... ad_cli" />
+            <marker date="1615286373053" expanded="true" signature="21117:21189" ph="SELECT * fro... ad_grp_sol" />
+            <marker date="1615286373053" expanded="true" signature="22043:22110" ph="SELECT * fro... ad_cli" />
+            <marker date="1615286373053" expanded="true" signature="22914:22997" ph="SELECT id_me... ad_grp_sol" />
+            <marker date="1615286373053" expanded="true" signature="23699:23789" ph="SELECT * FRO... champs_extras_valeurs_ad_cli" />
+            <marker date="1615286373053" expanded="true" signature="27656:27924" ph="select c.sta... ad_cli" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/batch/traite_epargne.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="280">
+          <caret line="928" column="40" lean-forward="true" selection-start-line="928" selection-start-column="40" selection-end-line="928" selection-end-column="40" />
+          <folding>
+            <marker date="1615285370909" expanded="true" signature="2000:2065" ph="SELECT freq_... adsys_calc_int_paye" />
+            <marker date="1615285370909" expanded="true" signature="2554:2605" ph="SELECT * fro... calcul_interets_a_payer" />
+            <marker date="1615285370909" expanded="true" signature="5328:5370" ph="SELECT * fro... Arrete_Comptes" />
+            <marker date="1615285370909" expanded="true" signature="7067:7106" ph="SELECT * FRO... isFinAnnee" />
+            <marker date="1615285370909" expanded="true" signature="7369:7411" ph="SELECT * FRO... isFinSemestre" />
+            <marker date="1615285370909" expanded="true" signature="7678:7721" ph="SELECT * FRO... isFinTrimestre" />
+            <marker date="1615285370909" expanded="true" signature="7984:8022" ph="SELECT * FRO... isFinMois" />
+            <marker date="1615285370909" expanded="true" signature="8894:9005" ph="SELECT * FRO... PreleveFraistenueCpt" />
+            <marker date="1615285370909" expanded="true" signature="10029:10071" ph="SELECT * FRO... isFinMois" />
+            <marker date="1615285370909" expanded="true" signature="10448:10572" ph="SELECT * FRO... ad_abonnement" />
+            <marker date="1615285370909" expanded="true" signature="11323:11447" ph="SELECT * FRO... ad_abonnement" />
+            <marker date="1615285370909" expanded="true" signature="12986:13016" ph="SELECT * FRO... ad_frais_attente" />
+            <marker date="1615285370909" expanded="true" signature="15075:15186" ph="DELETE FROM " />
+            <marker date="1615285370909" expanded="true" signature="20580:20739" ph="SELECT id, e... adsys_produit_epargne" />
+            <marker date="1615285370909" expanded="true" signature="21069:21187" ph="UPDATE adsys... " />
+            <marker date="1615285370909" expanded="true" signature="21462:21626" ph="UPDATE ad_cp... " />
+            <marker date="1615285370909" expanded="true" signature="22748:22817" ph="SELECT * fro... preleveinteretsdebiteurs" />
+            <marker date="1615285370909" expanded="true" signature="25368:25720" ph="UPDATE ad_cp... " />
+            <marker date="1615285370909" expanded="true" signature="26961:27046" ph="SELECT * FRO... ad_ord_perm" />
+            <marker date="1615285370909" expanded="true" signature="29920:30113" ph="SELECT c.id_... ad_ord_perm" />
+            <marker date="1615285370909" expanded="true" signature="30510:30587" ph="UPDATE ad_or... " />
+            <marker date="1615285370909" expanded="true" signature="32469:32538" ph="SELECT * FRO... traiteComptesDormants" />
+            <marker date="1615285370909" expanded="true" signature="33828:33897" ph="SELECT * FRO... traiteComptesInactifs" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/lib/dbProcedures/epargne.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="303">
+          <caret line="3618" column="54" lean-forward="true" selection-start-line="3618" selection-start-column="54" selection-end-line="3618" selection-end-column="54" />
+          <folding>
+            <marker date="1615287014244" expanded="true" signature="22103:22233" ph="SELECT a.*, ad_cpt" />
+            <marker date="1615287014244" expanded="true" signature="23488:23628" ph="SELECT a.*, ad_cpt" />
+            <marker date="1615287014244" expanded="true" signature="24926:25119" ph="SELECT a.*, ad_cpt" />
+            <marker date="1615287014244" expanded="true" signature="26328:26381" ph="SELECT id_pr... ad_agc" />
+            <marker date="1615287014244" expanded="true" signature="26628:26946" ph="SELECT a.*, ad_cpt" />
+            <marker date="1615287014244" expanded="true" signature="27819:27949" ph="SELECT a.*, ad_cpt" />
+            <marker date="1615287014244" expanded="true" signature="28857:28904" ph="select * fro... ad_mouvement" />
+            <marker date="1615287014244" expanded="true" signature="34462:34539" ph="SELECT * FRO... ad_cpt" />
+            <marker date="1615287014244" expanded="true" signature="35299:35398" ph="SELECT id_cp... ad_cpt" />
+            <marker date="1615287014244" expanded="true" signature="36211:36301" ph="SELECT count... ad_cli" />
+            <marker date="1615287014244" expanded="true" signature="37090:37174" ph="SELECT count... ad_cli" />
+            <marker date="1615287014244" expanded="true" signature="44295:44523" ph="select a.dat... ad_his" />
+            <marker date="1615287014244" expanded="true" signature="46161:46429" ph="select count... ad_his" />
+            <marker date="1615287014244" expanded="true" signature="49266:49406" ph="SELECT id_pr... ad_cpt" />
+            <marker date="1615287014244" expanded="true" signature="50094:50165" ph="SELECT cpt_f... ad_ord_perm" />
+            <marker date="1615287014244" expanded="true" signature="50913:50979" ph="SELECT etat_... ad_cpt" />
+            <marker date="1615287014244" expanded="true" signature="53765:54162" ph="SELECT a.id_... " />
+            <marker date="1615287014244" expanded="true" signature="54663:54716" ph="SELECT * FRO... ad_his" />
+            <marker date="1615287014244" expanded="true" signature="55433:55463" ph="SELECT date_... ad_cpt" />
+            <marker date="1615287014244" expanded="true" signature="76149:76227" ph="UPDATE ad_cp... " />
+            <marker date="1615287014244" expanded="true" signature="80205:80322" ph="SELECT count... ad_gar" />
+            <marker date="1615287014244" expanded="true" signature="80778:80882" ph="SELECT count... ad_dcr" />
+            <marker date="1615287014244" expanded="true" signature="94233:94261" ph="SELECT * FRO... attentes" />
+            <marker date="1615287014244" expanded="true" signature="95279:95320" ph="select max(i... attentes" />
+            <marker date="1615287014244" expanded="true" signature="107695:108575" ph="SELECT h.id_... ad_his" />
+            <marker date="1615287014244" expanded="true" signature="124852:125012" ph="SELECT a.*, attentes" />
+            <marker date="1615287014244" expanded="true" signature="126694:126794" ph="SELECT * FRO... attentes" />
+            <marker date="1615287014244" expanded="true" signature="129114:129174" ph="SELECT * FRO... attentes" />
+            <marker date="1615287014244" expanded="true" signature="140399:140471" ph="UPDATE atten... " />
+            <marker date="1615287014244" expanded="true" signature="156274:156330" ph="SELECT a.*, ad_cpt" />
+            <marker date="1615287014244" expanded="true" signature="159776:159887" ph="SELECT a.id_... ad_cpt" />
+            <marker date="1615287014244" expanded="true" signature="160934:161025" ph="SELECT a.id_... ad_cpt" />
+            <marker date="1615287014244" expanded="true" signature="165917:166000" ph="SELECT dat_d... ad_cpt" />
+            <marker date="1615287014244" expanded="true" signature="173020:173126" ph="UPDATE ad_cp... " />
+            <marker date="1615287014244" expanded="true" signature="180323:180407" ph="UPDATE ad_cp... " />
+            <marker date="1615287014244" expanded="true" signature="211929:212139" ph="select count... ad_dcr" />
+            <marker date="1615287014244" expanded="true" signature="214287:214385" ph="update ad_cp... " />
+            <marker date="1615287014244" expanded="true" signature="214413:214597" ph="update ad_cp... " />
+            <marker date="1615287014244" expanded="true" signature="214671:214759" ph="update ad_cp... " />
+            <marker date="1615287014244" expanded="true" signature="214787:214961" ph="update ad_cp... " />
+            <marker date="1615287014244" expanded="true" signature="217139:217227" ph="update ad_cp... " />
+            <marker date="1615287014244" expanded="true" signature="217320:217408" ph="update ad_cp... " />
+            <marker date="1615287014244" expanded="true" signature="217503:217591" ph="update ad_cp... " />
+            <marker date="1615287014244" expanded="true" signature="217619:217707" ph="update ad_cp... " />
+            <marker date="1615287014244" expanded="true" signature="224670:224695" ph="SELECT * FRO... ad_pers_ext" />
+            <marker date="1615287014244" expanded="true" signature="225389:225471" ph="SELECT a.lib... adsys_type_piece_identite" />
+            <marker date="1615287014244" expanded="true" signature="227310:227473" ph="select b.tra... adsys_type_piece_identite" />
+            <marker date="1615287014244" expanded="true" signature="230377:230407" ph="SELECT * FRO... ad_frais_attente" />
+            <marker date="1615287014244" expanded="true" signature="236466:236535" ph="DELETE FROM " />
+            <marker date="1615287014244" expanded="true" signature="238791:238862" ph="SELECT * FRO... ad_ord_perm" />
+            <marker date="1615287014244" expanded="true" signature="239411:239507" ph="UPDATE ad_or... " />
+            <marker date="1615287014244" expanded="true" signature="242677:242725" ph="SELECT * FRO... adsys_produit_epargne" />
+            <marker date="1615287014244" expanded="true" signature="244333:244983" ph="SELECT sum(m... ad_ecriture" />
+            <marker date="1615287014244" expanded="true" signature="244696:244970" ph="SELECT e.id_... ad_ecriture" />
+            <marker date="1615287014244" expanded="true" signature="245621:245742" ph="SELECT * fro... ad_transfert_ps_his" />
+            <marker date="1615287014244" expanded="true" signature="246358:246400" ph="SELECT param... ad_agc" />
+            <marker date="1615287014244" expanded="true" signature="247032:247070" ph="SELECT param... ad_agc" />
+            <marker date="1615287014244" expanded="true" signature="247691:247801" ph="select count... adsys_produit_epargne" />
+            <marker date="1615287014244" expanded="true" signature="248653:248814" ph="SELECT ext.n... ad_his_ext" />
+            <marker date="1615287014244" expanded="true" signature="252771:252826" ph="SELECT id_cl... ad_retrait_attente" />
+            <marker date="1615287014244" expanded="true" signature="253654:253730" ph="SELECT id_gu... ad_approvisionnement_delestage_attente" />
+            <marker date="1615287014244" expanded="true" signature="254619:254740" ph="SELECT id_cl... ad_retrait_deplace_attente" />
+            <marker date="1615287014244" expanded="true" signature="256679:256726" ph="SELECT * FRO... ad_retrait_attente" />
+            <marker date="1615287014244" expanded="true" signature="257756:257805" ph="SELECT * FRO... ad_transfert_attente" />
+            <marker date="1615287014244" expanded="true" signature="258874:258923" ph="SELECT * FRO... ad_transfert_attente" />
+            <marker date="1615287014244" expanded="true" signature="260100:260174" ph="SELECT * FRO... ad_retrait_attente" />
+            <marker date="1615287014244" expanded="true" signature="261126:261214" ph="SELECT * FRO... ad_retrait_deplace_attente" />
+            <marker date="1615287014244" expanded="true" signature="275019:275081" ph="select * fro... adsys_taxes" />
+            <marker date="1615287014244" expanded="true" signature="276187:276344" ph="SELECT SUM(m... ad_calc_int_paye_his" />
+            <marker date="1615287014244" expanded="true" signature="276904:276994" ph="SELECT cpte_... adsys_calc_int_paye" />
+            <marker date="1615287014244" expanded="true" signature="278184:278317" ph="UPDATE ad_ca... " />
+            <marker date="1615287014244" expanded="true" signature="278557:278687" ph="UPDATE ad_ca... " />
+            <marker date="1615287014244" expanded="true" signature="278932:279072" ph="UPDATE ad_ca... " />
+            <marker date="1615287014244" expanded="true" signature="279276:279377" ph="UPDATE ad_ca... " />
+            <marker date="1615287014244" expanded="true" signature="279710:279806" ph="select * fro... adsys_tarification" />
+            <marker date="1615287014244" expanded="true" signature="280141:280291" ph="SELECT max(i... ad_retrait_attente" />
+            <marker date="1615287014244" expanded="true" signature="280643:280814" ph="SELECT max(i... ad_transfert_attente" />
+            <marker date="1615287014244" expanded="true" signature="281202:281397" ph="SELECT max(i... ad_retrait_deplace_attente" />
+            <marker date="1615287014244" expanded="true" signature="281710:281789" ph="SELECT denom... tireur_benef" />
+            <marker date="1615287014244" expanded="true" signature="284725:284786" ph="SELECT id_cl... ad_transfert_attente" />
+            <marker date="1615287014244" expanded="true" signature="285641:285717" ph="SELECT * FRO... ad_transfert_attente" />
+            <marker date="1615287014244" expanded="true" signature="286908:286973" ph="SELECT cpte_... adsys_calc_int_paye" />
+            <marker date="1615287014244" expanded="true" signature="288017:288343" ph="SELECT COALE... ad_mouvement" />
+            <marker date="1615287014244" expanded="true" signature="291592:291670" ph="SELECT * fro... ad_quotite" />
+            <marker date="1615287014244" expanded="true" signature="291867:291916" ph="SELECT mnt_q... ad_cli" />
+            <marker date="1615287014244" expanded="true" signature="293313:293354" ph="SELECT * fro... ad_ord_perm" />
+            <marker date="1615287014244" expanded="true" signature="294135:294534" ph="SELECT id_or... " />
+            <marker date="1615287014244" expanded="true" signature="294168:294276" ph="SELECT p.lib... adsys_produit_epargne" />
+            <marker date="1615287014244" expanded="true" signature="294294:294352" ph="SELECT num_c... ad_cpt" />
+            <marker date="1615287014244" expanded="true" signature="294477:294524" ph="SELECT solde... ad_cpt" />
+            <marker date="1615287014244" expanded="true" signature="295365:295436" ph="SELECT id FR... adsys_profils_axs" />
+            <marker date="1615287014244" expanded="true" signature="300293:300354" ph="SELECT * FRO... ad_retrait_deplace_attente" />
+            <marker date="1615287014244" expanded="true" signature="305802:305869" ph="SELECT * FRO... ad_approvisionnement_delestage_attente" />
+            <marker date="1615287014244" expanded="true" signature="307184:307251" ph="SELECT * FRO... ad_approvisionnement_delestage_attente" />
+            <marker date="1615287014244" expanded="true" signature="308478:308678" ph="SELECT e.id_... ad_ecriture" />
+            <marker date="1615287014244" expanded="true" signature="308713:308942" ph="SELECT e.id_... ad_ecriture" />
+            <marker date="1615287014244" expanded="true" signature="309767:310226" ph="SELECT m.cpt... ad_ecriture" />
+            <marker date="1615287014244" expanded="true" signature="309996:310225" ph="SELECT e.id_... ad_ecriture" />
+            <marker date="1615287014244" expanded="true" signature="311057:311321" ph="SELECT m.mon... ad_ecriture" />
+            <marker date="1615287014244" expanded="true" signature="311247:311320" ph="SELECT cpte_... adsys_calc_int_paye" />
+            <marker date="1615287014244" expanded="true" signature="312828:312943" ph="SELECT e.id_... ad_ecriture" />
+            <marker date="1615287014244" expanded="true" signature="313783:314356" ph="SELECT DISTI... ad_dcr" />
+            <marker date="1615287014244" expanded="true" signature="314704:314767" ph="UPDATE ad_cp... " />
+            <marker date="1615287014244" expanded="true" signature="315023:315086" ph="UPDATE ad_dc... " />
+            <marker date="1615287014244" expanded="true" signature="315715:315768" ph="SELECT id_pr... ad_agc" />
+            <marker date="1615287014244" expanded="true" signature="316035:316742" ph="SELECT a.*, ad_cpt" />
+            <marker date="1615287014244" expanded="true" signature="317363:317416" ph="SELECT id_pr... ad_agc" />
+            <marker date="1615287014244" expanded="true" signature="317683:317920" ph="SELECT a.*, ad_cpt" />
+            <marker date="1615287014244" expanded="true" signature="319884:320025" ph="SELECT c.* F... ad_cpt" />
+            <marker date="1615287014244" expanded="true" signature="320957:322753" ph="SELECT case ad_mouvement" />
+            <marker date="1615287014244" expanded="true" signature="321651:322442" ph="select ext.i... ad_his_ext" />
+            <marker date="1615287014244" expanded="true" signature="321943:322294" ph="select pers.... ad_pers_ext" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/lib/dbProcedures/rapports.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="211">
+          <caret line="1411" column="19" lean-forward="true" selection-start-line="1411" selection-start-column="19" selection-end-line="1411" selection-end-column="19" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/modules/epargne/activer_compte_dormant.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="184">
+          <caret line="41" column="54" lean-forward="false" selection-start-line="41" selection-start-column="54" selection-end-line="41" selection-end-column="54" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/modules/menus/menu.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="354">
+          <caret line="511" column="41" lean-forward="true" selection-start-line="511" selection-start-column="41" selection-end-line="511" selection-end-column="41" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/modules/parametrage/tables.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="304">
+          <caret line="4176" column="18" lean-forward="true" selection-start-line="4176" selection-start-column="18" selection-end-line="4176" selection-end-column="18" />
+          <folding>
+            <marker date="1614692939786" expanded="true" signature="15325:15339" ph="..." />
+            <marker date="1614692939786" expanded="true" signature="42407:42537" ph="SELECT COUNT... adsys_asso_produitcredit_statjuri" />
+            <marker date="1614692939786" expanded="true" signature="42947:42964" ph="..." />
+            <marker date="1614692939786" expanded="true" signature="111775:111905" ph="SELECT COUNT... adsys_asso_produitcredit_statjuri" />
+            <marker date="1614692939786" expanded="true" signature="120719:120736" ph="..." />
+            <marker date="1614692939786" expanded="true" signature="127626:127811" ph="SELECT * FRO... adsys_etat_credits" />
+            <marker date="1614692939786" expanded="true" signature="127708:127793" ph="SELECT id_et... adsys_etat_credits" />
+            <marker date="1614692939786" expanded="true" signature="154267:154329" ph="UPDATE adsys... " />
+            <marker date="1614692939786" expanded="true" signature="155453:155539" ph="DELETE FROM " />
+            <marker date="1614692939786" expanded="true" signature="155772:155880" ph="INSERT INTO adsys_asso_produitcredit_statjuri... " />
+            <marker date="1614692939786" expanded="true" signature="161111:161296" ph="SELECT * FRO... adsys_etat_credits" />
+            <marker date="1614692939786" expanded="true" signature="161193:161278" ph="SELECT id_et... adsys_etat_credits" />
+            <marker date="1614692939786" expanded="true" signature="162947:163254" ph="..." />
+            <marker date="1614692939786" expanded="false" signature="162970:162976" ph=" " />
+            <marker date="1614692939786" expanded="true" signature="163003:163208" ph="..." />
+            <marker date="1614692939786" expanded="true" signature="163024:163203" ph="..." />
+            <marker date="1614692939786" expanded="true" signature="163056:163198" ph="..." />
+            <marker date="1614692939786" expanded="true" signature="163231:163237" ph=" " />
+            <marker date="1614692939786" expanded="true" signature="208234:208251" ph="..." />
+            <marker date="1614692939786" expanded="true" signature="236373:236435" ph="UPDATE adsys... " />
+            <marker date="1614692939786" expanded="true" signature="237256:237306" ph="SELECT last_... adsys_produit_credit_id_seq" />
+            <marker date="1614692939786" expanded="true" signature="237835:237947" ph="INSERT INTO adsys_asso_produitcredit_statjuri... " />
+            <marker date="1614692939786" expanded="true" signature="239453:239459" ph=" " />
+            <marker date="1614692939786" expanded="true" signature="239468:239474" ph=" " />
+            <marker date="1614692939786" expanded="false" signature="242348:242367" ph="..." />
+            <marker date="1614692939786" expanded="true" signature="242368:242498" ph="..." />
+            <marker date="1614692939786" expanded="true" signature="242399:242498" ph="..." />
+            <marker date="1614692939786" expanded="true" signature="242660:242820" ph="..." />
+            <marker date="1614692939786" expanded="true" signature="242913:243035" ph="..." />
+            <marker date="1614692939786" expanded="true" signature="248275:248347" ph="DELETE FROM " />
+            <marker date="1614692939786" expanded="true" signature="255400:255406" ph=" " />
+            <marker date="1614692939786" expanded="true" signature="255415:255421" ph=" " />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/modules/rapports/rapports_epargne.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="303">
+          <caret line="175" column="0" lean-forward="true" selection-start-line="175" selection-start-column="0" selection-end-line="175" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/modules/rapports/xml_epargne.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="82">
+          <caret line="166" column="0" lean-forward="true" selection-start-line="166" selection-start-column="0" selection-end-line="166" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/lib/misc/tableSys.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="274">
+          <caret line="405" column="81" lean-forward="true" selection-start-line="405" selection-start-column="81" selection-end-line="405" selection-end-column="81" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>

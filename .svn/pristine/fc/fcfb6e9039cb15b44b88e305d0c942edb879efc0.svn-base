@@ -1,0 +1,30 @@
+<Directory "/usr/share/adbanking/web">
+    AllowOverride All
+    Order allow,deny
+    Allow from all
+    Options FollowSymlinks
+</Directory>
+
+<Directory "/var/lib/adbanking">
+    AllowOverride All
+    Order allow,deny
+    Allow from all
+    Options FollowSymlinks
+</Directory>
+
+Alias /adbanking/images_agence  /var/lib/adbanking/backup/images_agence
+Alias /adbanking/images_clients /var/lib/adbanking/backup/images_clients
+Alias /adbanking/images_tmp     /var/lib/adbanking/backup/images_tmp
+Alias /adbanking/licence        /var/lib/adbanking/backup/licence
+Alias /adbanking                /usr/share/adbanking/web
+
+php_value include_path ".:/usr/share/pear:/usr/share/adbanking/web"
+php_value max_execution_time "240"
+php_value memory_limit "256M"
+php_value error_reporting "6135"
+php_value register_globals "On"
+php_value short_open_tag "On"
+
+<VirtualHost *:80>
+    DocumentRoot /usr/share/adbanking/web
+</VirtualHost>

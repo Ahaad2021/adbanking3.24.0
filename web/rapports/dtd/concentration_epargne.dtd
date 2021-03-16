@@ -1,0 +1,25 @@
+<!-- DTD pour le rapport sur la concentration epargne disponible -->
+
+<!-- Element root -->
+<!ELEMENT concentration_epargne (header, produit+)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!ELEMENT produit (tranche+)>
+<!ATTLIST produit libel  CDATA #REQUIRED>
+
+<!ELEMENT tranche (comptes,  solde, solde_moyen)>
+<!ATTLIST tranche libel  CDATA #REQUIRED>
+
+<!ELEMENT comptes (#PCDATA)>
+<!ATTLIST comptes nombre  CDATA #REQUIRED>
+<!ATTLIST comptes prc  CDATA #REQUIRED>
+
+<!ELEMENT solde (#PCDATA)>
+<!ATTLIST solde montant  CDATA #REQUIRED>
+<!ATTLIST solde prc  CDATA #REQUIRED>
+
+<!ELEMENT solde_moyen (#PCDATA)>
+

@@ -1,0 +1,18 @@
+<!-- DTD pour le rapport des transactions -->
+
+<!-- Element root -->
+<!ELEMENT visualisation_transaction_agent (header,transactions)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!ELEMENT transactions (his_data*)>
+<!ELEMENT his_data (date, fonction, etat, login, login_initiateur, montant, num_cpte_complet)>
+<!ELEMENT date (#PCDATA)>
+<!ELEMENT fonction (#PCDATA)>
+<!ELEMENT etat (#PCDATA)>
+<!ELEMENT login (#PCDATA)>
+<!ELEMENT login_initiateur (#PCDATA)>
+<!ELEMENT montant (#PCDATA)>
+<!ELEMENT num_cpte_complet (#PCDATA)>

@@ -1,0 +1,12 @@
+#just for tac
+#Tue Feb 19 15:00:02 MUT 2019
+statistics=false
+job=ALIM_SIEGE
+jobVersion=0.3
+date=2019-02-19 150002168
+contextName=Linux
+jobId=_K74jAKxbEeSVRKY0JR9v2A
+projectId=0
+applyContextToChildren=true
+project=ALIM_SIEGE
+cmdLineVersion=5.5.0.r117820

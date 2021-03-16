@@ -1,0 +1,73 @@
+<!-- DTD pour le recu (changement de devise) -->
+
+<!-- Element root -->
+<!ELEMENT changetaux (header,body)>
+
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- Corps -->
+<!ELEMENT body (achat,vente,taux,commission,reste?, libel_billet_0*, hasBilletage*, libel_billet_1*, libel_billet_2*, libel_billet_3*, libel_billet_4*, libel_billet_5*, libel_billet_6* ,
+libel_billet_7* ,libel_billet_8* ,libel_billet_9* ,libel_billet_10* ,libel_billet_11* ,libel_billet_12* ,libel_billet_13* ,
+valeur_billet_0* ,valeur_billet_1* ,valeur_billet_2* ,valeur_billet_3* ,valeur_billet_4* ,valeur_billet_5* ,valeur_billet_6* ,
+valeur_billet_7* ,valeur_billet_8* ,valeur_billet_9* ,valeur_billet_10* ,valeur_billet_11* ,valeur_billet_12* ,valeur_billet_13* ,
+total_billet_0* ,total_billet_1* ,total_billet_2* ,total_billet_3* ,total_billet_4* ,total_billet_5* ,total_billet_6* ,
+total_billet_7* ,total_billet_8* ,total_billet_9* ,total_billet_10* ,total_billet_11* ,total_billet_12* ,total_billet_13*)>
+
+<!ELEMENT achat (#PCDATA)>
+<!ELEMENT vente (#PCDATA)>
+<!ELEMENT taux (#PCDATA)>
+<!ELEMENT commission (#PCDATA)>
+<!ELEMENT reste (#PCDATA)>
+
+<!ELEMENT hasBilletage (#PCDATA)>
+
+<!--<!ELEMENT libel_billet (libel_billet_0, libel_billet_1, libel_billet_2, libel_billet_3, libel_billet_4, libel_billet_5, libel_billet_6 ,libel_billet_7 ,libel_billet_8 ,libel_billet_9 ,libel_billet_10 ,libel_billet_11 ,libel_billet_12 ,libel_billet_13 ,libel_billet_14)> -->
+<!ELEMENT libel_billet_0 (#PCDATA)>
+<!ELEMENT libel_billet_1 (#PCDATA)>
+<!ELEMENT libel_billet_2 (#PCDATA)>
+<!ELEMENT libel_billet_3 (#PCDATA)>
+<!ELEMENT libel_billet_4 (#PCDATA)>
+<!ELEMENT libel_billet_5 (#PCDATA)>
+<!ELEMENT libel_billet_6 (#PCDATA)>
+<!ELEMENT libel_billet_7 (#PCDATA)>
+<!ELEMENT libel_billet_8 (#PCDATA)>
+<!ELEMENT libel_billet_9 (#PCDATA)>
+<!ELEMENT libel_billet_10 (#PCDATA)>
+<!ELEMENT libel_billet_11 (#PCDATA)>
+<!ELEMENT libel_billet_12 (#PCDATA)>
+<!ELEMENT libel_billet_13 (#PCDATA)>
+
+<!--<!ELEMENT valeur_billet (valeur_billet_0 ,valeur_billet_1 ,valeur_billet_2 ,valeur_billet_3 ,valeur_billet_4 ,valeur_billet_5 ,valeur_billet_6 ,valeur_billet_7 ,valeur_billet_8 ,valeur_billet_9 ,valeur_billet_10 ,valeur_billet_11 ,valeur_billet_12 ,valeur_billet_13 ,valeur_billet_14)> -->
+<!ELEMENT valeur_billet_0 (#PCDATA)>
+<!ELEMENT valeur_billet_1 (#PCDATA)>
+<!ELEMENT valeur_billet_2 (#PCDATA)>
+<!ELEMENT valeur_billet_3 (#PCDATA)>
+<!ELEMENT valeur_billet_4 (#PCDATA)>
+<!ELEMENT valeur_billet_5 (#PCDATA)>
+<!ELEMENT valeur_billet_6 (#PCDATA)>
+<!ELEMENT valeur_billet_7 (#PCDATA)>
+<!ELEMENT valeur_billet_8 (#PCDATA)>
+<!ELEMENT valeur_billet_9 (#PCDATA)>
+<!ELEMENT valeur_billet_10 (#PCDATA)>
+<!ELEMENT valeur_billet_11 (#PCDATA)>
+<!ELEMENT valeur_billet_12 (#PCDATA)>
+<!ELEMENT valeur_billet_13 (#PCDATA)>
+
+<!--<!ELEMENT total_billet (total_billet_0 ,total_billet_1 ,total_billet_2 ,total_billet_3 ,total_billet_4 ,total_billet_5 ,total_billet_6 ,total_billet_7 ,total_billet_8 ,total_billet_9 ,total_billet_10 ,total_billet_11 ,total_billet_12 ,total_billet_13 ,total_billet_14 )> -->
+<!ELEMENT total_billet_0 (#PCDATA)>
+<!ELEMENT total_billet_1 (#PCDATA)>
+<!ELEMENT total_billet_2 (#PCDATA)>
+<!ELEMENT total_billet_3 (#PCDATA)>
+<!ELEMENT total_billet_4 (#PCDATA)>
+<!ELEMENT total_billet_5 (#PCDATA)>
+<!ELEMENT total_billet_6 (#PCDATA)>
+<!ELEMENT total_billet_7 (#PCDATA)>
+<!ELEMENT total_billet_8 (#PCDATA)>
+<!ELEMENT total_billet_9 (#PCDATA)>
+<!ELEMENT total_billet_10 (#PCDATA)>
+<!ELEMENT total_billet_11 (#PCDATA)>
+<!ELEMENT total_billet_12 (#PCDATA)>
+<!ELEMENT total_billet_13 (#PCDATA)>

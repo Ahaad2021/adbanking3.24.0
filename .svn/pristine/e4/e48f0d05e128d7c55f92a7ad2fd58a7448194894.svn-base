@@ -1,0 +1,13 @@
+[DATABASE]
+; Le paramètre DB_socket n'est actuellement pas utilisé
+; Pour se connecter par socket UNIX (plus rapide) il suffit de ne pas déclarer les variables
+; DB_host et DB_port
+;DB_host = localhost
+;DB_port = 5432
+;DB_socket = /var/run/postresql
+;DB_cluster = 7.4/main
+DB_host =192.168.5.198
+DB_port =5432
+DB_user =adbanking
+DB_pass =VkhjQ2NGQXlVbTVUT1ZSbA
+DB_name =siege_fenacobu

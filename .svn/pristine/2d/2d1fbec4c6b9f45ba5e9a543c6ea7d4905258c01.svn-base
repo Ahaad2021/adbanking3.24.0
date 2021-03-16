@@ -1,0 +1,35 @@
+<!-- DTD pour le rapport concentration de l'épargne -->
+
+<!-- Element root -->
+<!ELEMENT concentration_epargne1 (header, header_contextuel, produit*, total)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- En-tete contextuel -->
+<!ELEMENT header_contextuel (critere)>
+<!ELEMENT critere (#PCDATA)>
+
+<!-- Corps -->
+<!ELEMENT produit (libel,tranche*, sous_total*)>
+<!ELEMENT libel (#PCDATA)>
+<!ELEMENT tranche (statut_juridique, nbre, nbre_prc, solde, solde_prc)>
+<!ELEMENT statut_juridique (#PCDATA)>
+<!ELEMENT nbre (#PCDATA)>
+<!ELEMENT nbre_prc (#PCDATA)>
+<!ELEMENT solde (#PCDATA)>
+<!ELEMENT solde_prc (#PCDATA)>
+
+<!ELEMENT sous_total (libel, total_cpte, total_cpte_prc, total_solde, total_solde_prc)>
+<!ELEMENT libel (#PCDATA)>
+<!ELEMENT total_cpte (#PCDATA)>
+<!ELEMENT total_cpte_prc (#PCDATA)>
+<!ELEMENT total_solde (#PCDATA)>
+<!ELEMENT total_solde_prc (#PCDATA)>
+
+<!ELEMENT total (cpte_total, cpte_total_prc, solde_total, solde_total_prc)>
+<!ELEMENT cpte_total (#PCDATA)>
+<!ELEMENT cpte_total_prc (#PCDATA)>
+<!ELEMENT solde_total (#PCDATA)>
+<!ELEMENT solde_total_prc (#PCDATA)>

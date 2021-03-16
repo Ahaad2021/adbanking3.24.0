@@ -1,0 +1,21 @@
+<!-- DTD pour les recus defection -->
+
+<!-- Element root -->
+<!ELEMENT recu_defection (header, body)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- Corps -->
+<!ELEMENT body (num_client, nom_client, nom_ayant_droit, date_adhesion, date_defection, motif_defection, balance_debit, balance_credit, num_trans)>
+<!ELEMENT num_client (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT nom_ayant_droit (#PCDATA)>
+<!ELEMENT date_adhesion (#PCDATA)>
+<!ELEMENT date_defection (#PCDATA)>
+<!ELEMENT motif_defection (#PCDATA)>
+<!ELEMENT balance_debit (#PCDATA)>
+<!ELEMENT balance_credit (#PCDATA)>
+<!ELEMENT num_trans (#PCDATA)>
+

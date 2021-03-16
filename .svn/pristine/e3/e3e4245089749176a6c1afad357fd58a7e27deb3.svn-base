@@ -1,0 +1,36 @@
+<!-- DTD pour le rapport de l'historique des credits clients soldes -->
+
+
+<!-- Element root -->
+<!ELEMENT histo_credit (header, header_contextuel, ligne_produit*)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- En-tete contextuel -->
+<!ELEMENT header_contextuel (criteres_recherche, total)>
+
+<!-- Criteres de recherche commun -->
+<!ENTITY % mod_criteres SYSTEM "criteres_recherche.dtd">
+%mod_criteres;
+<!ELEMENT ligne_produit (lib_prod, ligne_histo*,ligne_histo_credit_gs*, prod_total)>
+<!ELEMENT lib_prod (#PCDATA)>
+<!ELEMENT ligne_histo (num_client,nom_client,mnt_credit,total_credit,date_reglt,taux_retard,etat_credit,jours_sans_pret,prd_credit)>
+<!ELEMENT ligne_histo_credit_gs (num_client,nom_client,mnt_credit,total_credit,date_reglt,taux_retard,etat_credit,jours_sans_pret,prd_credit,membre_gs)>
+
+<!ELEMENT num_client (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT total (mnt_credit)>
+<!ELEMENT mnt_credit (#PCDATA)>
+<!ELEMENT date_reglt (#PCDATA)>
+<!ELEMENT taux_retard (#PCDATA)>
+<!ELEMENT etat_credit (#PCDATA)>
+<!ELEMENT jours_sans_pret (#PCDATA)>
+<!ELEMENT prd_credit (#PCDATA)>
+<!ELEMENT membre_gs (#PCDATA)>
+
+<!ELEMENT prod_total (tot_mnt_octr)>
+<!ELEMENT tot_mnt_octr (#PCDATA)>
+
+

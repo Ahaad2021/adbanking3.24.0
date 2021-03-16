@@ -1,0 +1,58 @@
+<!-- DTD pour le rapport generaliste sur les clients -->
+
+<!-- Element root -->
+<!ELEMENT stat_agence (header, infos_globales, ratio_prud?, separe_devise?, indic_productivite?, indic_impact?)>
+
+<!-- Un en-tete commun a tous -->
+<!--<!ENTITY % mod_header SYSTEM "header.dtd">-->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+
+%mod_header;
+<!--Infos globales -->
+<!ELEMENT infos_globales (debut_periode, fin_periode, responsable, type_structure, date_agrement, num_agrement)>
+<!ELEMENT debut_periode (#PCDATA)>
+<!ELEMENT fin_periode (#PCDATA)>
+<!ELEMENT responsable (#PCDATA)>
+<!ELEMENT type_structure (#PCDATA)>
+<!ELEMENT date_agrement (#PCDATA)>
+<!ELEMENT num_agrement (#PCDATA)>
+
+<!-- Ratios prudentiels -->
+<!ELEMENT ratio_prud (limit_prets_dirig, limit_risk_membre, tx_transform)>
+<!ELEMENT limit_prets_dirig (#PCDATA)>
+<!ELEMENT limit_risk_membre (#PCDATA)>
+<!ELEMENT tx_transform (#PCDATA)>
+
+<!-- ============================================à changé Début=================================================================== -->
+<!-- Couverture -->
+<!ELEMENT separe_devise (couvert*)>
+<!ELEMENT separe (libel,valeur_devise,valeur_autre_devise,valeur_tot)>
+<!ELEMENT libel (#PCDATA)>
+<!ELEMENT valeur_devise (#PCDATA)>
+<!ELEMENT valeur_autre_devise (#PCDATA)>
+<!ELEMENT valeur_tot (#PCDATA)>
+
+<!-- ============================================à changé FIN=================================================================== -->
+
+<!-- Indicateurs de productivite -->
+<!ELEMENT indic_productivite (ecart_rendement, rendement_portefeuille, nbr_moyen_gi)>
+<!ELEMENT ecart_rendement (#PCDATA)>
+<!ELEMENT rendement_portefeuille (#PCDATA)>
+<!ELEMENT nbr_moyen_gi (#PCDATA)>
+
+<!-- Indicateurs d'impact -->
+<!ELEMENT indic_impact (clients, epargnants, emprunteurs)>
+<!ELEMENT clients (nbre_individus)>
+<!ELEMENT epargnants (nbre_individus, medianne_epargne)>
+<!ELEMENT emprunteurs (nbre_individus, medianne_credit)>
+
+<!ELEMENT nbre_individus (nbre_total, nbre_pp, prc_homme, prc_femme, nbre_pm, nbre_gi, nbre_gs)>
+<!ELEMENT nbre_total (#PCDATA)>
+<!ELEMENT nbre_pp (#PCDATA)>
+<!ELEMENT prc_homme (#PCDATA)>
+<!ELEMENT prc_femme (#PCDATA)>
+<!ELEMENT nbre_pm (#PCDATA)>
+<!ELEMENT nbre_gi (#PCDATA)>
+<!ELEMENT nbre_gs (#PCDATA)>
+<!ELEMENT medianne_epargne (#PCDATA)>
+<!ELEMENT medianne_credit (#PCDATA)>

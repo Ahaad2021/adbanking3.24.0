@@ -1,0 +1,20 @@
+<!-- DTD pour les autorisations de recharge -->
+
+<!-- Element root -->
+<!ELEMENT autorisation (header, body)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- Corps -->
+<!ELEMENT body (numSeqAuto, codeAntenne, codeAgence, numCarte, compteRecharge, dateDmde, codeTitulaire, montant, devise)>
+<!ELEMENT numSeqAuto (#PCDATA)>
+<!ELEMENT codeAntenne (#PCDATA)>
+<!ELEMENT codeAgence (#PCDATA)>
+<!ELEMENT numCarte (#PCDATA)>
+<!ELEMENT compteRecharge (#PCDATA)>
+<!ELEMENT dateDmde (#PCDATA)>
+<!ELEMENT codeTitulaire (#PCDATA)>
+<!ELEMENT montant (#PCDATA)>
+<!ELEMENT devise (#PCDATA)>

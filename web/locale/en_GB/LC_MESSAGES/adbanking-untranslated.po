@@ -1,0 +1,1907 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ADbanking
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: ADBANKING\n"
+"Report-Msgid-Bugs-To: devel@adbanking.org\n"
+"POT-Creation-Date: 2012-07-24 15:04+0000\n"
+"PO-Revision-Date: 2012-06-28 15:09-0000\n"
+"Last-Translator: ibou <ibou.ndiaye@adfinance.org>\n"
+"Language-Team: ADfinance <devel@adbanking.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#, php-format
+msgid " %s - %s - %s chéquier(s)"
+msgstr ""
+
+msgid " Etat du chèque "
+msgstr ""
+
+msgid " Provisional result of fiscal year N°"
+msgstr ""
+
+#, php-format
+msgid " ligne  %s ,"
+msgstr ""
+
+msgid " numéro chèque "
+msgstr ""
+
+#, php-format
+msgid "%s"
+msgstr ""
+
+msgid "(agence"
+msgstr ""
+
+#, php-format
+msgid "- L opération est déjà liée à une taxe de ce type.\\n Cette dernière sera remplacée, si vous continuez la procédure!"
+msgstr ""
+
+msgid "1er trimestre"
+msgstr ""
+
+msgid "1st  Quarter"
+msgstr ""
+
+msgid "2nd Quarter"
+msgstr ""
+
+msgid "2ème trimestre"
+msgstr ""
+
+msgid "3rd  Quartere"
+msgstr ""
+
+msgid "3ème trimestre"
+msgstr ""
+
+msgid "4th Quarter"
+msgstr ""
+
+msgid "4ème trimestre"
+msgstr ""
+
+msgid "<br />Etes-vous sûr de réellement vouloir continuer?"
+msgstr ""
+
+msgid "A envoyer à l'impréssion"
+msgstr ""
+
+msgid "Abréviation"
+msgstr ""
+
+msgid "Accroissement"
+msgstr ""
+
+msgid "Activez les comptes dormants"
+msgstr ""
+
+msgid "Activité professionnelle"
+msgstr ""
+
+msgid "Adhésions du jour : "
+msgstr ""
+
+msgid "Ajout d'un champs extras dans"
+msgstr ""
+
+msgid "Ajout des chéquiers imprimés"
+msgstr ""
+
+msgid "Ajustements de soldes de comptes clients : "
+msgstr ""
+
+msgid "Amounts in"
+msgstr ""
+
+msgid "AmtProv"
+msgstr ""
+
+msgid "Ancien numéro"
+msgstr ""
+
+msgid "Annulation déboursement crédit"
+msgstr ""
+
+msgid "Annulation déboursement progressif"
+msgstr ""
+
+msgid "Aout"
+msgstr ""
+
+msgid "Approvisionnement des caisses : "
+msgstr ""
+
+msgid "Au"
+msgstr ""
+
+msgid "Au "
+msgstr ""
+
+msgid "Au client N°"
+msgstr ""
+
+#, php-format
+msgid "Au moins une valeur comprise dans l'intervalle [%s-%s] est dèjà utilisé comme numero de chèque "
+msgstr ""
+
+msgid "Aucun chéquier n'a été imprimé pour ce compte"
+msgstr ""
+
+msgid "Aucun fichier dump a éte trouvé dans le repertoire images_consolidation."
+msgstr ""
+
+msgid "Aucune agence n'a été consolidée: vérifier la présence des fichiers dump dans le repertoire images_consolidation."
+msgstr ""
+
+msgid "Aucune commande de chéquier n'a été enregistrée pour ce compte"
+msgstr ""
+
+msgid "Autorisation de retrait sans livret/chèque"
+msgstr ""
+
+msgid "Autres dépôts: Garanties sur crédits"
+msgstr ""
+
+msgid "Base pour le calcul des intérêts"
+msgstr ""
+
+msgid "Bilan BNR"
+msgstr ""
+
+msgid "Branch of Activity"
+msgstr ""
+
+msgid "CAT, DAT et épargnes à la source arrivés à échéance : "
+msgstr ""
+
+msgid "COMMISSION DE CHANGE"
+msgstr ""
+
+msgid "COMMUNICATION"
+msgstr ""
+
+msgid "Capital récupéré"
+msgstr ""
+
+msgid "Catégorie"
+msgstr ""
+
+msgid "Charge"
+msgstr ""
+
+msgid "Charges d exploitation"
+msgstr ""
+
+msgid "Choix des dossiers de crédit à modifier"
+msgstr ""
+
+msgid "Chéquier à Imprimer"
+msgstr ""
+
+msgid "Client débiteur "
+msgstr ""
+
+msgid "Clients archivés : "
+msgstr ""
+
+msgid "Clôture"
+msgstr ""
+
+msgid "Clôtures de comptes du jour : "
+msgstr ""
+
+msgid "Code de l'agence"
+msgstr ""
+
+msgid "Code de l'antenne"
+msgstr ""
+
+msgid "Code de la carte du client"
+msgstr ""
+
+msgid "Code postal"
+msgstr ""
+
+msgid "Commande de chèquier"
+msgstr ""
+
+msgid "Commande de chèquier : choix du compte d'épargne"
+msgstr ""
+
+msgid "Commission de change"
+msgstr ""
+
+msgid "Compte crédit"
+msgstr ""
+
+msgid "Compte de Dépôt"
+msgstr ""
+
+msgid "Compte de résultat BNR"
+msgstr ""
+
+msgid "Compte débit"
+msgstr ""
+
+msgid "Compte lié à la taxe collectée n'est pas paramétré: "
+msgstr ""
+
+msgid "Compte lié à la taxe déductible n'est pas paramétré: "
+msgstr ""
+
+msgid "Comptes arrêtés : "
+msgstr ""
+
+msgid "Comptes d'attente"
+msgstr ""
+
+msgid "Comptes existant il y a moins de"
+msgstr ""
+
+msgid "Comptes inactifs depuis plus de"
+msgstr ""
+
+msgid "Comptes à terme non-prolongés dans la journée : "
+msgstr ""
+
+msgid "Comptes à terme prolongés dans la journée : "
+msgstr ""
+
+msgid "Concentration par "
+msgstr ""
+
+msgid "Confiration modification d'un champs extras"
+msgstr ""
+
+msgid "Confirmation annulation déboursement de crédit"
+msgstr ""
+
+msgid "Confirmation d'activation des comptes dormants"
+msgstr ""
+
+msgid "Confirmation de l'ajout des chéquiers imprimés"
+msgstr ""
+
+msgid "Confirmation des chéquiers Imprimés"
+msgstr ""
+
+msgid "Correspondant extérieur"
+msgstr ""
+
+msgid "Critère"
+msgstr ""
+
+msgid "Critères"
+msgstr ""
+
+msgid "Crédit et Découvert"
+msgstr ""
+
+msgid "Crédits  accordés (dans l année)"
+msgstr ""
+
+msgid "Crédits accordés (cumul du 1er Janvier précédent à la date retenue)"
+msgstr ""
+
+msgid "Crédits annulés du jour : "
+msgstr ""
+
+msgid "Crédits approuvés du jour : "
+msgstr ""
+
+msgid "Crédits déboursés du jour : "
+msgstr ""
+
+msgid "Crédits rejetés du jour : "
+msgstr ""
+
+msgid "Crédits repris du jour : "
+msgstr ""
+
+msgid "DAT arrivant à échéance : dans"
+msgstr ""
+
+msgid "DATE VALEUR"
+msgstr ""
+
+msgid "DB"
+msgstr ""
+
+msgid "DERNIER SOLDE AU"
+msgstr ""
+
+msgid "DONNEUR D'ORDRE"
+msgstr ""
+
+msgid "DU"
+msgstr ""
+
+msgid "Date Provision"
+msgstr ""
+
+msgid "Date chèque"
+msgstr ""
+
+msgid "Date de deblocage inferieure"
+msgstr ""
+
+msgid "Date de défection"
+msgstr ""
+
+msgid "Date de désactivation"
+msgstr ""
+
+msgid "Date de transaction"
+msgstr ""
+
+msgid "Date du "
+msgstr ""
+
+msgid "Date début Provision"
+msgstr ""
+
+msgid "Date dépôt greffe"
+msgstr ""
+
+msgid "Date ech."
+msgstr ""
+
+msgid "Date expiration pièce d'identité"
+msgstr ""
+
+msgid "Date fin Provision"
+msgstr ""
+
+msgid "Date notaire"
+msgstr ""
+
+msgid "Date/Heure"
+msgstr ""
+
+msgid "Days Overdue"
+msgstr ""
+
+msgid "Debit"
+msgstr ""
+
+msgid "Delais de grâce"
+msgstr ""
+
+msgid "Delestages des caisses : "
+msgstr ""
+
+msgid "Demandes de crédit du jour : "
+msgstr ""
+
+msgid "Destination vente"
+msgstr ""
+
+msgid "Detailed of Risks Situation by Sector"
+msgstr ""
+
+msgid "Details of Employees Loans"
+msgstr ""
+
+msgid "Details of List of 10 Biggest Borrowers"
+msgstr ""
+
+msgid "Details of Loans granted to directors"
+msgstr ""
+
+msgid "Devise crédit"
+msgstr ""
+
+msgid "Devise de l'opération"
+msgstr ""
+
+msgid "Devise de la transaction"
+msgstr ""
+
+msgid "Devise débit"
+msgstr ""
+
+msgid "Difference solde"
+msgstr ""
+
+msgid "Donnée dèjà envoyée"
+msgstr ""
+
+msgid "Dossiers de crédit"
+msgstr ""
+
+msgid "Du"
+msgstr ""
+
+msgid "Du client N°"
+msgstr ""
+
+msgid "Duree"
+msgstr ""
+
+msgid "Duree "
+msgstr ""
+
+msgid "Déclarer"
+msgstr ""
+
+msgid "Défections du jour : "
+msgstr ""
+
+msgid "Démarre Vérification Egalité solde comptable de crédit - compte interne de crédit  ..."
+msgstr ""
+
+msgid "Démarre Vérification Egalité solde dossier de crédit - compte interne de crédit  ..."
+msgstr ""
+
+msgid "Démarre Vérification cohérence de donnée  ..."
+msgstr ""
+
+msgid "Démarre le traitement des comptes dormants..."
+msgstr ""
+
+msgid "Détails"
+msgstr ""
+
+msgid "Détails du client"
+msgstr ""
+
+msgid "EXCEL"
+msgstr ""
+
+msgid "EXTRAIT N°"
+msgstr ""
+
+msgid "Ecart de rendement (%)"
+msgstr ""
+
+msgid "Echeances"
+msgstr ""
+
+msgid "Echeancier"
+msgstr ""
+
+msgid "Echec : le compartiment d'un sous-compte d'un compte centralisateur actif ou bien  passif doit être de l'actif ou du passif."
+msgstr ""
+
+msgid "Echec création libellé écriture libre"
+msgstr ""
+
+msgid "Echec d'activation des comptes dormants "
+msgstr ""
+
+msgid "Echec lors de l'annulation de déboursement."
+msgstr ""
+
+msgid "Echec lors de la  modification du mot de passe"
+msgstr ""
+
+msgid "Echec lors de la modification des provisions des crédits en souffrances. "
+msgstr ""
+
+msgid "Echec modification libellé écriture libre"
+msgstr ""
+
+msgid "Echec suppression libellé écriture libre"
+msgstr ""
+
+msgid "Echec suppression taxes liées à l'opération diverse de caisse/compte"
+msgstr ""
+
+msgid "Ecriture dans l'historique ..."
+msgstr ""
+
+msgid "Ecriture dans l'historique terminée !"
+msgstr ""
+
+msgid "Edition de déclaration tva"
+msgstr ""
+
+#, php-format
+msgid "Elle est plus grande que celle spécifiée de manière globale pour le système (%d secondes, la valeur de <em>session.gc_maxlifetime</em> dans <strong>php.ini</strong>).  Ce temps d'inactivité ne sera donc probablement pas pris en compte."
+msgstr ""
+
+msgid "Email"
+msgstr ""
+
+msgid "En attente d'impréssion"
+msgstr ""
+
+msgid "En attente de livraison"
+msgstr ""
+
+msgid "En-cours total de crédit"
+msgstr ""
+
+msgid "En-cours total de l'épargne"
+msgstr ""
+
+msgid "Encours Epargne (compilation des fiches d épargne)"
+msgstr ""
+
+msgid "Encours crédits rééchelonnés"
+msgstr ""
+
+msgid "Encours de l'épargne"
+msgstr ""
+
+msgid "Encours des clients dirigeants"
+msgstr ""
+
+msgid "Encours des clients dirigeants + employés"
+msgstr ""
+
+msgid "Encours des clients employés"
+msgstr ""
+
+msgid "Encours des dossiers ci-dessous"
+msgstr ""
+
+msgid "Encours en retard sur ces dossiers"
+msgstr ""
+
+msgid "Encours en retard sur les dirigeants"
+msgstr ""
+
+msgid "Encours en retard sur les dirigeants + employés"
+msgstr ""
+
+msgid "Encours en retard sur les employés"
+msgstr ""
+
+msgid "Encours total de crédit"
+msgstr ""
+
+msgid "Epargnants (membres ayant au moins un compte épargne)"
+msgstr ""
+
+msgid "Epargne collectée"
+msgstr ""
+
+msgid "Epargne libre"
+msgstr ""
+
+msgid "Epargne à terme"
+msgstr ""
+
+msgid "Erreur : Date invalide: date de début doit être antérieure à la date de fin"
+msgstr ""
+
+#, php-format
+msgid "Erreur : les nouvelles données de l'agence %s n'ont pas été ajoutées !"
+msgstr ""
+
+#, php-format
+msgid "Erreur lors des traitements COMPTES DORMANTS, code %s, param '%s'"
+msgstr ""
+
+#, php-format
+msgid "Erreur lors du passage en perte du dossier '%s' : Erreur '%s', Message : '%s', Paramètre : '%s'"
+msgstr ""
+
+msgid "Erreur: il faut choisir une taxe"
+msgstr ""
+
+#, php-format
+msgid "Erreur: le client '%s' ne peut pas appartenir à plus de '%s' groupes, nombre maximum autorisé dans l'agence"
+msgstr ""
+
+msgid "Etat civil"
+msgstr ""
+
+msgid "Etat client"
+msgstr ""
+
+msgid "Etat de crédit  doit être choisi "
+msgstr ""
+
+msgid "Etat des crédits"
+msgstr ""
+
+msgid "Etat du client"
+msgstr ""
+
+msgid "Etes-vous sur de vouloir supprimer le champs"
+msgstr ""
+
+msgid "Evolution de epargne"
+msgstr ""
+
+msgid "Evolution des membres"
+msgstr ""
+
+msgid "Evolution du crédit"
+msgstr ""
+
+msgid "Existence"
+msgstr ""
+
+msgid "Extraits"
+msgstr ""
+
+msgid "FRAIS"
+msgstr ""
+
+msgid "Fax"
+msgstr ""
+
+msgid "Femmes (%)"
+msgstr ""
+
+#, php-format
+msgid "Format de fichier non supporté , seul les fichiers ( *.jasper).<br> Fichier '%s'"
+msgstr ""
+
+msgid "Frais de fermeture"
+msgstr ""
+
+msgid "Frequence"
+msgstr ""
+
+msgid "Garantie matérielle à bloquer"
+msgstr ""
+
+msgid "Garantie numéraire à bloquer"
+msgstr ""
+
+msgid "Garantie restant due"
+msgstr ""
+
+msgid "Genre"
+msgstr ""
+
+msgid "Gestion des champs extras"
+msgstr ""
+
+msgid "Gestionnaire d'images"
+msgstr ""
+
+msgid "Grand Livre"
+msgstr ""
+
+msgid "Hommes (%)"
+msgstr ""
+
+msgid "ID client maximum"
+msgstr ""
+
+msgid "ID client minimum"
+msgstr ""
+
+msgid "INFORMATION"
+msgstr ""
+
+msgid "Identifiant agence"
+msgstr ""
+
+msgid "Identifiant tutulaire du Compte"
+msgstr ""
+
+msgid "Impact"
+msgstr ""
+
+#, php-format
+msgid "Impossible d'écrire dans le dossier %s "
+msgstr ""
+
+msgid "Imprimer détails"
+msgstr ""
+
+msgid "Incohérence dans la base de données: une requête a renvoyé aucun enregistrement. Veuillez contacter l'administrateur. "
+msgstr ""
+
+msgid "Incohérence dans la base de données: une requête a renvoyé trop d'enregistrements. Veuillez contacter l'administrateur. "
+msgstr ""
+
+msgid "Income Statement"
+msgstr ""
+
+msgid "Informations Autorisation de retrait"
+msgstr ""
+
+msgid "Informations du groupe"
+msgstr ""
+
+msgid "Informations détaillées"
+msgstr ""
+
+msgid "Informations détaillées dirigeants"
+msgstr ""
+
+msgid "Informations détaillées employés"
+msgstr ""
+
+msgid "Informations générales sur le crédit"
+msgstr ""
+
+msgid "Informations supplémentaires"
+msgstr ""
+
+msgid "Intérets récupérés"
+msgstr ""
+
+msgid "Journal du "
+msgstr ""
+
+msgid "L'annulation déboursement de crédit  est passé avec succès !"
+msgstr ""
+
+msgid "L'encaisse du guichet  a été mis à jour avec succès"
+msgstr ""
+
+msgid "L'encaisse du guichet  n'a pas pu être mis à jour : ce guichet est ouvert (le login associé est connecté)."
+msgstr ""
+
+msgid "La borne durée 2 doit être strictement plus grande que la borne duree 1"
+msgstr ""
+
+msgid "La borne montant 2 doit être strictement plus grande que la borne montant 1"
+msgstr ""
+
+msgid "La date de fin doit être différente de la date du jour"
+msgstr ""
+
+#, php-format
+msgid "La date précisée dans le champ \\'%s\\' doit être égale ou antérieure à la date du jour"
+msgstr ""
+
+#, php-format
+msgid "La date précisée dans le champ \\'%s\\' doit être égale ou postérieure à la date du jour"
+msgstr ""
+
+msgid "La durée  maximum doit être supérieure ou égale à la durée minimum; mise à jour automatique."
+msgstr ""
+
+msgid "La déclaration de tva sur la période ci-dessus va être effective."
+msgstr ""
+
+msgid "La modification des provisions des crédits en souffrance  s'est terminé avec succès"
+msgstr ""
+
+#, php-format
+msgid "La recherche a renvoyé %s résultats; veuillez affiner vos critères de recherche ou imprimer."
+msgstr ""
+
+msgid "La somme totale perçue par devise"
+msgstr ""
+
+msgid "La taxe est bien associée à l'opération"
+msgstr ""
+
+#, php-format
+msgid "La valeur du temps d'inactivité donnée pour le profil '%s' (%d secondes) pose problème.  "
+msgstr ""
+
+msgid "Langue de correspondance"
+msgstr ""
+
+#, php-format
+msgid "Le Compte n° %s du client n° %s est bloqué pour les dépôts."
+msgstr ""
+
+#, php-format
+msgid "Le Compte n° %s du client n° %s est bloqué."
+msgstr ""
+
+#, php-format
+msgid "Le Compte n° %s du client n° %s est dormant."
+msgstr ""
+
+msgid "Le bilan"
+msgstr ""
+
+msgid "Le calcul des provisions des crédits en souffrance  s'est terminé avec succès"
+msgstr ""
+
+msgid "Le champ Sens de la taxe doit être renseigné"
+msgstr ""
+
+msgid "Le champ Type  durée doivent être renseigné !"
+msgstr ""
+
+#, php-format
+msgid "Le champ \\'%s\\' doit avoir une image associée"
+msgstr ""
+
+#, php-format
+msgid "Le champ \\'%s\\' doit être renseigné"
+msgstr ""
+
+#, php-format
+msgid "Le champ \\'%s\\' doit être renseigné (en %s au moins)"
+msgstr ""
+
+msgid "Le champs  Nombre doit être renseigné !"
+msgstr ""
+
+msgid "Le champs Nombre de carnets doit être supérieur à zero"
+msgstr ""
+
+#, php-format
+msgid "Le champs a été ajoutée avec succès"
+msgstr ""
+
+msgid "Le champs critère doit être renseigné !"
+msgstr ""
+
+msgid "Le champs localisation doit être renseigné !"
+msgstr ""
+
+msgid "Le chèque est mise en opposition"
+msgstr ""
+
+#, php-format
+msgid "Le chèquier numéro  %s a été mise en opposition ."
+msgstr ""
+
+msgid "Le chéquier n'est pas actif"
+msgstr ""
+
+#, php-format
+msgid "Le code paramètre  %s est dèjà associé au rapport %s"
+msgstr ""
+
+msgid "Le compte comptable associé n'est pas paramétré : "
+msgstr ""
+
+msgid "Le compte comptable pour l'attente de déboursement n'est pas paramétré pour ce produit "
+msgstr ""
+
+msgid "Le compte de garantie numéraire mobilisée non trouvé dans la base de données pour le dossier!"
+msgstr ""
+
+#, php-format
+msgid "Le compte interne du client n'est pas renseigné."
+msgstr ""
+
+msgid "Le déboursement n'a pas été annulé"
+msgstr ""
+
+#, php-format
+msgid "Le format du champ \\'%s\\' est incorrect"
+msgstr ""
+
+#, php-format
+msgid "Le format du champ \\'%s\\' est incorrect : il doit être un nombre naturel"
+msgstr ""
+
+#, php-format
+msgid "Le format du champ \\'%s\\' est incorrect : il doit être un nombre relatif"
+msgstr ""
+
+msgid "Le montant  des part sociales doit être multiple de la valeur nominale de la part sociale"
+msgstr ""
+
+#, php-format
+msgid "Le montant en (%s), entré est incorrect"
+msgstr ""
+
+#, php-format
+msgid "Le montant en (%s),des frais de virement entré est incorrect"
+msgstr ""
+
+msgid "Le nombre de mois ne doit pas excéder 6"
+msgstr ""
+
+#, php-format
+msgid "Le numéro de l'ordre permanent n'est pas renseigné."
+msgstr ""
+
+msgid "Le numéro de série du chequier existe dèjà"
+msgstr ""
+
+msgid "Le ou les comptes de liaison  de(s) dossier(s) ci dessous vont être débiteur(s)"
+msgstr ""
+
+msgid "Le palier 1 doit être inférieur au palier 2"
+msgstr ""
+
+#, php-format
+msgid "Le rapport '%s' existe dèjà,  êtes-vous sûr de vouloir le supprimer ?"
+msgstr ""
+
+#, php-format
+msgid "Le solde disponible dans le compte ne permet pas un transfert de %s"
+msgstr ""
+
+msgid "Les champs Palier 1 montant et Palier 2 montant doivent être renseignés !"
+msgstr ""
+
+msgid "Les champs bornes pour durée doivent être renseignés !"
+msgstr ""
+
+msgid "Les champs bornes pour montants doivent être renseignés !"
+msgstr ""
+
+msgid "Les champs paliers pour les soldes doivent être renseignés !"
+msgstr ""
+
+msgid "Les chéquiers ont été ajoutés avec succès"
+msgstr ""
+
+msgid "Libellé agence"
+msgstr ""
+
+msgid "Libellé champs"
+msgstr ""
+
+msgid "Lieu dépôt greffe"
+msgstr ""
+
+#, php-format
+msgid "Ligne %s: Certains champs  ne sont pas renseignés !"
+msgstr ""
+
+#, php-format
+msgid "Ligne %s: Le numéro de reçu  a déjà été utilisé !"
+msgstr ""
+
+#, php-format
+msgid "Ligne N°%s: Le montant du dépôt doit-être renseigné "
+msgstr ""
+
+#, php-format
+msgid "Ligne N°%s: Le numéro de compte  client N°compte=%s  n'est pas valide !"
+msgstr ""
+
+msgid "Limitation des prêts aux dirigeants"
+msgstr ""
+
+msgid "Limitation du risque pris sur un seul membre"
+msgstr ""
+
+msgid "Liquidation différence en"
+msgstr ""
+
+msgid "Liste chèquiers à imprimer"
+msgstr ""
+
+msgid "Liste des agences consolidées"
+msgstr ""
+
+msgid "Liste des champs extras de la table"
+msgstr ""
+
+msgid "Liste des chéquiers à imprimer"
+msgstr ""
+
+msgid "Liste des crédits soldés depuis le"
+msgstr ""
+
+msgid "Liste des groupes solidaires"
+msgstr ""
+
+msgid "Liste des opérations comptables"
+msgstr ""
+
+msgid "Liste des schémas comptables"
+msgstr ""
+
+msgid "Localisation1"
+msgstr ""
+
+msgid "Localisation2"
+msgstr ""
+
+msgid "M.DLCI."
+msgstr ""
+
+msgid "M.EML.11"
+msgstr ""
+
+msgid "M.EML.12"
+msgstr ""
+
+msgid "M.EML.13"
+msgstr ""
+
+msgid "M.EML.14"
+msgstr ""
+
+msgid "M.EML.15"
+msgstr ""
+
+msgid "M.EML.16"
+msgstr ""
+
+msgid "M.EML.17"
+msgstr ""
+
+msgid "M.EML.18"
+msgstr ""
+
+msgid "M.EML.19"
+msgstr ""
+
+msgid "M.VI.Guar"
+msgstr ""
+
+msgid "M.VI.Names"
+msgstr ""
+
+msgid "M.VI.No"
+msgstr ""
+
+msgid "M.VI.O"
+msgstr ""
+
+msgid "M.VI.O.Amount"
+msgstr ""
+
+msgid "M.VI.O.Date"
+msgstr ""
+
+msgid "M.VI.Prov"
+msgstr ""
+
+msgid "M.VI.Terms"
+msgstr ""
+
+msgid "MONTANT"
+msgstr ""
+
+msgid "MV.TB.AMOUNT"
+msgstr ""
+
+msgid "MV.TB.BALANCE"
+msgstr ""
+
+msgid "MV.TB.DATE"
+msgstr ""
+
+msgid "MV.TB.GUAR"
+msgstr ""
+
+msgid "MV.TB.NAME"
+msgstr ""
+
+msgid "MV.TB.NO"
+msgstr ""
+
+msgid "MV.TB.OVERDUE"
+msgstr ""
+
+msgid "MV.TB.PROV"
+msgstr ""
+
+msgid "MV.TB.TERMS"
+msgstr ""
+
+msgid "Masquer le solde des comptes clients ?"
+msgstr ""
+
+msgid "Mise en opposition chèquier/chèque"
+msgstr ""
+
+msgid "Modification d'un champs extras"
+msgstr ""
+
+msgid "Modification de la provision des crédits en souffrances"
+msgstr ""
+
+msgid "Modification libellé écriture libre"
+msgstr ""
+
+msgid "Montant acheté du client"
+msgstr ""
+
+msgid "Montant capital"
+msgstr ""
+
+msgid "Montant de la garantie en cours"
+msgstr ""
+
+msgid "Montant de la souscription part sociale"
+msgstr ""
+
+msgid "Montant de la souscription:  0"
+msgstr ""
+
+msgid "Montant de la tranche versé"
+msgstr ""
+
+msgid "Montant des frais d'adhésion"
+msgstr ""
+
+msgid "Montant des frais d'adhésion restant"
+msgstr ""
+
+msgid "Montant des frais en attente"
+msgstr ""
+
+#, php-format
+msgid "Montant du dépôt inférieur au montant minimum sur le compte n° %s du client n° %s."
+msgstr ""
+
+#, php-format
+msgid "Montant du transfert prélevé sur le compte source : %s, frais de transfert prélevés : %s"
+msgstr ""
+
+msgid "Montant frais d'adhésion versé"
+msgstr ""
+
+msgid "Montant garantie"
+msgstr ""
+
+msgid "Montant intérêt"
+msgstr ""
+
+msgid "Montant moyen des crédits"
+msgstr ""
+
+msgid "Montant moyen des premiers crédits"
+msgstr ""
+
+msgid "Montant médian des crédits"
+msgstr ""
+
+msgid "Montant médian des premiers crédits"
+msgstr ""
+
+msgid "Montant réech"
+msgstr ""
+
+msgid "Montant total (clients) en devise"
+msgstr ""
+
+msgid "Montant total (comptes) en devise"
+msgstr ""
+
+msgid "Montant total crédits rééchelonnés"
+msgstr ""
+
+msgid "Montant total du capital attendu en devise  "
+msgstr ""
+
+msgid "Montant total du capital restant en devise  "
+msgstr ""
+
+msgid "Montant total en ("
+msgstr ""
+
+msgid "Montant total frais d'adhésion versé"
+msgstr ""
+
+msgid "Montant total octroyé"
+msgstr ""
+
+msgid "Montant total passé en perte"
+msgstr ""
+
+msgid "Montant total provisionné"
+msgstr ""
+
+msgid "Montant total recouvert"
+msgstr ""
+
+msgid "Montant total versé"
+msgstr ""
+
+msgid "Montant ttc"
+msgstr ""
+
+msgid "Montant tva"
+msgstr ""
+
+msgid "Montant tva sur la commission"
+msgstr ""
+
+msgid "Montant tva sur les frais"
+msgstr ""
+
+msgid "Montant vendu au client"
+msgstr ""
+
+msgid "Montant virement"
+msgstr ""
+
+msgid "Motif de la défection"
+msgstr ""
+
+msgid "Mouvementer un compte interne à une date antérieure"
+msgstr ""
+
+msgid "N/ REFERENCE"
+msgstr ""
+
+msgid "NOUVEAU SOLDE AU"
+msgstr ""
+
+msgid "Names"
+msgstr ""
+
+msgid "Nature Juridique"
+msgstr ""
+
+msgid "Nbr. Ech. état avancé"
+msgstr ""
+
+msgid "No"
+msgstr ""
+
+msgid "Nom groupe solidaire"
+msgstr ""
+
+msgid "Nombre de carnets"
+msgstr ""
+
+msgid "Nombre de comptes d'épargne actifs"
+msgstr ""
+
+msgid "Nombre de frais en attente"
+msgstr ""
+
+msgid "Nombre de membre"
+msgstr ""
+
+msgid "Nombre de parts sociales souscrites"
+msgstr ""
+
+msgid "Nombre de parts sociales souscrites: 0"
+msgstr ""
+
+msgid "Nombre de reconduction du DAT?"
+msgstr ""
+
+msgid "Nombre de sociétaires"
+msgstr ""
+
+msgid "Nombre en attente enregistrement décés"
+msgstr ""
+
+msgid "Nombre en attente solde crédit garanti"
+msgstr ""
+
+msgid "Nombre femmes"
+msgstr ""
+
+msgid "Nombre groupes informels"
+msgstr ""
+
+msgid "Nombre groupes solidaires"
+msgstr ""
+
+msgid "Nombre hommes"
+msgstr ""
+
+msgid "Nombre parts sociales"
+msgstr ""
+
+msgid "Nombre personnes morales"
+msgstr ""
+
+msgid "Nombre total clients"
+msgstr ""
+
+msgid "Nombre total clients actifs"
+msgstr ""
+
+msgid "Nombre total clients décédés"
+msgstr ""
+
+msgid "Nombre total clients démissionnaires"
+msgstr ""
+
+msgid "Nombre total clients en attente de validation"
+msgstr ""
+
+msgid "Nombre total clients non inscrits"
+msgstr ""
+
+msgid "Nombre total clients radiés"
+msgstr ""
+
+msgid "Nombre total clients transférés"
+msgstr ""
+
+msgid "Nombre total comptes clôturés"
+msgstr ""
+
+msgid "Nombre total de clients"
+msgstr ""
+
+msgid "Nombre total de comptes"
+msgstr ""
+
+msgid "Nombre total de parts sociales souscrites"
+msgstr ""
+
+msgid "Nombre total de parts souscrites"
+msgstr ""
+
+msgid "Non parametre"
+msgstr ""
+
+msgid "Nouveau solde du compte lié"
+msgstr ""
+
+msgid "Nouvelles parts sociales souscrites"
+msgstr ""
+
+msgid "Number of Loans Benef. in Legal Entities or Groups"
+msgstr ""
+
+msgid "Number of debtors legal entities and groups"
+msgstr ""
+
+msgid "Numéro chèque"
+msgstr ""
+
+msgid "Numéro de pièce"
+msgstr ""
+
+msgid "Numéro de séquence d'enregistrement de l'autorisation"
+msgstr ""
+
+msgid "Numéro dossier de crédit"
+msgstr ""
+
+msgid "Numéro du compte de parts sociales"
+msgstr ""
+
+msgid "Numéro groupe solidaire"
+msgstr ""
+
+msgid "Numéro pièce"
+msgstr ""
+
+msgid "Numéro registre"
+msgstr ""
+
+msgid "Numéro transaction"
+msgstr ""
+
+msgid "Numéro téléphone"
+msgstr ""
+
+#, php-format
+msgid "OK (%s Comptes dormants ont été bloqués )"
+msgstr ""
+
+#, php-format
+msgid "OK (%s ne sont pas égaux )"
+msgstr ""
+
+#, php-format
+msgid "OK. %s comptes à terme ont été clôturés, %s comptes à terme ont été prolongés clôturées,%s comptes DAT ont été reconduits"
+msgstr ""
+
+msgid "Objet de crédit"
+msgstr ""
+
+msgid "Ordres permanents : "
+msgstr ""
+
+msgid "Original date"
+msgstr ""
+
+msgid "Origine des fonds"
+msgstr ""
+
+msgid "Ouvertures de comptes du jour : "
+msgstr ""
+
+msgid "Par montant"
+msgstr ""
+
+msgid "Par nombre"
+msgstr ""
+
+msgid "Paramètre : "
+msgstr ""
+
+msgid "Paramètre :  Le choix d'un compte centralisateur n'est pas permis"
+msgstr ""
+
+msgid "Paramétrage épargne "
+msgstr ""
+
+msgid "Parts sociales reprises du jour : "
+msgstr ""
+
+msgid "Passage écritures Brouillard"
+msgstr ""
+
+msgid "Patrimoine"
+msgstr ""
+
+msgid "Pays de naissance"
+msgstr ""
+
+msgid "Pays de nationalité"
+msgstr ""
+
+msgid "Penalités restantes"
+msgstr ""
+
+msgid "Periode"
+msgstr ""
+
+msgid "Personnes Physiques"
+msgstr ""
+
+msgid "Portefeuille total"
+msgstr ""
+
+msgid "Portefeuille à risque sur 1 échéance"
+msgstr ""
+
+msgid "Portefeuille à risque sur 2 échéances"
+msgstr ""
+
+msgid "Portefeuille à risque sur 3 échéances"
+msgstr ""
+
+msgid "Portefeuille à risque à 30 jours"
+msgstr ""
+
+msgid "Pourcentage"
+msgstr ""
+
+msgid "Pourcentage par rapport aux comptes il y a moins de"
+msgstr ""
+
+msgid "Pourcentage par rapport aux nombre total de comptes"
+msgstr ""
+
+msgid "Problème de nommage d'une base: vérifier si le nommage est respecté ou si la version correspond à celle enregistrée dans la table de schema"
+msgstr ""
+
+msgid "Produit d'épargne "
+msgstr ""
+
+msgid "Produits d exploitation"
+msgstr ""
+
+msgid "Provisions pour créances douteuses"
+msgstr ""
+
+msgid "Prélèvement frais de tenue de compte : "
+msgstr ""
+
+msgid "Prélèvement intérêts débiteurs : "
+msgstr ""
+
+msgid "Prévisions"
+msgstr ""
+
+msgid "Prêt"
+msgstr ""
+
+msgid "Pénalitès"
+msgstr ""
+
+msgid "Rapport suivant : Repatition clients par état"
+msgstr ""
+
+msgid "Ratio"
+msgstr ""
+
+msgid "Ratio dirigeants"
+msgstr ""
+
+msgid "Ratio dirigeants + employés"
+msgstr ""
+
+msgid "Ratio employés"
+msgstr ""
+
+msgid "Ratio encours en retard"
+msgstr ""
+
+msgid "Ratio encours en retard dirigeants"
+msgstr ""
+
+msgid "Ratio encours en retard dirigeants + employés"
+msgstr ""
+
+msgid "Ratio encours en retard employés"
+msgstr ""
+
+msgid "Ratios epargne  employes et dirigeants"
+msgstr ""
+
+msgid "Ratios epargne des dirigeants"
+msgstr ""
+
+msgid "Ratios epargne des employes"
+msgstr ""
+
+msgid "Ratios épargne"
+msgstr ""
+
+msgid "Ratipo de liquidité"
+msgstr ""
+
+msgid "Recherche de compte"
+msgstr ""
+
+msgid "Recovery for the Current Period"
+msgstr ""
+
+msgid "Recovery of Doubtful Loans, Litigious and Contingent Loans"
+msgstr ""
+
+msgid "Recu du client la somme de"
+msgstr ""
+
+msgid "Remboursements automatiques échéances : "
+msgstr ""
+
+msgid "Remis au client la somme de"
+msgstr ""
+
+msgid "Rendement du portefeuille (%)"
+msgstr ""
+
+msgid "Rendement théorique du portefeuille (%)"
+msgstr ""
+
+msgid "Research criteria"
+msgstr ""
+
+msgid "Retrait Cash sur présentation d'une autorisation de retrait sans livret/chèque"
+msgstr ""
+
+msgid "Réconduire le DAT?"
+msgstr ""
+
+msgid "Répartition par groupe solidaire"
+msgstr ""
+
+msgid "Résultat recherche"
+msgstr ""
+
+msgid "SANS COMMUNICATION"
+msgstr ""
+
+msgid "Saisie libellé écriture libre"
+msgstr ""
+
+msgid "Saisie par lot (dépôt sur compte )"
+msgstr ""
+
+msgid "Secteur"
+msgstr ""
+
+msgid "Signature client"
+msgstr ""
+
+msgid "Signature opérateur"
+msgstr ""
+
+msgid "Situation Epargne"
+msgstr ""
+
+msgid "Situation crédits"
+msgstr ""
+
+msgid "Situation des dépenses : "
+msgstr ""
+
+msgid "Situation du coffre-fort : "
+msgstr ""
+
+msgid "Situation garanties"
+msgstr ""
+
+msgid "Situation parts sociales"
+msgstr ""
+
+msgid "Situation épargne"
+msgstr ""
+
+msgid "Solde Fin Période"
+msgstr ""
+
+msgid "Solde calcul intérêts"
+msgstr ""
+
+msgid "Solde capital restant dû"
+msgstr ""
+
+msgid "Solde comptable crédit"
+msgstr ""
+
+msgid "Solde compte interne"
+msgstr ""
+
+msgid "Solde courant disponible"
+msgstr ""
+
+msgid "Solde du compte de base"
+msgstr ""
+
+msgid "Solde initial"
+msgstr ""
+
+msgid "Solde moyen des comptes d'épargne"
+msgstr ""
+
+msgid "Solde médian des comtpes d'épargne"
+msgstr ""
+
+msgid "Solde provision non nul"
+msgstr ""
+
+msgid "Solde provision non nul?"
+msgstr ""
+
+msgid "Solde total clients"
+msgstr ""
+
+msgid "Solde total clôture en ("
+msgstr ""
+
+msgid "Solde total comptes"
+msgstr ""
+
+msgid "Solde à la cloture"
+msgstr ""
+
+msgid "Solde à la fin du relevé"
+msgstr ""
+
+msgid "Soldes des comptes d'épargne mouvementés dans la journée"
+msgstr ""
+
+msgid "Source"
+msgstr ""
+
+msgid "Source des fonds"
+msgstr ""
+
+msgid "Sous Total"
+msgstr ""
+
+msgid "Sous-total"
+msgstr ""
+
+msgid "Sous-total-"
+msgstr ""
+
+msgid "Standard"
+msgstr ""
+
+msgid "Statut juridique :"
+msgstr ""
+
+msgid "Sur 1 mois"
+msgstr ""
+
+msgid "Sur 12 mois"
+msgstr ""
+
+msgid "Sur 3 mois"
+msgstr ""
+
+msgid "Sur 6 mois"
+msgstr ""
+
+msgid "Sur deux semaines"
+msgstr ""
+
+msgid "Sur trois semaines"
+msgstr ""
+
+msgid "Sur une semaine"
+msgstr ""
+
+msgid "Synthétique"
+msgstr ""
+
+msgid "TAUX : 1"
+msgstr ""
+
+msgid "Table"
+msgstr ""
+
+msgid "Taux d'abandon de créances"
+msgstr ""
+
+msgid "Taux d'intérêts"
+msgstr ""
+
+msgid "Taux de renouvellement de crédits (%)"
+msgstr ""
+
+msgid "Taux de rééchelonnement des prêts"
+msgstr ""
+
+msgid "Taux de transformation de l'épargne en crédit"
+msgstr ""
+
+msgid "Texte"
+msgstr ""
+
+msgid "Total Risks on 31st December of Previous /Last Year"
+msgstr ""
+
+msgid "Total amount of loans by each  Sector or Branch of activity"
+msgstr ""
+
+msgid "Total capital restant dû"
+msgstr ""
+
+msgid "Total des crédits sain"
+msgstr ""
+
+msgid "Total des échéances en retard"
+msgstr ""
+
+msgid "Total découvert"
+msgstr ""
+
+msgid "Total en devise"
+msgstr ""
+
+msgid "Total general"
+msgstr ""
+
+msgid "Total membres groupe informel"
+msgstr ""
+
+msgid "Total membres groupe solidaire"
+msgstr ""
+
+msgid "Total number of loans beneficiaries"
+msgstr ""
+
+msgid "Total provision des crédits"
+msgstr ""
+
+msgid "Total période"
+msgstr ""
+
+msgid "Total retard capital"
+msgstr ""
+
+msgid "Total retard intérêts"
+msgstr ""
+
+msgid "Total solde intérêts des crédits en retard"
+msgstr ""
+
+msgid "Total solde intérêts des crédits en retard et sain"
+msgstr ""
+
+msgid "Total solde pénalités des crédits en retard"
+msgstr ""
+
+msgid "Total solde pénalités des crédits en retard et sain"
+msgstr ""
+
+msgid "Total épargne nantie des crédits en retard"
+msgstr ""
+
+msgid "Total épargne nantie des crédits en retard et sain"
+msgstr ""
+
+msgid "Tous ne peut pas être sélectionné pour ce critère !"
+msgstr ""
+
+msgid "Traitement des comptes dormants terminer"
+msgstr ""
+
+msgid "Traitements de nuit terminés !"
+msgstr ""
+
+msgid "Type d'épargne"
+msgstr ""
+
+msgid "Type de pièce d'identité"
+msgstr ""
+
+msgid "Type durée"
+msgstr ""
+
+msgid "Type pièce"
+msgstr ""
+
+#, php-format
+msgid "Un des comptes tva de l'agence n'est pas bien paramétré"
+msgstr ""
+
+msgid "Une commande de chéquier est déjà en cours pour ce compte"
+msgstr ""
+
+msgid "Usagers (tous les membres et auxiliaires)"
+msgstr ""
+
+msgid "Veuillez conserver cet extrait. Les écritures s'entendent sauf erreur ou omission. Tout désaccord est à signaler avant un moins."
+msgstr ""
+
+msgid "Visualisation gestion des champs extras"
+msgstr ""
+
+msgid "Volume moyen d'épargne des clients"
+msgstr ""
+
+msgid "Volume médian d'épargne des clients"
+msgstr ""
+
+msgid "Volé"
+msgstr ""
+
+msgid "Vous allez supprimer le(s) dossier(s) de crédit suivant"
+msgstr ""
+
+#, php-format
+msgid "Vous essayez de mouvementer le compte %s associé à un crédit sans lui assocer un compte client"
+msgstr ""
+
+#, php-format
+msgid "Vous essayez de mouvementer le compte de garantie %s sans lui assocer un compte client"
+msgstr ""
+
+msgid "Vous ne pouvez pas depasser  le nombre  maximum de part sociale pour un client"
+msgstr ""
+
+msgid "Vérification Egalité solde comptable de crédit - compte interne de crédit  terminé"
+msgstr ""
+
+msgid "Vérification cohérence de donnée terminée !"
+msgstr ""
+
+msgid "compte activer"
+msgstr ""
+
+msgid "compte comptable associé au produit d'épargne du compte de liaison"
+msgstr ""
+
+#, php-format
+msgid "compte provision au débit associé à l'état %s du  produit de crédit %s"
+msgstr ""
+
+#, php-format
+msgid "compte reprise sur provision associé à l'état %s du  produit de crédit %s"
+msgstr ""
+
+msgid "comptes"
+msgstr ""
+
+msgid "confirmation d'un champs extras dans"
+msgstr ""
+
+msgid "credits"
+msgstr ""
+
+msgid "erreur insertion chéquiers imprimés"
+msgstr ""
+
+msgid "femmes"
+msgstr ""
+
+msgid "hommes"
+msgstr ""
+
+msgid "jour(s)"
+msgstr ""
+
+msgid "le solde du compte lié est insuffisant !"
+msgstr ""
+
+msgid "libel"
+msgstr ""
+
+msgid "par groupe informel"
+msgstr ""
+
+msgid "par groupe solidaire"
+msgstr ""
+
+msgid "pas encore implémenté"
+msgstr ""
+
+msgid "prec"
+msgstr ""
+
+msgid "solde clôture C/V("
+msgstr ""

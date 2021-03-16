@@ -1,0 +1,30 @@
+<!-- DTD pour le rapport situation de compensation des transactions en deplacé -->
+
+<!-- Element root -->
+<!ELEMENT situation_compensation (header, footer, header_contextuel, compensations_par_agence)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!ELEMENT compensations_par_agence (situation_agence*, summary*)>
+<!ELEMENT situation_agence (situation_local, situation_distant, synthese)>
+<!ELEMENT summary (summary_info)>
+
+<!ELEMENT situation_local (donnees_agence)>
+<!ELEMENT situation_distant (donnees_agence)>
+<!ELEMENT synthese (#PCDATA)>
+<!ELEMENT summary_info (#PCDATA)>
+
+<!ELEMENT donnees_agence (agence_local, agence_distant, total_depot, total_retrait, cpte_liaison, solde_deb, solde_fin, mvmts_deb, mvmts_cred,comm_od_deplace)>
+
+<!ELEMENT agence_local (#PCDATA)>
+<!ELEMENT agence_distant (#PCDATA)>
+<!ELEMENT total_depot (#PCDATA)>
+<!ELEMENT total_retrait (#PCDATA)>
+<!ELEMENT cpte_liaison (#PCDATA)>
+<!ELEMENT solde_deb (#PCDATA)>
+<!ELEMENT solde_fin (#PCDATA)>
+<!ELEMENT mvmts_deb (#PCDATA)>
+<!ELEMENT mvmts_cred (#PCDATA)>
+<!ELEMENT comm_od_deplace (#PCDATA)>

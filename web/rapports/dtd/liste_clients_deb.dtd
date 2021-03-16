@@ -1,0 +1,33 @@
+<!-- DTD pour le rapports des plus gros debiteurs de l'institution -->
+
+<!-- Element root -->
+<!ELEMENT liste_clients_deb (header, total, details)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!ELEMENT total (encours_total, encours_clients_deb, ratio, encours_retard_deb, ratio_retard,total_sain)>
+
+<!ELEMENT details (libel_etat)>
+<!ELEMENT libel_etat (etat,client*)>
+<!ELEMENT etat (#PCDATA)>
+
+
+<!ELEMENT client (index, id_client, id_doss, nom, encours_client, cre_etat, mnt_pen, groupe_gs, membre_gs)>
+
+<!ELEMENT encours_total (#PCDATA)>
+<!ELEMENT encours_clients_deb (#PCDATA)>
+<!ELEMENT ratio (#PCDATA)>
+<!ELEMENT encours_retard_deb (#PCDATA)>
+<!ELEMENT ratio_retard (#PCDATA)>
+<!ELEMENT total_sain (#PCDATA)>
+<!ELEMENT index (#PCDATA)>
+<!ELEMENT id_client (#PCDATA)>
+<!ELEMENT id_doss (#PCDATA)>
+<!ELEMENT nom (#PCDATA)>
+<!ELEMENT encours_client (#PCDATA)>
+<!ELEMENT cre_etat (#PCDATA)>
+<!ELEMENT mnt_pen (#PCDATA)>
+<!ELEMENT groupe_gs (#PCDATA)>
+<!ELEMENT membre_gs (#PCDATA)>

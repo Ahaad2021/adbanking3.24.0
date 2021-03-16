@@ -1,0 +1,34 @@
+<!-- DTD pour le rapport sur la concentration de l epargne disponible -->
+
+<!-- Element root -->
+<!ELEMENT echeances_CAT (header, header_contextuel, table_header, ligne*)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- En-tete contextuel -->
+<!ELEMENT header_contextuel (criteres_recherche)>
+
+<!-- Criteres de recherche commun -->
+<!ENTITY % mod_criteres SYSTEM "criteres_recherche.dtd">
+%mod_criteres;
+
+<!-- En-tete lie a la table -->
+<!ELEMENT table_header (colonne*)>
+<!ATTLIST table_header colonnes  CDATA #REQUIRED>
+
+<!-- Ligne de la table (correspond a un type de compte) -->
+<!ELEMENT ligne (cellule*)>
+<!ATTLIST ligne type_compte  CDATA #REQUIRED>
+
+<!-- Libelle d'un colonne -->
+<!ELEMENT colonne (#PCDATA)>
+<!ATTLIST colonne id  CDATA #REQUIRED>
+<!ATTLIST colonne libel  CDATA #REQUIRED>
+
+<!-- Cellule de la table (correspond a un mois donne) -->
+<!ELEMENT cellule (montant, nombre)>
+<!ATTLIST cellule id  CDATA #REQUIRED>
+<!ELEMENT nombre (#PCDATA)>
+<!ELEMENT montant (#PCDATA)>

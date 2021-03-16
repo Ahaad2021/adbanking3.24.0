@@ -1,0 +1,41 @@
+<!-- DTD pour le rapport sur historisation ligne de credit -->
+
+    <!-- Element root -->
+    <!ELEMENT his_ligne_credit (header, infos_synthetique, details_his_credit*)>
+
+    <!-- Un en-tete commun a tous -->
+    <!ENTITY % mod_header SYSTEM "header.dtd">
+    %mod_header;
+
+    <!ELEMENT infos_synthetique (num_client, nom_client, num_doss, etat, date_dem, date_approb, libel_prod, montant_octroye, devise, taux_interet, taux_frais, date_fin_ech)>
+    <!ELEMENT num_client (#PCDATA)>
+    <!ELEMENT nom_client (#PCDATA)>
+    <!ELEMENT num_doss (#PCDATA)>
+    <!ELEMENT etat (#PCDATA)>
+    <!ELEMENT date_dem (#PCDATA)>
+    <!ELEMENT date_approb (#PCDATA)>
+    <!ELEMENT libel_prod (#PCDATA)>
+    <!ELEMENT montant_octroye (#PCDATA)>
+    <!ELEMENT devise (#PCDATA)>
+    <!ELEMENT taux_interet (#PCDATA)>
+    <!ELEMENT taux_frais (#PCDATA)>
+    <!ELEMENT date_fin_ech (#PCDATA)>
+
+    <!ELEMENT details_his_credit (ligne_his_credit*, xml_total)>
+    <!ELEMENT lib_prod (#PCDATA)>
+
+    <!ELEMENT ligne_his_credit (date_evnt, mnt_deb, cap_remb, int_remb, frais_remb, pen_remb, cap_restant_du)>
+    <!ELEMENT date_evnt (#PCDATA)>
+    <!ELEMENT mnt_deb (#PCDATA)>
+    <!ELEMENT cap_remb (#PCDATA)>
+    <!ELEMENT int_remb (#PCDATA)>
+    <!ELEMENT frais_remb (#PCDATA)>
+    <!ELEMENT pen_remb (#PCDATA)>
+    <!ELEMENT cap_restant_du (#PCDATA)>
+
+    <!ELEMENT xml_total (mnt_deb_tot, cap_remb_tot, int_remb_tot, frais_remb_tot, pen_remb_tot)>
+    <!ELEMENT mnt_deb_tot (#PCDATA)>
+    <!ELEMENT cap_remb_tot (#PCDATA)>
+    <!ELEMENT int_remb_tot (#PCDATA)>
+    <!ELEMENT frais_remb_tot (#PCDATA)>
+    <!ELEMENT pen_remb_tot (#PCDATA)>

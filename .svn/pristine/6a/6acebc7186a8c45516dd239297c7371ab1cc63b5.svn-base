@@ -1,0 +1,36 @@
+<!-- DTD pour le rapport liste des epargnes -->
+
+<!-- Element root -->
+<!ELEMENT liste_impot_mobilier_collecte (header, header_contextuel, clients*, total)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- En-tete contextuel -->
+<!ELEMENT header_contextuel (critere,date_debut,date_fin,produit_epargne)>
+<!ELEMENT critere (#PCDATA)>
+<!ELEMENT date_debut (#PCDATA)>
+<!ELEMENT date_fin (#PCDATA)>
+<!ELEMENT produit_epargne (#PCDATA)>
+
+<!-- Corps -->
+<!ELEMENT clients (lib_prod_ep, comptes*, sous_total)>
+<!ELEMENT lib_prod_ep (#PCDATA)>
+
+<!ELEMENT comptes (date_operation, num_client, nom_client, interet_annuel, montant_impot)>
+<!ELEMENT date_operation (#PCDATA)>
+<!ELEMENT num_client (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT interet_annuel (#PCDATA)>
+<!ELEMENT montant_impot (#PCDATA)>
+
+
+<!ELEMENT sous_total (sous_total_interet_annuel, sous_total_montant_impot)>
+<!ELEMENT sous_total_interet_annuel (#PCDATA)>
+<!ELEMENT sous_total_montant_impot (#PCDATA)>
+
+<!ELEMENT total (total_interet_annuel, total_montant_impot)>
+<!ELEMENT total_interet_annuel (#PCDATA)>
+<!ELEMENT total_montant_impot (#PCDATA)>
+

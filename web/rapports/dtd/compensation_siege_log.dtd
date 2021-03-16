@@ -1,0 +1,20 @@
+<!-- DTD pour le rapport des etat compensation siege log -->
+
+<!-- Element root -->
+<!ELEMENT compensation_siege_log (header,compensation_etat_log)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- Corps -->
+<!ELEMENT compensation_etat_log (details_log*)>
+
+<!ELEMENT details_log (id_agence,agence,date_rapport,etat,etat_compensation,date_derniere_compensation,date_derniere_compensation_reussi)>
+<!ELEMENT id_agence (#PCDATA)>
+<!ELEMENT agence (#PCDATA)>
+<!--<!ELEMENT date_rapport (#PCDATA)>-->
+<!ELEMENT etat (#PCDATA)>
+<!ELEMENT etat_compensation (#PCDATA)>
+<!ELEMENT date_derniere_compensation (#PCDATA)>
+<!ELEMENT date_derniere_compensation_reussi (#PCDATA)>

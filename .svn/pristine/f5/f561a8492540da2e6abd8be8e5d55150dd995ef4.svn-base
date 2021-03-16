@@ -1,0 +1,56 @@
+<!-- DTD pour le rapport generaliste sur les credits -->
+
+<!-- Element root -->
+<!ELEMENT creditactif (header, header_contextuel, client*,total?)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- En-tete contextuel -->
+<!ELEMENT header_contextuel (criteres_recherche)>
+
+<!-- Criteres de recherche commun -->
+<!ENTITY % mod_criteres SYSTEM "criteres_recherche.dtd">
+%mod_criteres;
+
+<!-- Corps -->
+<!ELEMENT gestionnaire (nom_gestionnaire, client, sous_total)>
+<!ELEMENT nom_gestionnaire (#PCDATA)>
+
+<!ELEMENT client (num_doss, num_client, nom_client, cre_mnt_octr, cre_date_debloc, duree_mois,cre_etat, mnt_remb_cap, mnt_remb_int, mnt_remb_pen, mnt_remb_total, capital_du, membre_gs, groupe_gs)>
+<!ELEMENT num_doss (#PCDATA)>
+<!ELEMENT num_client (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT lib_prod (#PCDATA)>
+<!ELEMENT cre_mnt_octr (#PCDATA)>
+<!ELEMENT cre_date_debloc (#PCDATA)>
+<!ELEMENT duree_mois (#PCDATA)>
+<!ELEMENT cre_etat (#PCDATA)>
+<!ELEMENT mnt_remb_cap (#PCDATA)>
+<!ELEMENT mnt_remb_int (#PCDATA)>
+<!ELEMENT mnt_remb_pen (#PCDATA)>
+<!ELEMENT mnt_remb_total (#PCDATA)>
+<!ELEMENT capital_du (#PCDATA)>
+<!ELEMENT membre_gs (#PCDATA)>
+<!ELEMENT groupe_gs (#PCDATA)>
+
+<!ELEMENT sous_total (prod_nombre, prod_montant,prod_devise,prod_capital, prod_interet, prod_penalite, prod_garantie, prod_total_remb, prod_capital_du)>
+<!ELEMENT prod_nombre (#PCDATA)>
+<!ELEMENT prod_montant (#PCDATA)>
+<!ELEMENT prod_devise (#PCDATA)>
+<!ELEMENT prod_capital (#PCDATA)>
+<!ELEMENT prod_interet (#PCDATA)>
+<!ELEMENT prod_garantie (#PCDATA)>
+<!ELEMENT prod_penalite (#PCDATA)>
+<!ELEMENT prod_total_remb (#PCDATA)>
+<!ELEMENT prod_capital_du (#PCDATA)>
+
+<!ELEMENT total (nombre, montant, capital, interet, penalite, total_remb, total_capital_du)>
+<!ELEMENT nombre (#PCDATA)>
+<!ELEMENT montant (#PCDATA)>
+<!ELEMENT capital (#PCDATA)>
+<!ELEMENT interet (#PCDATA)>
+<!ELEMENT penalite (#PCDATA)>
+<!ELEMENT total_remb (#PCDATA)>
+<!ELEMENT total_capital_du (#PCDATA)>

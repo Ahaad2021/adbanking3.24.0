@@ -1,0 +1,21 @@
+<!-- DTD pour les recus (demande autorisation de retrait sup au plafond) -->
+
+<!-- Element root -->
+<!ELEMENT recu_demande_auto (header, body)>
+<!ATTLIST recu type CDATA #REQUIRED>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- Corps -->
+<!ELEMENT body (num_beneficiaire,  nom_beneficiaire, num_commande, qtite_dep_engrais,qtite_dep_amendement, date_demande, utilisateur_demande)>
+<!ELEMENT num_beneficiaire (#PCDATA)>
+<!ELEMENT nom_beneficiaire (#PCDATA)>
+<!ELEMENT num_commande (#PCDATA)>
+<!ELEMENT qtite_dep_engrais (#PCDATA)>
+<!ELEMENT qtite_dep_amendement (#PCDATA)>
+<!ELEMENT date_demande (#PCDATA)>
+<!ELEMENT utilisateur_demande (#PCDATA)>
+
+

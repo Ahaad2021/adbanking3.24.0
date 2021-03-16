@@ -1,0 +1,37 @@
+<!-- DTD pour le rapport des comptes inactifs depuis une certaine periode -->
+
+
+<!-- Element root -->
+<!ELEMENT comptes_inactifs (header, header_contextuel, groupe_comptes*)>
+
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- En-tete contextuel -->
+<!ELEMENT header_contextuel (criteres_recherche)>
+
+<!-- Criteres de recherche commun -->
+<!ENTITY % mod_criteres SYSTEM "criteres_recherche.dtd">
+%mod_criteres;
+
+<!ELEMENT groupe_comptes (lib_prod_ep, ligne_compte*, sous_total, total_general)>
+<!ELEMENT lib_prod_ep (#PCDATA)>
+
+<!ELEMENT ligne_compte (num_compte, nom_client, num_client, solde_compte, cv, date_derniere_operation, nbre_jours_inactifs)>
+<!ELEMENT num_compte (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT num_client (#PCDATA)>
+<!ELEMENT solde_compte (#PCDATA)>
+<!ELEMENT cv (#PCDATA)>
+<!ELEMENT date_derniere_operation (#PCDATA)>
+<!ELEMENT nbre_jours_inactifs (#PCDATA)>
+
+<!ELEMENT sous_total (sous_tot_compte, sous_tot_solde)>
+<!ELEMENT sous_tot_compte (#PCDATA)>
+<!ELEMENT sous_tot_solde (#PCDATA)>
+
+<!ELEMENT total_general (total_nombre,total_montant)>
+<!ELEMENT total_nombre (#PCDATA)>
+<!ELEMENT total_montant (#PCDATA)>

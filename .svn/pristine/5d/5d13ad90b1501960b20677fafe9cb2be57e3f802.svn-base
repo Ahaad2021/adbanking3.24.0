@@ -1,0 +1,30 @@
+<!-- Created by PhpStorm.
+User: Roshan
+Date: 10/26/2017
+Time: 1:24 PM -->
+
+<!-- DTD pour le rapport historique de revision budgetaire -->
+
+<!-- Element root -->
+<!ELEMENT budget_revisionhistorique (header, list_revision)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!ELEMENT list_revision (list_budget*)>
+
+<!ELEMENT list_budget (type_budget, list_period*)>
+<!ELEMENT type_budget (#PCDATA)>
+
+<!ELEMENT list_period (period, ligne_revision*)>
+<!ELEMENT period (#PCDATA)>
+
+<!ELEMENT ligne_revision (date_revision, ligne_budget, login_revise, login_valide, anc_montant, nouv_montant, variation)>
+<!ELEMENT date_revision (#PCDATA)>
+<!ELEMENT ligne_budget (#PCDATA)>
+<!ELEMENT login_revise (#PCDATA)>
+<!ELEMENT login_valide (#PCDATA)>
+<!ELEMENT anc_montant (#PCDATA)>
+<!ELEMENT nouv_montant (#PCDATA)>
+<!ELEMENT variation (#PCDATA)>

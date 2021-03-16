@@ -1,0 +1,1483 @@
+<?php
+require_once 'lib/misc/xml_lib.php';
+require_once 'lib/dbProcedures/client.php';
+require_once 'lib/dbProcedures/epargne.php';
+require_once 'lib/dbProcedures/rapports.php';
+require_once 'lib/misc/divers.php';
+require_once 'modules/rapports/xslt.php';
+require_once 'lib/dbProcedures/compte.php';
+require_once 'lib/dbProcedures/devise.php';
+require_once 'lib/dompdf/autoload.inc.php';
+
+
+use Dompdf\Dompdf;
+use Dompdf\Options;
+
+/**
+ * Recu for each frais tansactionnel SMS
+ * print_recu_depot was taken as reference to build this function
+ * @param $id_client
+ * @param $id_his
+ * @param $mnt
+ * @param $global_langue_rapport
+ * @param $InfoProduit
+ * @param $infos
+ * @return bool
+ */
+function print_recu_frais_transactionnel_SMS ($id_client, $id_his, $mnt, $global_langue_rapport, $InfoProduit, $infos)
+{
+  global $global_id_agence, $global_id_profil;
+
+  $isAffichageSolde = getParamAffichageSolde();
+
+  //appel a la fonction qui fait la conversion d'un montant  en  montant en lettre
+  $mntEnLettre = getMontantEnLettre($mnt,$global_langue_rapport ,$InfoProduit["devise"]);
+
+  $format_A5 = false;
+
+  $document = create_xml_doc("recu1", "recu_ancien1.dtd");
+
+  //Element root
+  $root = $document->root();
+  $root->set_attribute("type", 6);
+
+  $num= $infos['num_complet_cpte']." ".$infos["libel"];
+
+  $AG = getAgenceDatas($global_id_agence);
+  if($AG['imprimante_matricielle'] == 't'){
+    $format_A5 = true;
+  }
+  //En-tête généraliste
+  $ref = gen_header($root, 'REC-SMS');
+
+  //Corps
+  $body = $root->new_child("body", "");
+
+  $body->new_child("num_cpte", $num);
+  $body->new_child("num_trans", sprintf("%09d", $id_his));
+  $body->new_child("frais", afficheMontant($mnt, true));
+
+  if($mntEnLettre!='')
+    $body->new_child("mntEnLettre", $mntEnLettre);
+
+
+  $xml = $document->dump_mem(true);
+
+
+  //Génération du XSL-FO (grâce au XSLT) et du PDF (grâce à FOP)
+    $name = "_FraisTransactionnel" . rand(0,1000000000);
+    $fichier_pdf = xml_2_xslfo_2_pdf($xml, 'recu_ancien1.xslt',false, $name);
+
+
+  // Affichage du rapport dans une nouvelle fenêtre
+  echo get_show_pdf_html(NULL, $fichier_pdf);
+
+  $myErr = confirmeGenerationRecu($id_his, $ref);
+  if ($myErr->errCode != NO_ERR)
+    signalErreur(__FILE__,__LINE__,__FUNCTION__);
+
+  return true;
+}
+
+function print_recu_depot($id_client, $nom_client, $mnt, $InfoProduit, $infos, $id_his, $id_pers_ext = NULL,$remarq=NULL,$communic=NULL, $mnt_frais_attente = 0, $id_mandat = NULL, $listTypesBilletArr = array(), $valeurBilletArr = array(), $global_langue_rapport, $total_billetArr = array(), $hasBilletage = false, $isBilletageParam,$type_imprimante) {
+  global $global_id_agence, $global_id_profil;
+  setMonnaiecourante($InfoProduit["devise"]);
+
+  $isAffichageSolde=getParamAffichageSolde();
+
+  //appel a la fonction qui fait la conversion d'un montant  en  montant en lettre
+  $mntEnLettre = getMontantEnLettre($mnt,$global_langue_rapport ,$InfoProduit["devise"]);
+
+  $format_A5 = false;
+
+    if($isBilletageParam == 't') {
+        $document = create_xml_doc("recu", "recu.dtd");
+    }
+    else{
+        $document = create_xml_doc("recu", "recu_ancien.dtd");
+    }
+
+  //Element root
+  $root = $document->root();
+  $root->set_attribute("type", 6);
+
+  $num= $infos['num_complet_cpte']." ".$infos["libel"];
+
+  //recuperation des données de l'agence'
+  $AG = getAgenceDatas($global_id_agence);
+  if($AG['imprimante_matricielle'] == 't'){
+  	$format_A5 = true;
+  }
+  //En-tête généraliste
+  $ref = gen_header($root, 'REC-DEE');
+
+  //Corps
+  $body = $root->new_child("body", "");
+  $body->new_child("nom_client", $nom_client);
+  if ($id_mandat != NULL || $id_pers_ext != NULL)  {
+ 	  if ($id_mandat != NULL) {
+ 	    $MANDAT = getInfosMandat($id_mandat);
+ 	    $body->new_child("donneur_ordre", $MANDAT['denomination']);
+ 	  } elseif ($id_pers_ext != NULL) {
+ 	    $PERS_EXT = getPersonneExt(array("id_pers_ext" => $id_pers_ext));
+ 	    $body->new_child("donneur_ordre", $PERS_EXT[0]['denomination']);
+ 	  }
+ 	} elseif($id_pers_ext == NULL ) {
+    //Contôle sur l'affichage des soldes
+    if ($isAffichageSolde == 't') {
+      $access_solde = get_profil_acces_solde($global_id_profil, $InfoProduit['id']);
+      $access_solde_vip = get_profil_acces_solde_vip($global_id_profil, $id_client);
+      if (manage_display_solde_access($access_solde, $access_solde_vip))
+        $body->new_child("solde", afficheMontant($infos['solde'], true));
+    }
+  }
+  $body->new_child("num_cpte", $num);
+  $body->new_child("montant", afficheMontant($mnt, true));
+  $body->new_child("num_trans", sprintf("%09d", $id_his));
+  $body->new_child("frais", afficheMontant($InfoProduit['frais_depot_cpt'], true));
+  if($mnt_frais_attente > 0){
+ 		 $body->new_child("frais_attente", afficheMontant($mnt_frais_attente, true));
+ 	}
+  if ($remarq != '')
+    $body->new_child("remarque", $remarq);
+  if ($communic != '')
+    $body->new_child("communication", $communic);
+          
+  // Billetage
+  if($hasBilletage) {      
+      $body->new_child("hasBilletage", true);
+      
+      for ($x = 0; $x < count($valeurBilletArr); $x ++) {
+          if ($valeurBilletArr[$x] != 'XXXX') {
+              $body->new_child("libel_billet_" . $x, afficheMontant($listTypesBilletArr[$x]['libel']));
+              $body->new_child("valeur_billet_" . $x, $valeurBilletArr[$x]);
+              $body->new_child("total_billet_" . $x, afficheMontant($total_billetArr[$x]));
+          }
+      }    
+  }
+  
+  if($mntEnLettre!='')
+  	$body->new_child("mntEnLettre", $mntEnLettre);
+  
+  $xml = $document->dump_mem(true);
+
+  //Génération du XSL-FO (grâce au XSLT) et du PDF (grâce à FOP)
+
+    if($isBilletageParam == 't'){
+
+        if($format_A5){
+            $fichier_pdf = xml_2_xslfo_2_pdf($xml, 'recuA5.xslt', false, "recu_depot_".rand(),'depot.php',$type_imprimante);
+        } else {
+            $fichier_pdf = xml_2_xslfo_2_pdf($xml, 'recu.xslt', false, "recu_depot_".rand(),'depot.php',$type_imprimante);
+        }
+    }
+    else{
+        if($format_A5){
+            $fichier_pdf = xml_2_xslfo_2_pdf($xml, 'recuA5_ancien.xslt', false, "recu_depot_".rand(),'depot.php',$type_imprimante);
+        } else {
+            $fichier_pdf = xml_2_xslfo_2_pdf($xml, 'recu_ancien.xslt', false, "recu_depot_".rand(),'depot.php',$type_imprimante);
+        }
+    }
+
+  // Affichage du rapport dans une nouvelle fenêtre
+  echo get_show_pdf_html(NULL, $fichier_pdf);
+
+  $myErr = confirmeGenerationRecu($id_his, $ref);
+  if ($myErr->errCode != NO_ERR)
+    signalErreur(__FILE__,__LINE__,__FUNCTION__);
+
+  return true;
+}
+
+function print_recu_depot_cheque($id_client, $nom_client, $id_compte, $mnt, $id_his, $num_cheque, $id_bqe, $date_cheque, $id_pers_ext = NULL) {
+  global $global_id_agence;
+  $format_A5 = false;
+  $document = create_xml_doc("recu", "recu.dtd");
+
+  //Element root
+  $root = $document->root();
+  $root->set_attribute("type", 7);
+
+  //recuperation des données de l'agence'
+  $AG = getAgenceDatas($global_id_agence);
+  if($AG['imprimante_matricielle'] == 't'){
+  	$format_A5 = true;
+  }
+
+  //En-tête généraliste
+  $ref = gen_header($root, 'REC-DEC');
+
+  $infos = get_compte_epargne_info($id_compte);
+  //Corps
+  $body = $root->new_child("body", "");
+  $body->new_child("nom_client", $nom_client);
+  if ($id_pers_ext != NULL) {
+    $PERS_EXT = getPersonneExt(array("id_pers_ext" => $id_pers_ext));
+    $body->new_child("donneur_ordre", $PERS_EXT[0]['denomination']);
+  }
+  $body->new_child("num_cpte", $infos['num_complet_cpte']);
+  $body->new_child("montant", afficheMontant($mnt, true));
+  $body->new_child("num_trans", sprintf("%09d", $id_his));
+
+  $info_cheque = $body->new_child("info_cheque", "");
+  $info_cheque->new_child("num_cheque", $num_cheque);
+  $info_cheque->new_child("banque_cheque", getLibel("adsys_banque", $id_bqe));
+  $info_cheque->new_child("date_cheque", $date_cheque);
+
+  $xml = $document->dump_mem(true);
+
+  //Génération du XSL-FO (grâce au XSLT) et du PDF (grâce à FOP)
+  if($format_A5){
+  	$fichier_pdf = xml_2_xslfo_2_pdf($xml, 'recuA5.xslt');
+  } else {
+  	$fichier_pdf = xml_2_xslfo_2_pdf($xml, 'recu.xslt');
+  }
+
+  // Affichage du rapport dans une nouvelle fenêtre
+  echo get_show_pdf_html(NULL, $fichier_pdf);
+
+  $myErr = confirmeGenerationRecu($id_his, $ref);
+  if ($myErr->errCode != NO_ERR)
+    signalErreur(__FILE__,__LINE__,__FUNCTION__);
+
+  return true;
+}
+
+function print_recu_retrait_cheque($id_client, $nom_client,$mnt,$InfoProduit, $infos, $id_his, $num_cheque, $date_cheque, $id_mandat = NULL,$beneficiaire=NULL,$isDureeMinEntreRetraits=NULL) {
+  global $global_id_agence, $global_id_profil;
+  $format_A5 = false;
+
+  $document = create_xml_doc("recu", "recu.dtd");
+
+  //recuperation des données de l'agence'
+  $AG = getAgenceDatas($global_id_agence);
+  if($AG['imprimante_matricielle'] == 't'){
+  	$format_A5 = true;
+  }
+
+  $num= $infos['num_complet_cpte']." ".$infos["libel"];
+  //Element root
+  $root = $document->root();
+  $root->set_attribute("type", 40);
+
+  //En-tête généraliste
+  gen_header($root, 'REC-REC');
+
+  //Corps
+  $body = $root->new_child("body", "");
+  $body->new_child("nom_client", $nom_client);
+  $body->new_child("num_cpte",$num);
+  $body->new_child("montant", afficheMontant($mnt, true));
+  $body->new_child("num_trans", sprintf("%09d", $id_his));
+  $body->new_child("frais", afficheMontant($InfoProduit['frais_retrait_cpt'], true));
+  if ($InfoProduit != NULL){ // ticket 805 : ajout frais de non respect de la duree minimum entre 2 retraits
+    if ($isDureeMinEntreRetraits != null && $isDureeMinEntreRetraits == 't' && $InfoProduit['frais_duree_min2retrait'] > 0){
+      $body->new_child("fraisDureeMin", afficheMontant($InfoProduit['frais_duree_min2retrait'], true));
+    }
+    else{
+      $body->new_child("fraisDureeMin", afficheMontant(0, true));
+    }
+  }
+  //Contôle sur l'affichage des soldes
+  //$access_solde = get_profil_acces_solde($global_id_profil, $InfoProduit['id']);
+  if ($id_mandat != NULL) {
+    $MANDAT = getInfosMandat($id_mandat);
+    if( $MANDAT['denomination'] != $nom_client){
+      $body->new_child("donneur_ordre", $MANDAT['denomination']);
+    }
+  }
+
+  $info_cheque = $body->new_child("info_cheque", "");
+  $info_cheque->new_child("num_cheque", $num_cheque);
+// $info_cheque->new_child("banque_cheque", getLibel("adsys_banques", $id_bqe));
+  $info_cheque->new_child("date_cheque", $date_cheque);
+  if($beneficiaire != NULL ) {
+  	 $info_cheque->new_child("beneficiaire", $beneficiaire);
+  }
+
+  $xml = $document->dump_mem(true);
+
+  //Génération du XSL-FO (grâce au XSLT) et du PDF (grâce à FOP)
+  if($format_A5){
+  	$fichier_pdf = xml_2_xslfo_2_pdf($xml, 'recuA5.xslt', false,"recu_retrait_".rand());
+  } else {
+  	$fichier_pdf = xml_2_xslfo_2_pdf($xml, 'recu.xslt', false,"recu_retrait_".rand());
+  }
+
+  // Affichage du rapport dans une nouvelle fenêtre
+  echo get_show_pdf_html(NULL, $fichier_pdf);
+
+}
+
+function print_recu_retrait($id_client, $nom_client, $InfoProduit, $infos, $mnt, $id_his, $code_recu='REC-REE', $id_mandat = NULL,$remarque=NULL,$communication=NULL, $id_pers_ext = NULL, $num_carte_ferlo=NULL, $nom_conj = "", $listTypesBilletArr = array(), $valeurBilletArr = array(),$global_langue_rapport, $total_billetArr = array(), $hasBilletage = false,$isBilletageParam,$isDureeMinEntreRetraits=NULL,$type_imprimante)
+{
+
+  global $global_id_agence, $global_id_profil;
+  $format_A5 = false;
+
+  $isAffichageSolde=getParamAffichageSolde();
+
+  if($isBilletageParam == 't') {
+    $document = create_xml_doc("recu", "recu.dtd");
+  }
+  else{
+    $document = create_xml_doc("recu", "recu_ancien.dtd");
+  }
+
+  //Element root
+  $root = $document->root();
+  $root->set_attribute("type", 8);
+
+  //recuperation des données de l'agence'
+  $AG = getAgenceDatas($global_id_agence);
+  if($AG['imprimante_matricielle'] == 't'){
+  	$format_A5 = true;
+  }
+
+  //En-tête généraliste
+  $ref = gen_header($root, $code_recu);
+
+  setMonnaieCourante($InfoProduit["devise"]);
+ 
+  //appel a la fonction qui fait la conversion d'un montant  en  montant en lettre
+  $mntEnLettre = getMontantEnLettre($mnt,$global_langue_rapport ,$InfoProduit["devise"]);
+  
+  //Corps
+  $body = $root->new_child("body", "");
+  if ( $nom_client!= NULL)
+    $body->new_child("nom_client", $nom_client);
+  if ($id_pers_ext != NULL || $id_mandat != NULL || $nom_conj != NULL) {
+ 	    if ($id_mandat != NULL) {
+ 	      $MANDAT = getInfosMandat($id_mandat);
+ 	      $MANDAT["denomination"] = str_replace('&apos;', "'", $MANDAT["denomination"]);
+ 	      $body->new_child("donneur_ordre", $MANDAT['denomination']);
+ 	    } elseif ($id_pers_ext != NULL) {
+ 	      $PERS_EXT = getPersonneExt(array("id_pers_ext" => $id_pers_ext));
+ 	      $PERS_EXT[0]['denomination'] =  str_replace('&apos;', "'", $PERS_EXT[0]['denomination']);
+ 	      $body->new_child("donneur_ordre", $PERS_EXT[0]['denomination']);
+ 	    } elseif ($nom_conj) {
+ 	      $body->new_child("donneur_ordre",$nom_conj);
+ 	    }
+
+ 	} else {
+                //Contôle sur l'affichage des soldes
+  		$access_solde = get_profil_acces_solde($global_id_profil, $InfoProduit['id']);
+  		$access_solde_vip = get_profil_acces_solde_vip($global_id_profil, $id_client);
+
+    if($isAffichageSolde == 't'){
+  		if(manage_display_solde_access($access_solde, $access_solde_vip))
+ 	    	$body->new_child("solde", afficheMontant($infos['solde'], true));
+		}
+  }
+  if ($infos['num_complet_cpte'] != NULL)
+    $body->new_child("num_cpte", $infos['num_complet_cpte']);
+  if ($num_carte_ferlo != NULL)
+    $body->new_child("num_carte_ferlo", $num_carte_ferlo);
+  $body->new_child("montant", afficheMontant($mnt, true));
+  $body->new_child("num_trans", sprintf("%09d", $id_his));
+  if ($InfoProduit != NULL)
+    $body->new_child("frais", afficheMontant($InfoProduit['frais_retrait_cpt'], true));
+  if ($InfoProduit != NULL){ // ticket 805 : ajout frais de non respect de la duree minimum entre 2 retraits
+    if ($isDureeMinEntreRetraits != null && $isDureeMinEntreRetraits == 't' && $InfoProduit['frais_duree_min2retrait'] > 0){
+      $body->new_child("fraisDureeMin", afficheMontant($InfoProduit['frais_duree_min2retrait'], true));
+    }
+    else{
+      $body->new_child("fraisDureeMin", afficheMontant(0, true));
+    }
+  }
+  if ($remarque != '')
+    $body->new_child("remarque", $remarque);
+  if ($communication != '')
+    $body->new_child("communication", $communication);
+    
+  // Billetage
+  if($hasBilletage) {
+      $body->new_child("hasBilletage", true);
+  
+      for ($x=0;$x<count($valeurBilletArr);$x++){
+          if ($valeurBilletArr[$x] != 'XXXX') {
+              $body->new_child("libel_billet_".$x, afficheMontant($listTypesBilletArr[$x]['libel']));              
+              $body->new_child("valeur_billet_".$x, $valeurBilletArr[$x]);              
+              $body->new_child("total_billet_".$x, afficheMontant($total_billetArr[$x]));
+          }    
+      }     
+  }
+
+ //montant en lettre
+  if($mntEnLettre !='')
+  $body->new_child("mntEnLettre", $mntEnLettre);
+  
+  $xml = $document->dump_mem(true);
+
+  //Génération du XSL-FO (grâce au XSLT) et du PDF (grâce à FOP)
+    if($isBilletageParam=='t'){
+
+        if($format_A5){
+            $fichier_pdf = xml_2_xslfo_2_pdf($xml, 'recuA5.xslt', false, "recu_retrait_".rand(),'recu.php',$type_imprimante);
+        } else {
+            $fichier_pdf = xml_2_xslfo_2_pdf($xml, 'recu.xslt', false, "recu_retrait_".rand(),'recu.php',$type_imprimante);
+        }
+    }
+    else{
+        if($format_A5){
+            $fichier_pdf = xml_2_xslfo_2_pdf($xml, 'recuA5_ancien.xslt', false, "recu_retrait_".rand(),'recu.php',$type_imprimante);
+        } else {
+            $fichier_pdf = xml_2_xslfo_2_pdf($xml, 'recu_ancien.xslt', false, "recu_retrait_".rand(),'recu.php',$type_imprimante);
+        }
+    }
+
+  //Message de confirmation + affichage du rapport dans une nouvelle fenêtre
+  get_show_pdf_html("Gen-10", $fichier_pdf, false);
+
+  $myErr = confirmeGenerationRecu($id_his, $ref);
+  if ($myErr->errCode != NO_ERR)
+    signalErreur(__FILE__,__LINE__,__FUNCTION__);
+
+  return true;
+}
+
+function print_recu_tranche_adhesion ($id_client, $id_his, $versement,$montant_droits_adhesion=NULL) {
+  global $global_id_agence;
+  $format_A5 = false;
+
+  $document = create_xml_doc("recu_adhesion", "recu_adhesion.dtd");
+
+  //Element root
+  $root = $document->root();
+  $root->set_attribute("type", 22);
+
+  //En-tête généraliste
+  $ref = gen_header($root, 'REC-TFA');
+
+  // Récupérer les données
+  $CLI = getClientDatas($id_client);
+  if($montant_droits_adhesion==NULL){
+    $montant_droits_adhesion = getMontantDroitsAdhesion($CLI["statut_juridique"]);
+  }
+  $ACC = getAccountDatas(getBaseAccountID($id_client));
+  $AGC = getAgenceDatas($global_id_agence);
+  if($AGC['imprimante_matricielle'] == 't'){
+  	$format_A5 = true;
+  }
+
+  //Corps
+  $body = $root->new_child("body", "");
+  $body->new_child("num_client", sprintf("%06d", $id_client));
+  $body->new_child("nom_client", getClientName($id_client));
+  //$body->new_child("Montant droits adhésion", $montant_frais_adhesion);
+  $body->new_child("montant_frais_adh", afficheMontant($montant_droits_adhesion, true));
+  $body->new_child("montant_versement", afficheMontant($versement, true));
+  $montant_frais_adh_restant = recupMontant($CLI["solde_frais_adhesion_restant"]);
+  $montant_frais_adh_verse = $montant_droits_adhesion - $montant_frais_adh_restant;
+  $body->new_child("montant_frais_adh_verse", afficheMontant($montant_frais_adh_verse, true));
+  $body->new_child("montant_frais_adh_restant", afficheMontant($montant_frais_adh_restant, true));
+  $body->new_child("num_cpte", $ACC["num_complet_cpte"]);
+  $body->new_child("solde_cpt_base", afficheMontant($ACC["solde"], true));
+
+  $body->new_child("num_trans", sprintf("%09d", $id_his));
+
+  $xml = $document->dump_mem(true);
+
+  //Génération du XSL-FO (grâce au XSLT) et du PDF (grâce à FOP)
+    if($format_A5){
+	  	$fichier_pdf = xml_2_xslfo_2_pdf($xml, 'recu_tranche_adhesionA5.xslt');
+	  } else {
+	  	$fichier_pdf = xml_2_xslfo_2_pdf($xml, 'recu_tranche_adhesion.xslt');
+	  }
+
+ // Affichage du rapport dans une nouvelle fenêtre
+  echo get_show_pdf_html(NULL, $fichier_pdf);
+
+  $myErr = confirmeGenerationRecu($id_his, $ref);
+  if ($myErr->errCode != NO_ERR)
+    signalErreur(__FILE__,__LINE__,__FUNCTION__);
+
+  return true;
+
+}
+
+function print_recu_adhesion ($id_client, $versement, $id_his, $transfert_client = NULL, $montant_droits_adhesion = NULL) {
+  basculer_langue_rpt();
+
+  //FIXME : obligé de mettre un booléen pour savoir si on transfère un client afin de ne pas afficher les frais d'adhésion
+
+  global $global_id_agence;
+  global $global_monnaie;
+  setMonnaieCourante($global_monnaie);
+  $format_A5 = false;
+
+  $document = create_xml_doc("recu", "recu.dtd");
+
+    //Element root
+  $root = $document->root();
+  $root->set_attribute("type", 22);
+
+  //En-tête généraliste
+  $ref = gen_header($root, 'REC-INI');
+
+  // Récupérer les données
+  $CLI = getClientDatas($id_client);
+  $ACC = getAccountDatas(getBaseAccountID($id_client));
+  $AGC = getAgenceDatas($global_id_agence);
+  $valeur_ps = $AGC["val_nominale_part_sociale"] ;
+  if (is_null($montant_droits_adhesion)) {
+    $montant_droits_adhesion = getMontantDroitsAdhesion($CLI["statut_juridique"]);
+  }
+  if($AGC['imprimante_matricielle'] == 't'){
+  	$format_A5 = true;
+  }
+  //Corps
+  $body = $root->new_child("body", "");
+  $body->new_child("num_client", sprintf("%06d", $id_client));
+  $body->new_child("nom_client", getClientName($id_client));
+
+  if ($ACC["etat_cpte"] == 1) { // Le compte de base est ouvert, on l'affiche dans le reçu
+    $body->new_child("num_cpte", $ACC["num_complet_cpte"]);
+    $body->new_child("solde_cpt_base", afficheMontant($ACC["solde"], true));
+  }
+
+  $body->new_child("total", afficheMontant($versement, true));
+
+  if ($transfert_client == true)
+    $body->new_child("montant_frais_adh", 0);
+  else
+    $body->new_child("montant_frais_adh", afficheMontant($montant_droits_adhesion, true));
+
+  if ($CLI["qualite"] >= 1) {//souscription&/liberation
+    $body->new_child("nbre_parts", $CLI["nbre_parts"]);
+    $body->new_child("nbre_parts_lib", $CLI["nbre_parts_lib"]);
+    $body->new_child("prix_part", afficheMontant($valeur_ps, true));
+    $mnt_min_cpt_base = $ACC['mnt_min_cpte'];
+
+/*     if ($AGC["tranche_part_sociale"] == "t" && $AGC["tranche_frais_adhesion"] == "t") {
+      $Montant_total_ps = recupMontant($versement - $mnt_min_cpt_base)/2;
+      if ($Montant_total_ps > ($valeur_ps * $CLI["nbre_parts"])){
+      	$Montant_total_ps = $valeur_ps * $CLI["nbre_parts"];
+      }
+      $mnt_droits_adhesion = recupMontant($versement - $mnt_min_cpt_base - $Montant_total_ps);
+      if($mnt_droits_adhesion > $montant_droits_adhesion){
+    		$mnt_droits_adhesion =$montant_droits_adhesion;// getMontantDroitsAdhesion($CLI["statut_juridique"]);
+    	}
+      $body->new_child("total_ps", afficheMontant($Montant_total_ps, true));
+      $body->new_child("tranche_frais", afficheMontant($mnt_droits_adhesion, true));
+    }
+    
+
+    else if ($AGC["tranche_part_sociale"] == "t" && $AGC["tranche_frais_adhesion"] == "f") {
+      $mnt_droits_adhesion =$montant_droits_adhesion; //getMontantDroitsAdhesion($CLI["statut_juridique"]);
+      $Montant_total_ps = recupMontant($versement - $mnt_min_cpt_base - $mnt_droits_adhesion);
+      if ($Montant_total_ps > ($valeur_ps * $CLI["nbre_parts"])) {
+        $Montant_total_ps = $valeur_ps * $CLI["nbre_parts"];
+      }
+      $body->new_child("total_ps", afficheMontant($Montant_total_ps, true));
+      $body->new_child("tranche_frais", afficheMontant($mnt_droits_adhesion, true));
+    }
+    
+    
+    else if ($AGC["tranche_frais_adhesion"] == "t" && $AGC["tranche_part_sociale"] == "f"){
+    	$mnt_droits_adhesion = recupMontant($versement - $mnt_min_cpt_base - $valeur_ps);
+    	if($mnt_droits_adhesion > $montant_droits_adhesion){
+    		$mnt_droits_adhesion =$montant_droits_adhesion;// getMontantDroitsAdhesion($CLI["statut_juridique"]);
+    	}
+      $Montant_total_ps = $valeur_ps ;
+      if ($Montant_total_ps > ($valeur_ps * $CLI["nbre_parts"])) {
+        $Montant_total_ps = $valeur_ps * $CLI["nbre_parts"];
+      }
+      $body->new_child("total_ps", afficheMontant($Montant_total_ps, true));
+      $body->new_child("tranche_frais", afficheMontant($mnt_droits_adhesion, true));
+    }
+    
+    
+    else if ($AGC["tranche_part_sociale"] == "f" && $AGC["tranche_frais_adhesion"] == "f") {
+      $mnt_droits_adhesion = $montant_droits_adhesion;//getMontantDroitsAdhesion($CLI["statut_juridique"]);
+      $Montant_total_ps = $valeur_ps;
+      $body->new_child("total_ps", afficheMontant($Montant_total_ps, true));
+      $body->new_child("tranche_frais", afficheMontant($mnt_droits_adhesion, true));
+    } */
+    if ($AGC["tranche_part_sociale"] == "t"){
+    	$mnt_droits_adhesion = $montant_droits_adhesion;//getMontantDroitsAdhesion($CLI["statut_juridique"]);
+    	
+    	//Les information Actuelle du client source
+    	$nbre_part = getNbrePartSoc($id_client);//returns an object
+    	$nbrePSsous = $nbre_part->param [0] ['nbre_parts'];//object passed to variable
+    	 
+    	$nbre_part_lib = getNbrePartSocLib($id_client);
+    	$nbrePSlib = $nbre_part_lib->param[0]['nbre_parts_lib']; // nbre part transferable_src
+    	
+    	$soldePartSoc = getSoldePartSoc($id_client);//returns an object
+    	$soldePS =$soldePartSoc->param[0]['solde'];//object passed to variables
+    	//$soldePartSocRestant = $soldePartSoc->param[0]['solde_part_soc_restant'];//object passed to variables
+    	$montant_souscription =$valeur_ps * $nbrePSsous;
+    	$montant_liberation =  $soldePS	;
+    	$montant_restant = $montant_souscription- $montant_liberation;
+    	
+    	$Montant_total_ps = $montant_liberation;
+    	$body->new_child("total_ps", afficheMontant($Montant_total_ps, true));
+    	$body->new_child("tranche_frais", afficheMontant($mnt_droits_adhesion, true));
+    }
+    else if ($AGC["tranche_part_sociale"] == "f"){
+    	$mnt_droits_adhesion = $montant_droits_adhesion;//getMontantDroitsAdhesion($CLI["statut_juridique"]);
+    	//Les information Actuelle du client source
+    	$nbre_part = getNbrePartSoc($id_client);//returns an object
+    	$nbrePSsous = $nbre_part->param [0] ['nbre_parts'];//object passed to variable
+    	
+    	$nbre_part_lib = getNbrePartSocLib($id_client);
+    	$nbrePSlib = $nbre_part_lib->param[0]['nbre_parts_lib']; // nbre part transferable_src
+    	 
+    	$soldePartSoc = getSoldePartSoc($id_client);//returns an object
+    	$soldePS =$soldePartSoc->param[0]['solde'];//object passed to variables
+    	//$soldePartSocRestant = $soldePartSoc->param[0]['solde_part_soc_restant'];//object passed to variables
+    	$montant_souscription =$valeur_ps * $nbrePSsous;
+    	$montant_liberation =  $soldePS	;
+    	$montant_restant = $montant_souscription- $montant_liberation;
+    	
+    	$Montant_total_ps = $montant_liberation;
+    	$body->new_child("total_ps", afficheMontant($Montant_total_ps, true));
+    	$body->new_child("tranche_frais", afficheMontant($mnt_droits_adhesion, true));
+    }
+
+  }
+
+
+  $body->new_child("num_trans", sprintf("%09d", $id_his));
+
+  $xml = $document->dump_mem(true);
+
+  //Génération du XSL-FO (grâce au XSLT) et du PDF (grâce à FOP)
+    if($format_A5){
+	  	$fichier_pdf = xml_2_xslfo_2_pdf($xml, 'recu_adhesionA5.xslt');
+	  } else {
+	  	$fichier_pdf = xml_2_xslfo_2_pdf($xml, 'recu_adhesion.xslt');
+	  }
+
+  // Affichage du rapport dans une nouvelle fenêtre
+  echo get_show_pdf_html(NULL, $fichier_pdf);
+
+  reset_langue();
+
+  $myErr = confirmeGenerationRecu($id_his, $ref);
+  if ($myErr->errCode != NO_ERR)
+    signalErreur(__FILE__,__LINE__,__FUNCTION__);
+
+  return true;
+
+}
+
+function print_recu_sps ($id_client, $nbre_parts, $id_his, $versement=0,$recu) {
+  global $global_id_agence;
+  $format_A5 = false;
+
+  $document = create_xml_doc("recu_sps", "recu_sps.dtd");
+
+  //Element root
+  $root = $document->root();
+  $root->set_attribute("type", 27);
+
+  //En-tête généraliste
+
+  if ($recu == 1){
+  $ref = gen_header($root, 'REC-SPS');
+  }else{
+  $ref = gen_header($root, 'REC-LPS');
+  }
+  // Récupérer les données
+  $CLI = getClientDatas($id_client);
+  $ACC_BASE = getAccountDatas(getBaseAccountID($id_client));
+  $ACC_PS = getAccountDatas(getPSAccountID($id_client));
+  //get nbre ps liberees
+  $nbre_part_lib = getNbrePartSocLib($id_client);
+  $nbrePSlib = $nbre_part_lib->param[0]['nbre_parts_lib'];
+
+  $AGC = getAgenceDatas($global_id_agence);
+  if($AGC['imprimante_matricielle'] == 't'){
+  	$format_A5 = true;
+  }
+
+  //Corps
+  $body = $root->new_child("body", "");
+  $body->new_child("num_client", sprintf("%06d", $id_client));
+  //control_affichage lib/ sous
+  if($recu ==1){
+  	$body->new_child("sous_set", $recu );
+  }
+  else{
+  	$body->new_child("lib_set", $recu );
+  }
+  $body->new_child("nom_client", getClientName($id_client));
+  $body->new_child("nbre_parts", $nbre_parts);
+  $body->new_child("prix_part", afficheMontant($AGC["val_nominale_part_sociale"], true));
+  if($recu == 2){ //if liberation
+  	 if($versement > 0){
+  	 $body->new_child("total_ps", afficheMontant($versement,true));
+  	 } else {
+  	 $body->new_child("total_ps", afficheMontant($AGC["val_nominale_part_sociale"] * $nbre_parts, true));
+  	 } 
+  }
+  $body->new_child("total_ps_restant", afficheMontant($ACC_PS["solde_part_soc_restant"], true));
+  $body->new_child("nbre_parts_lib", $nbrePSlib);
+  $body->new_child("num_cpte_base", $ACC_BASE["num_complet_cpte"]);
+  $body->new_child("solde_cpte_base", afficheMontant($ACC_BASE["solde"], true));
+  $body->new_child("num_cpte_ps", $ACC_PS["num_complet_cpte"]);
+  $body->new_child("nbre_total_ps", $CLI["nbre_parts"]);
+  $body->new_child("solde_cpte_ps", afficheMontant($ACC_PS["solde"], true));
+  $body->new_child("num_trans", sprintf("%09d", $id_his));
+
+  $xml = $document->dump_mem(true);
+
+  //Génération du XSL-FO (grâce au XSLT) et du PDF (grâce à FOP)
+  if($format_A5){
+  	$fichier_pdf = xml_2_xslfo_2_pdf($xml, 'recu_spsA5.xslt');
+  } else {
+  	$fichier_pdf = xml_2_xslfo_2_pdf($xml, 'recu_sps.xslt');
+  }
+
+  // Affichage du rapport dans une nouvelle fenêtre
+  echo get_show_pdf_html(NULL, $fichier_pdf);
+
+  $myErr = confirmeGenerationRecu($id_his, $ref);
+  if ($myErr->errCode != NO_ERR)
+    signalErreur(__FILE__,__LINE__,__FUNCTION__);
+
+  return true;
+
+}
+
+
+/*
+ * xml pour demande transfert part sociales
+ *
+ * 25-02-2016
+ */
+function print_demande_transfert($id_client, $DATA = array(), $id_his) {
+    global $adsys;
+    global $global_id_agence;
+    $format_A5 = false;
+    $document = create_xml_doc ( "demande_tps", "demande_transfert_ps.dtd" );
+    // Element root
+    $root = $document->root ();
+    // En-tête généraliste
+    $ref = gen_header ( $root, 'DEM-TPS' );
+    // Récupérer les données
+    $CLI = getClientDatas ( $id_client );
+    $ACC_BASE = getAccountDatas ( getBaseAccountID ( $id_client ) );
+    $ACC_PS = getAccountDatas ( getPSAccountID ( $id_client ) );
+
+    // info compte courant pour meme societaire
+    $compte_courant_info = getAccountDatas ( $DATA ["id_cpte_dest"] );
+    $info_cpte_courant = getCurrentAccountDatas($id_client);
+
+    $AGC = getAgenceDatas ( $global_id_agence );
+    if ($AGC ['imprimante_matricielle'] == 't') {
+        $format_A5 = true;
+    }
+    // Corps
+    $body = $root->new_child ( "body", "" );
+    if ($DATA ["type_transfert"] == 1) { // transfert vers compte ps
+        $body->new_child ( "type_transfer_1", $DATA ["type_transfert"] );
+        $body->new_child ( "libelle_ps", $ACC_PS ["libel"] );
+    }
+    if ($DATA ["type_transfert"] == 2) { // transfert vers compte courant
+        $body->new_child ( "type_transfer_2", $DATA ["type_transfert"] );
+        $body->new_child ( "solde_courant", afficheMontant ( $compte_courant_info ["solde"], true ) );
+        $body->new_child ( "libelle_courant", $compte_courant_info ["libel"] );
+    }
+    $body->new_child ( "num_client", sprintf ( "%06d", $id_client ) );
+    $body->new_child ( "nom_client", getClientName ( $id_client ) );
+    $body->new_child ( "num_cpte_courant_src", $info_cpte_courant ["num_complet_cpte"] );
+    $body->new_child ( "intitule_cpte_courant_src", $info_cpte_courant ["intitule_compte"] );
+    $body->new_child ( "num_cpte_ps", $ACC_PS ["num_complet_cpte"] );
+    $body->new_child ( "prix_part", afficheMontant ( $AGC ["val_nominale_part_sociale"], true ) );
+    // nombre de parts transferer
+    $body->new_child ( "nbre_parts", $DATA ["nmbre_part_a_transferer"] );
+    $body->new_child ( "total_ps", afficheMontant ( $AGC ["val_nominale_part_sociale"] * $DATA ["nmbre_part_a_transferer"], true ) );
+//    $body->new_child ( "total_ps_restant", afficheMontant ( $ACC_PS ["solde"], true ) );
+    $body->new_child ( "total_ps_restant", afficheMontant ( $DATA ["nouveau_solde_ps_src"], true ) );
+
+    // Snapshot nombre PS at end of transaction
+    $body->new_child ( "solde_total_ps_sous", afficheMontant ($DATA ["solde_total_ps_sous"], true ) );
+    $body->new_child ( "solde_total_ps_lib", afficheMontant ($DATA ["solde_total_ps_lib"], true ) );
+    $body->new_child ( "num_trans", sprintf ( "%09d", $id_his ) );
+    // information destinataire
+    $body->new_child ( "num_cli_dest", sprintf ( "%06d", $DATA ["id_client_dest"] ) );
+    $body->new_child ( "nom_cli_dest", getClientName ( $DATA ["id_client_dest"] ) );
+    $body->new_child ( "num_compte_dest", $DATA ["num_cpte_dest"] );
+
+    $xml = $document->dump_mem(true);
+
+    //Génération du XSL-FO (grâce au XSLT) et du PDF (grâce à FOP)
+    if($format_A5){
+        $fichier_pdf = xml_2_xslfo_2_pdf($xml, 'demande_transfert_psA5.xslt');// a implementer
+    } else {
+        $fichier_pdf = xml_2_xslfo_2_pdf($xml, 'demande_transfert_ps.xslt');
+    }
+
+    // Affichage du rapport dans une nouvelle fenêtre
+    echo get_show_pdf_html(NULL, $fichier_pdf);
+
+    $myErr = confirmeGenerationRecu($id_his, $ref);
+    if ($myErr->errCode != NO_ERR)
+        signalErreur(__FILE__,__LINE__,__FUNCTION__);
+
+    return true;
+}
+
+
+/*
+ * xml pour recu transfert part sociales
+ * 
+ * 10-03-2015
+ */
+function print_recu_transfert($id_client, $DATA = array(), $id_his) {
+	global $adsys;
+	global $global_id_agence;
+	$format_A5 = false;
+	$document = create_xml_doc ( "recu_tps", "recu_transfert_ps.dtd" );
+	// Element root
+	$root = $document->root ();
+	// En-tête généraliste
+	$ref = gen_header ( $root, 'REC-TPS' );
+	// Récupérer les données
+	$CLI = getClientDatas ( $id_client );
+	$ACC_BASE = getAccountDatas ( getBaseAccountID ( $id_client ) );
+	$ACC_PS = getAccountDatas ( getPSAccountID ( $id_client ) );
+	
+	// info compte courant pour meme societaire
+	$compte_courant_info = getAccountDatas ( $DATA ["id_cpte_dest"] );
+	
+	$AGC = getAgenceDatas ( $global_id_agence );
+	if ($AGC ['imprimante_matricielle'] == 't') {
+		$format_A5 = true;
+	}
+	// Corps
+	$body = $root->new_child ( "body", "" );
+	if ($DATA ["type_transfert"] == 1) { // transfert vers compte ps
+		$body->new_child ( "type_transfer_1", $DATA ["type_transfert"] );
+		$body->new_child ( "libelle_ps", $ACC_PS ["libel"] );
+	}
+	if ($DATA ["type_transfert"] == 2) { // transfert vers compte courant
+		$body->new_child ( "type_transfer_2", $DATA ["type_transfert"] );
+		$body->new_child ( "solde_courant", afficheMontant ( $compte_courant_info ["solde"], true ) );
+		$body->new_child ( "libelle_courant", $compte_courant_info ["libel"] );
+	}
+	$body->new_child ( "num_client", sprintf ( "%06d", $id_client ) );
+	$body->new_child ( "nom_client", getClientName ( $id_client ) );
+	$body->new_child ( "num_cpte_ps", $ACC_PS ["num_complet_cpte"] );
+	$body->new_child ( "prix_part", afficheMontant ( $AGC ["val_nominale_part_sociale"], true ) );
+	// nombre de parts transferer
+	$body->new_child ( "nbre_parts", $DATA ["nmbre_part_a_transferer"] );
+	$body->new_child ( "total_ps", afficheMontant ( $AGC ["val_nominale_part_sociale"] * $DATA ["nmbre_part_a_transferer"], true ) );
+	$body->new_child ( "total_ps_restant", afficheMontant ( $ACC_PS ["solde"], true ) );
+	// Snapshot nombre PS at end of transaction
+	$body->new_child ( "nbre_total_ps_sous", $DATA ["nouveau_nmbre_part_src"] );
+	$body->new_child ( "nbre_total_ps_lib", $DATA ["nouveau_nmbre_part_lib_src"] );
+	$body->new_child ( "num_trans", sprintf ( "%09d", $id_his ) );
+	// information destinataire
+	$body->new_child ( "num_cli_dest", sprintf ( "%06d", $DATA ["id_client_dest"] ) );
+	$body->new_child ( "nom_cli_dest", getClientName ( $DATA ["id_client_dest"] ) );
+	$body->new_child ( "num_compte_dest", $DATA ["num_cpte_dest"] );
+	
+	$xml = $document->dump_mem(true);
+	
+	//Génération du XSL-FO (grâce au XSLT) et du PDF (grâce à FOP)
+	if($format_A5){
+		$fichier_pdf = xml_2_xslfo_2_pdf($xml, 'recu_transfert_psA5.xslt');// a implementer
+	} else {
+		$fichier_pdf = xml_2_xslfo_2_pdf($xml, 'recu_transfert_ps.xslt');
+	}
+
+	// Affichage du rapport dans une nouvelle fenêtre
+	echo get_show_pdf_html(NULL, $fichier_pdf);
+
+	$myErr = confirmeGenerationRecu($id_his, $ref);
+	if ($myErr->errCode != NO_ERR)
+		signalErreur(__FILE__,__LINE__,__FUNCTION__);
+
+	return true;
+}
+
+
+function print_recu_defection ($id_client, $motif, $balance, $id_his, $nom_ayant_droit = NULL) {
+  global $global_id_agence;
+  global $adsys;
+  $format_A5 = false;
+
+  $document = create_xml_doc("recu_defection", "recu_defection.dtd");
+
+  //Element root
+  $root = $document->root();
+
+  //En-tête généraliste
+  $ref = gen_header($root, 'REC-DEF');
+
+  // Récupérer les données
+  $nomClient = getClientName($id_client);
+  $CLI = getClientDatas($id_client);
+  $AGC = getAgenceDatas($global_id_agence);
+  if($AGC['imprimante_matricielle'] == 't'){
+  	$format_A5 = true;
+  }
+
+  //Corps
+  $body = $root->new_child("body", "");
+  $body->new_child("num_client", sprintf("%06d", $id_client));
+  $body->new_child("nom_client", $nomClient);
+  $body->new_child("date_adhesion", pg2phpDate($CLI["date_adh"]));
+  $body->new_child("date_defection", date("d/m/Y"));
+  $body->new_child("motif_defection", adb_gettext($adsys["adsys_etat_client"][$motif]));
+ 	if ($balance < 0){
+ 	  $body->new_child("balance_debit", afficheMontant(abs($balance), true));
+ 	}
+ 	else if ($balance > 0){
+ 	  $body->new_child("balance_credit", afficheMontant($balance, true));
+ 	}
+ 	if($nom_ayant_droit != NULL){
+ 	  $body->new_child("nom_ayant_droit", $nom_ayant_droit);
+ 	}
+  $body->new_child("num_trans", sprintf("%09d", $id_his));
+
+  $xml = $document->dump_mem(true);
+
+  //Génération du XSL-FO (grâce au XSLT) et du PDF (grâce à FOP)
+  if($format_A5){
+  	$fichier_pdf = xml_2_xslfo_2_pdf($xml, 'recu_defectionA5.xslt');
+  } else {
+  	$fichier_pdf = xml_2_xslfo_2_pdf($xml, 'recu_defection.xslt');
+  }
+
+  // Affichage du rapport dans une nouvelle fenêtre
+  echo get_show_pdf_html(NULL, $fichier_pdf);
+
+  $myErr = confirmeGenerationRecu($id_his, $ref);
+  if ($myErr->errCode != NO_ERR)
+    signalErreur(__FILE__,__LINE__,__FUNCTION__);
+
+  return true;
+}
+
+function print_recu_ouverture_compte($id_client,$numcpte,$libel,$solde,$intitule_compte, $id_his) {
+  global $global_id_agence;
+  $format_A5 = false;
+
+  $document = create_xml_doc("recucpt", "recucpt.dtd");
+
+  //Element root
+  $root = $document->root();
+  $root->set_attribute("type", 29);
+
+  //En-tête généraliste
+  $ref = gen_header($root, 'REC-OUC');
+
+  // Récupérer les données
+  $CLI = getClientDatas($id_client);
+
+  $AGC = getAgenceDatas($global_id_agence);
+  if($AGC['imprimante_matricielle'] == 't'){
+  	$format_A5 = true;
+  }
+
+  //Corps
+  $compte = $numcpte." ".$intitule_compte;
+
+  $body = $root->new_child("body", "");
+  $body->new_child("num_client", sprintf("%06d", $id_client));
+  $body->new_child("nom_client", getClientName($id_client));
+  $body->new_child("num_cpte", $compte);
+  $body->new_child("libelprod",$libel);
+  $body->new_child("solde", afficheMontant($solde, true));
+  $body->new_child("num_trans", sprintf("%09d", $id_his));
+  $xml = $document->dump_mem(true);
+
+  //Génération du XSL-FO (grâce au XSLT) et du PDF (grâce à FOP)
+  if($format_A5){
+  	$fichier_pdf = xml_2_xslfo_2_pdf($xml, 'recu_ouverture_compteA5.xslt');
+  } else {
+  	$fichier_pdf = xml_2_xslfo_2_pdf($xml, 'recu_ouverture_compte.xslt');
+  }
+
+  // Affichage du rapport dans une nouvelle fenêtre
+  echo get_show_pdf_html(NULL, $fichier_pdf);
+
+  $myErr = confirmeGenerationRecu($id_his, $ref);
+  if ($myErr->errCode != NO_ERR)
+    signalErreur(__FILE__,__LINE__,__FUNCTION__);
+
+  return true;
+}
+
+function print_recu_cloture_compte($numcpte, $solde, $destination, $historique, $frais=array(),$tax_interet=null) {
+  global $global_id_agence;
+  global $global_id_client;
+  $format_A5 = false;
+
+  $document = create_xml_doc("recu_cloture_compte", "cloture_compte.dtd");
+
+  $AGC = getAgenceDatas($global_id_agence);
+  if($AGC['imprimante_matricielle'] == 't'){
+  	$format_A5 = true;
+  }
+  //Element root
+  $root = $document->root();
+
+  $root->set_attribute("type", 48);
+
+  //En-tête généraliste
+  $ref = gen_header($root, 'REC-CLC');
+
+  //Corps
+  $body = $root->new_child("body", "");
+  $body->new_child("num_client", sprintf("%06d",$global_id_client));
+  $body->new_child("nom_client", getClientName($global_id_client));
+  $body->new_child("num_cpte", $numcpte);
+  $body->new_child("solde", afficheMontant($solde, true));
+  $body->new_child("frais_tenue_cpte", afficheMontant($frais['tenue'], true));
+  $body->new_child("frais_fermeture", afficheMontant($frais['fermeture'], true));
+  $body->new_child("penalites", afficheMontant($frais['penalites'], true));
+
+  if(!is_null($tax_interet)){
+    $body->new_child("impot_mobilier", afficheMontant($tax_interet, true));
+  }
+
+  $body->new_child("destination",$destination);
+  $body->new_child("historique",sprintf("%09d", $historique));
+  $xml = $document->dump_mem(true);
+
+  //Génération du XSL-FO (grâce au XSLT) et du PDF (grâce à FOP)
+  if($format_A5){
+  	$fichier_pdf = xml_2_xslfo_2_pdf($xml, 'recu_cloture_compteA5.xslt');
+  } else {
+  	$fichier_pdf = xml_2_xslfo_2_pdf($xml, 'recu_cloture_compte.xslt');
+  }
+
+  // Affichage du rapport dans une nouvelle fenêtre
+  echo get_show_pdf_html(NULL, $fichier_pdf);
+
+  $myErr = confirmeGenerationRecu($historique, $ref);
+  if ($myErr->errCode != NO_ERR)
+    signalErreur(__FILE__,__LINE__,__FUNCTION__);
+
+  return true;
+}
+
+function print_recu_ecriture($a_DATA, $a_login, $a_nbre_ligne, $id_his, $name_initiateur=null){
+	global $adsys, $global_id_agence;
+
+	$document = create_xml_doc("recu_passage_ecriture", "recu_passage_ecriture.dtd");
+
+  //Element root
+   $root = $document->root();
+  //En-tête généraliste
+  $ref = gen_header($root, 'PIE-ECR');
+  $header_contextuel = $root->new_child("header_contextuel", "");
+  $infos_synthetiques = $header_contextuel->new_child("infos_synthetiques", "");
+  $infos_synthetiques->new_child("login", $a_login);
+  $infos_synthetiques->new_child("date", $a_DATA[1]["date"]);
+  $infos_synthetiques->new_child("libelle", $a_DATA[1]["libelle_ecriture"]);
+  $infos_synthetiques->new_child("num_trans", $id_his);
+  $infos_synthetiques->new_child("login_initiateur", $name_initiateur);
+  //Corps
+  $i = 1;
+  while ($i <= $a_nbre_ligne){
+  	$body = $root->new_child("body", "");
+ 		$body->new_child("num_cpte_deb", $a_DATA[$i]["id_cpte_deb"]);
+ 		$body->new_child("nom_cpte_deb", $a_DATA[$i]["nom_cpte_deb"]);
+	 	$body->new_child("num_cpte_cre", $a_DATA[$i]["id_cpte_cre"]);
+	 	$body->new_child("nom_cpte_cre", $a_DATA[$i]["nom_cpte_cre"]);
+	 	setMonnaieCourante($a_DATA[$i]["devise"]);
+ 		$body->new_child("montant", afficheMontant($a_DATA[$i]["montant"], true));
+	 	$body->new_child("num_client", $a_DATA[$i]["id_client"]);
+ 		$body->new_child("num_trans", sprintf("%09d", $id_his));
+ 		$i = $i + 1;
+ }
+
+  $xml = $document->dump_mem(true);
+
+  //Génération du XSL-FO (grâce au XSLT) et du PDF (grâce à FOP)
+  $fichier_pdf = xml_2_xslfo_2_pdf($xml, 'recu_passage_ecriture.xslt');
+
+  // Affichage du rapport dans une nouvelle fenêtre
+  echo get_show_pdf_html(NULL, $fichier_pdf);
+  $myErr = confirmeGenerationRecu($id_his, $ref);
+ 	if ($myErr->errCode != NO_ERR)
+ 	   signalErreur(__FILE__,__LINE__,__FUNCTION__);
+
+  return true;
+}
+
+function print_recu_transfert_comptes($dataDonneurOrdre,$dataBenef,$dataTransf, $mnt_frais_attente = 0) {
+	global $global_id_agence;
+  global $global_id_client, $global_id_profil;
+  $format_A5 = false;
+  $document = create_xml_doc("recu", "recu_transfert.dtd");
+
+  $AGC = getAgenceDatas($global_id_agence);
+  if($AGC['imprimante_matricielle'] == 't'){
+  	$format_A5 = true;
+  }
+  $root = $document->root();
+  $root->set_attribute("type", 40);
+
+  //En-tête généraliste
+ // gen_header($root, 'REC-REC');
+
+  //Corps
+  $body = $root->new_child("body", "");
+  gen_header($body, 'REC-TRC');
+  //donneur d'ordre
+  $donneur=$body->new_child("donneur", "");
+  $donneur->new_child("idClient",$dataDonneurOrdre['id_client']);
+  if (isset($dataDonneurOrdre['donneur_ordre'])){
+    $donneur->new_child("nomClient",$dataDonneurOrdre['nom_client']);
+    $donneur->new_child("donneurOrdre",$dataDonneurOrdre['donneur_ordre']);
+  }else{
+    $donneur->new_child("nomClient",$dataDonneurOrdre['nom_client']);
+  }
+  $donneur->new_child("numCpte",$dataDonneurOrdre['num_cpte']);
+  $donneur->new_child("montant", $dataDonneurOrdre['mnt']);
+  $access_solde = get_profil_acces_solde($global_id_profil, $dataDonneurOrdre["id_prod"]);
+  $access_solde_vip = get_profil_acces_solde_vip($global_id_profil, $dataDonneurOrdre['id_client']);
+  if(manage_display_solde_access($access_solde, $access_solde_vip))
+  	$donneur->new_child("solde",$dataDonneurOrdre['solde']);
+  //destinataire(s)
+
+  foreach($dataBenef as $key=> $value){
+	  $benef=$body->new_child("beneficaires", "");
+	  $benef->new_child("nomBeneficaire", $value['nom_client']);
+	  $benef->new_child("numCpteBeneficaire",$value['num_complet_cpte']);
+	  $benef->new_child("dateDemandeVir",$dataTransf['date_piece']);
+	  $benef->new_child("mntPreleve",$value['mnt_src']);
+	  $benef->new_child("mntBeneficaire",$value['mnt_dest']);
+	  $benef->new_child("frais",$value['frais']);
+	  if($mnt_frais_attente > 0){
+	  	$benef->new_child("frais_attente",$mnt_frais_attente);
+	  }
+  }
+  //transfert
+  $transf=$body->new_child("transfert", "");
+  $transf->new_child("frais", $dataTransf['frais_transfert']);
+  $transf->new_child("frais_minimum_2retrait", $dataTransf['frais_minimum2retrait']);
+  $transf->new_child("numTransa", sprintf("%09d",$dataTransf['id_his']));
+  $transf->new_child("dateTransa",  date("d/m/Y"));
+  $transf->new_child("TypeTransfert",$dataTransf['TypeTransfert']);
+
+
+  $body->new_child("communication",$dataTransf['communication']);
+  $body->new_child("remarque",$dataTransf['remarque']);
+
+  $xml = $document->dump_mem(true);
+
+  //Génération du XSL-FO (grâce au XSLT) et du PDF (grâce à FOP)
+  if($format_A5){
+  	$fichier_pdf = xml_2_xslfo_2_pdf($xml, 'recu_transfertA5.xslt');
+  } else {
+  	$fichier_pdf = xml_2_xslfo_2_pdf($xml, 'recu_transfert.xslt');
+  }
+
+  // Affichage du rapport dans une nouvelle fenêtre
+  echo get_show_pdf_html(NULL, $fichier_pdf);
+
+}
+
+
+
+function print_recu_demande_autorisation($id_client, $nom_client,$num_cpte,$mnt_retrait,$date_retrait,$utilisateur, $num_trans) {
+  global $global_id_agence, $global_id_profil;
+  $format_A5 = false;
+
+  $document = create_xml_doc("recu", "recu_demande_autorisation.dtd");
+
+  //recuperation des données de l'agence'
+  //$AG = getAgenceDatas($global_id_agence);
+  //if($AG['imprimante_matricielle'] == 't'){
+  //  $format_A5 = true;
+  //}
+
+  //$num= $infos['num_complet_cpte']." ".$infos["libel"];
+  //Element root
+  $root = $document->root();
+  $root->set_attribute("type", 22);
+
+  //En-tête généraliste
+  gen_header($root, 'REC-DAU');
+
+  //Corps
+  $body = $root->new_child("body", "");
+  $body->new_child("nom_client", $nom_client);
+  $body->new_child("num_cpte",$num_cpte);
+  $body->new_child("montant_retrait", afficheMontant($mnt_retrait, true));
+  $body->new_child("date_demande",  $date_retrait);
+  $body->new_child("utilisateur_demande", $utilisateur);
+  $body->new_child("num_transaction", $num_trans);
+  //Contôle sur l'affichage des soldes
+  //$access_solde = get_profil_acces_solde($global_id_profil, $InfoProduit['id']);
+  /*if ($id_mandat != NULL) {
+    $MANDAT = getInfosMandat($id_mandat);
+    if( $MANDAT['denomination'] != $nom_client){
+      $body->new_child("donneur_ordre", $MANDAT['denomination']);
+    }
+  }
+
+  $info_cheque = $body->new_child("info_cheque", "");
+  $info_cheque->new_child("num_cheque", $num_cheque);
+// $info_cheque->new_child("banque_cheque", getLibel("adsys_banques", $id_bqe));
+  $info_cheque->new_child("date_cheque", $date_cheque);
+  if($beneficiaire != NULL ) {
+    $info_cheque->new_child("beneficiaire", $beneficiaire);
+  }*/
+
+  $xml = $document->dump_mem(true);
+
+  //Génération du XSL-FO (grâce au XSLT) et du PDF (grâce à FOP)
+  if($format_A5){
+    $fichier_pdf = xml_2_xslfo_2_pdf($xml, 'recu_demande_autorisation.xslt');
+  } else {
+    $fichier_pdf = xml_2_xslfo_2_pdf($xml, 'recu_demande_autorisation.xslt');
+  }
+
+  // Affichage du rapport dans une nouvelle fenêtre
+  echo get_show_pdf_html(NULL, $fichier_pdf);
+
+}
+
+
+function print_recu_demande_autorisation_retrait_deplace($id_client, $nom_client_distant,$num_cpte_distant,$nom_agence_distant,$mnt_retrait,$date_retrait,$utilisateur, $num_trans) {
+  global $global_id_agence, $global_id_profil;
+  $format_A5 = false;
+
+  $document = create_xml_doc("recu_dep", "recu_demande_autorisation_deplace.dtd");
+
+  //recuperation des données de l'agence'
+  //$AG = getAgenceDatas($global_id_agence);
+  //if($AG['imprimante_matricielle'] == 't'){
+  //  $format_A5 = true;
+  //}
+
+  //$num= $infos['num_complet_cpte']." ".$infos["libel"];
+  //Element root
+  $root = $document->root();
+  $root->set_attribute("type", 22);
+
+  //En-tête généraliste
+  gen_header($root, 'REC-DAD');
+
+  //Corps
+  $body = $root->new_child("body", "");
+  $body->new_child("nom_client_distant", $nom_client_distant);
+  $body->new_child("num_cpte_distant",$num_cpte_distant);
+  $body->new_child("nom_agence_distant",$nom_agence_distant);
+  $body->new_child("montant_retrait", afficheMontant($mnt_retrait, true));
+  $body->new_child("date_demande",  $date_retrait);
+  $body->new_child("utilisateur_demande", $utilisateur);
+  $body->new_child("num_transaction", $num_trans);
+  //Contôle sur l'affichage des soldes
+  //$access_solde = get_profil_acces_solde($global_id_profil, $InfoProduit['id']);
+  /*if ($id_mandat != NULL) {
+    $MANDAT = getInfosMandat($id_mandat);
+    if( $MANDAT['denomination'] != $nom_client){
+      $body->new_child("donneur_ordre", $MANDAT['denomination']);
+    }
+  }
+
+  $info_cheque = $body->new_child("info_cheque", "");
+  $info_cheque->new_child("num_cheque", $num_cheque);
+// $info_cheque->new_child("banque_cheque", getLibel("adsys_banques", $id_bqe));
+  $info_cheque->new_child("date_cheque", $date_cheque);
+  if($beneficiaire != NULL ) {
+    $info_cheque->new_child("beneficiaire", $beneficiaire);
+  }*/
+
+  $xml = $document->dump_mem(true);
+
+  //Génération du XSL-FO (grâce au XSLT) et du PDF (grâce à FOP)
+  if($format_A5){
+    $fichier_pdf = xml_2_xslfo_2_pdf($xml, 'recu_demande_autorisation_deplace.xslt');
+  } else {
+    $fichier_pdf = xml_2_xslfo_2_pdf($xml, 'recu_demande_autorisation_deplace.xslt');
+  }
+
+  // Affichage du rapport dans une nouvelle fenêtre
+  echo get_show_pdf_html(NULL, $fichier_pdf);
+
+}
+
+function print_recu_demande_autorisation_transfert($type_transfert, $nom_client,$num_cpte,$nom_client_dest,$num_cpte_dest,$mnt_transfert,$date_transfert,$utilisateur, $num_trans) {
+  global $global_id_agence, $global_id_profil;
+  $format_A5 = false;
+
+  $document = create_xml_doc("recu", "recu_demande_autorisation_transfert.dtd");
+
+  //recuperation des données de l'agence'
+  //$AG = getAgenceDatas($global_id_agence);
+  //if($AG['imprimante_matricielle'] == 't'){
+  //  $format_A5 = true;
+  //}
+
+  //$num= $infos['num_complet_cpte']." ".$infos["libel"];
+  //Element root
+  $root = $document->root();
+  $root->set_attribute("type", 22);
+
+  //En-tête généraliste
+  gen_header($root, 'REC-DAT');
+
+  switch ($type_transfert) {
+    case 1 :
+      $type = "Même client";
+      break;
+    case 2 :
+      $type= "Virement interne";
+      break;
+    case 3 :
+      $type= "Virement externe";
+      break;
+    case 4 :
+      $type= "Transfert groupé";
+      break;
+  }
+
+  //Corps
+  $body = $root->new_child("body", "");
+  $body->new_child("type_transfert", $type);
+  $body->new_child("nom_client", $nom_client);
+  $body->new_child("num_cpte",$num_cpte);
+  $body->new_child("nom_client_dest",$nom_client_dest);
+  $body->new_child("num_cpte_dest",$num_cpte_dest);
+  $body->new_child("montant_transfert", afficheMontant($mnt_transfert, true));
+  $body->new_child("date_demande",  $date_transfert);
+  $body->new_child("utilisateur_demande", $utilisateur);
+  $body->new_child("num_transaction", $num_trans);
+
+  $xml = $document->dump_mem(true);
+
+  //Génération du XSL-FO (grâce au XSLT) et du PDF (grâce à FOP)
+  if($format_A5){
+    $fichier_pdf = xml_2_xslfo_2_pdf($xml, 'recu_demande_autorisation_transfert.xslt');
+  } else {
+    $fichier_pdf = xml_2_xslfo_2_pdf($xml, 'recu_demande_autorisation_transfert.xslt');
+  }
+
+  // Affichage du rapport dans une nouvelle fenêtre
+  echo get_show_pdf_html(NULL, $fichier_pdf);
+
+}
+/**
+ * Recu pour approvisionnement/delestage
+ */
+function print_recu_appro_delestage($isBilletage,$num_guichet, $num_transaction, $data_appro_delestage, $array_type_billet,$array_billet, $array_total,$ecran_precedent)
+{
+
+  global $global_id_agence, $global_id_profil,$global_nom_utilisateur,$global_nom_login;
+  $format_A5 = false;
+
+  $isAffichageSolde=getParamAffichageSolde();
+
+  if($isBilletage == 't') {
+    $document = create_xml_doc("recu_approvisionnement_delestage", "recu_approvisionnement_delestage.dtd");
+  }
+  else{
+    $document = create_xml_doc("recu", "recu_ancien.dtd");
+  }
+
+  //Element root
+  $root = $document->root();
+  $root->set_attribute("type", 8);
+
+  //recuperation des données de l'agence'
+  $AG = getAgenceDatas($global_id_agence);
+  if($AG['imprimante_matricielle'] == 't'){
+    $format_A5 = true;
+  }
+
+  //En-tête généraliste pourn une appro delestage sans autorisation
+  if ($ecran_precedent == 'Agu-1'){
+    $type_action = 1;
+    $ref = gen_header($root, 'REC-BAP');
+  }elseif ($ecran_precedent == 'Dgu-1') {
+    $type_action = 2;
+    $ref = gen_header($root, 'REC-BDE');
+  }
+
+  //En-tête généraliste pourn une appro delestage avec autorisation
+  if ($ecran_precedent == 'Agu-2'){
+    $type_action = 1;
+    $ref = gen_header($root, 'REC-BAA');
+  }elseif ($ecran_precedent == 'Dgu-2') {
+    $type_action = 2;
+    $ref = gen_header($root, 'REC-BDA');
+  }
+
+  //Corps
+  $body = $root->new_child("body", "");
+  // Date du jour
+  $date_jour = date("d");
+  $date_mois = date("m");
+  $date_annee = date("Y");
+  $date_total = $date_jour."/".$date_mois."/".$date_annee;
+  $body->new_child("date_recu", $date_total);
+  // nom de l'operateur
+  $body->new_child("nom_operateur", $global_nom_utilisateur);
+  // login
+  $body->new_child("login", $global_nom_login);
+  //compte Coffre debit
+  //y a-t-il assez d'argent dans le coffre-fort ?
+  $InfosCoffreFort = getCompteCoffreFortInfos($global_id_agence);
+
+  foreach ($array_billet as $key => $value) {
+      $compte_debit = $root->new_child("compte_debit", "");
+      $devise = $key;
+      $compte_debit->new_child("compte_coffre_debit", $InfosCoffreFort[$devise]['CompteCoffreFort']);
+  }
+  //compte guichet
+  $info_guichet =  getCompteCptaGui($num_guichet);
+  $body->new_child("compte_caisse_credit", $info_guichet);
+
+  //numero transaction ou numero de la demande
+  if ($ecran_precedent == 'Agu-2' || $ecran_precedent == 'Dgu-2'){
+    $body->new_child("type_recu", 1);
+    foreach($num_transaction as $key_trans=>$value_trans){
+      $numero_transaction = $root->new_child("transaction", "");
+      $numero_transaction->new_child("num_transaction", $value_trans);
+    }
+  }else {
+    $body->new_child("type_recu", 2);
+    $numero_transaction = $root->new_child("transaction", "");
+    $numero_transaction->new_child("num_transaction", $num_transaction);
+  }
+  $body->new_child("type_action", $type_action);
+
+  //montant
+
+   foreach ($data_appro_delestage as $key_montant => $value_montant){
+     $montant_appro_delestage = $root->new_child("montant_appro_delestage", "");
+     $montant_appro_delestage->new_child("montant", afficheMontant($value_montant['mnt'])." ".$value_montant['devise']);
+  }
+
+  // Billetage
+  if($isBilletage) {
+    foreach($array_billet as $key2 => $value2) {
+      $temp_devise = $root->new_child("temp_devise", "");
+      $temp_devise->new_child("hasBilletage", true);
+      $temp_devise->new_child("devise", $key2);
+      $devise = $key2;
+      for ($x = 0; $x < count($array_billet[$devise]); $x++) {
+        if ($array_billet[$devise][$x] != 'XXXX') {
+          $temp_devise->new_child("libel_billet_" . $x, afficheMontant($array_type_billet[$devise][$x]['libel']));
+          $temp_devise->new_child("valeur_billet_" . $x, afficheMontant($array_billet[$devise][$x]));
+          $temp_devise->new_child("total_billet_" . $x, afficheMontant($array_total[$devise][$x]));
+        }
+      }
+    }
+  }
+
+  $xml = $document->dump_mem(true);
+
+  $fichier_pdf = xml_2_xslfo_2_pdf($xml, 'recu_approvisionnement_delestage.xslt','copy1');
+
+
+  //Message de confirmation + affichage du rapport dans une nouvelle fenêtre
+  get_show_pdf_html("Gen-10", $fichier_pdf, false,'copy1');
+
+
+  return true;
+}
+
+?>

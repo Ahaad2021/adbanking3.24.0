@@ -1,0 +1,35 @@
+<!-- DTD pour le rapports des credits en perte -->
+
+<!-- Element root -->
+<!ELEMENT credits_perte (header, total, details)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!ELEMENT total (total_perte, total_perte_rec, total_cap_recupere, total_int_recupere, total_pen_recupere)>
+
+<!ELEMENT details (credit*,credit_gs*)>
+
+<!ELEMENT credit (index, id_client, id_doss, nom, produit, obj_dem, mnt_perte, mnt_rec, int_rec, date, prov_mnt, prov_date)>
+<!ELEMENT credit_gs (index, id_client, id_doss, nom, produit, obj_dem, mnt_perte, mnt_rec, int_rec ,pen_rec , date, prov_mnt, prov_date, membre_gs)>
+
+<!ELEMENT total_perte (#PCDATA)>
+<!ELEMENT total_perte_rec (#PCDATA)>
+<!ELEMENT total_cap_recupere (#PCDATA)>
+<!ELEMENT total_int_recupere (#PCDATA)>
+<!ELEMENT total_pen_recupere (#PCDATA)>
+<!ELEMENT id_client (#PCDATA)>
+<!ELEMENT id_doss (#PCDATA)>
+<!ELEMENT nom (#PCDATA)>
+<!ELEMENT index (#PCDATA)>
+<!ELEMENT produit (#PCDATA)>
+<!ELEMENT obj_dem (#PCDATA)>
+<!ELEMENT mnt_perte (#PCDATA)>
+<!ELEMENT mnt_rec (#PCDATA)>
+<!ELEMENT int_rec (#PCDATA)>
+<!ELEMENT pen_rec (#PCDATA)>
+<!ELEMENT date (#PCDATA)>
+<!ELEMENT prov_mnt (#PCDATA)>
+<!ELEMENT prov_date (#PCDATA)>
+<!ELEMENT membre_gs (#PCDATA)>

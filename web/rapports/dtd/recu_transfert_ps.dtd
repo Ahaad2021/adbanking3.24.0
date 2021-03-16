@@ -1,0 +1,29 @@
+<!-- DTD pour les recus (retrait, depot et depot cheque) -->
+
+<!-- Element root -->
+<!ELEMENT recu_tps (header, body)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- Corps -->
+<!ELEMENT body ( type_transfer_1? , type_transfer_2? ,solde_courant? , libelle_ps?, libelle_courant?, num_client,  nom_client, num_cpte_ps, prix_part, nbre_parts, total_ps, total_ps_restant, nbre_total_ps_sous, nbre_total_ps_lib, num_trans ,num_cli_dest ,nom_cli_dest , num_compte_dest)>
+<!ELEMENT type_transfer_1 (#PCDATA)>
+<!ELEMENT type_transfer_2 (#PCDATA)>
+<!ELEMENT solde_courant (#PCDATA)>
+<!ELEMENT libelle_ps (#PCDATA)>
+<!ELEMENT libelle_courant (#PCDATA)>
+<!ELEMENT num_client (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT num_cpte_ps (#PCDATA)>
+<!ELEMENT prix_part (#PCDATA)>
+<!ELEMENT nbre_parts (#PCDATA)>
+<!ELEMENT total_ps (#PCDATA)>
+<!ELEMENT total_ps_restant (#PCDATA)>
+<!ELEMENT nbre_total_ps_sous (#PCDATA)>
+<!ELEMENT nbre_total_ps_lib (#PCDATA)>
+<!ELEMENT num_trans (#PCDATA)>
+<!ELEMENT num_cli_dest (#PCDATA)>
+<!ELEMENT nom_cli_dest (#PCDATA)>
+<!ELEMENT num_compte_dest (#PCDATA)>

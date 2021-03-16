@@ -1,0 +1,4 @@
+app_db_host;app_db_name;id_agc;app_db_username;app_db_password
+192.168.17.33;moroni;1;adbanking;public
+192.168.17.3113;mbeni;2;adbanking;public
+192.168.17.33;domoni;10;adbanking;public

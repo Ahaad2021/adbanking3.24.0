@@ -1,0 +1,141 @@
+<!-- DTD pour les rapports batch -->
+
+<!-- Element root -->
+<!ELEMENT batch (header, archivage, comptes_arretes, cat_dat_echeance, frais_tenue_cpte, interets_debiteurs, rembourse_auto, declasse_credit, transaction_ferlo)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- Archivage clients -->
+<!ELEMENT archivage (detail_archivage*)>
+<!ATTLIST archivage nombre  CDATA #REQUIRED>
+
+<!-- Details archivage -->
+<!ELEMENT detail_archivage (id_client, nom_client, date_adh)>
+<!ELEMENT id_client (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT date_adh (#PCDATA)>
+
+<!-- Comptes Arrêtés -->
+<!ELEMENT comptes_arretes (detail_comptes_arretes*)>
+<!ATTLIST comptes_arretes nombre  CDATA #REQUIRED>
+
+<!-- Details comptes arrêtés -->
+<!ELEMENT detail_comptes_arretes (id_cpte, nom_client, solde, montant_interets, compte_ben)>
+
+<!ELEMENT id_cpte (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT solde (#PCDATA)>
+<!ELEMENT montant_interets (#PCDATA)>
+<!ELEMENT compte_ben (#PCDATA)>
+
+<!-- CAT et DAT arrivés à échéance -->
+<!ELEMENT cat_dat_echeance (detail_cat_dat_echeance*)>
+<!ATTLIST cat_dat_echeance nombre  CDATA #REQUIRED>
+
+<!-- Details CAT et DAT  arrivés à échéance -->
+<!ELEMENT detail_cat_dat_echeance (id_cpte, nom_client, solde, action, date_ouv, destination)>
+<!ELEMENT id_cpte (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT solde (#PCDATA)>
+<!ELEMENT action (#PCDATA)>
+<!ELEMENT date_ouv (#PCDATA)>
+<!ELEMENT destination (#PCDATA)>
+
+<!-- Prélèvement frais de tenue de compte -->
+<!ELEMENT frais_tenue_cpte (detail_frais_tenue_cpte*)>
+<!ATTLIST frais_tenue_cpte nombre CDATA #REQUIRED>
+
+<!-- Details Prélèvement frais de tenus compte -->
+<!ELEMENT detail_frais_tenue_cpte (num_cpte1, num_client1, solde1, frais1,num_cpte2, num_client2, solde2, frais2 )>
+<!ELEMENT num_cpte1 (#PCDATA)>
+<!ELEMENT num_client1 (#PCDATA)>
+<!ELEMENT solde1 (#PCDATA)>
+<!ELEMENT frais1 (#PCDATA)>
+<!ELEMENT num_cpte2 (#PCDATA)>
+<!ELEMENT num_client2 (#PCDATA)>
+<!ELEMENT solde2 (#PCDATA)>
+<!ELEMENT frais2 (#PCDATA)>
+
+<!-- Prélèvement intérêts débiteurs -->
+<!ELEMENT interets_debiteurs (detail_interets_debiteurs*)>
+<!ATTLIST interets_debiteurs nombre  CDATA #REQUIRED>
+
+<!-- Details prélèvement intérêts débiteurs -->
+<!ELEMENT detail_interets_debiteurs (num_cpte1, id_client1, solde1, frais1, num_cpte2, id_client2, solde2, frais2 )>
+<!ELEMENT num_cpte1 (#PCDATA)>
+<!ELEMENT id_client1 (#PCDATA)>
+<!ELEMENT solde1 (#PCDATA)>
+<!ELEMENT frais1 (#PCDATA)>
+<!ELEMENT num_cpte2 (#PCDATA)>
+<!ELEMENT id_client2 (#PCDATA)>
+<!ELEMENT solde2 (#PCDATA)>
+<!ELEMENT frais2 (#PCDATA)>
+
+<!-- Ordres permanents -->
+<!ELEMENT ordres_permanents (detail_ordres_permanents*)>
+<!ATTLIST ordres_permanents nombre  CDATA #REQUIRED>
+
+<!-- Details ordres permanents -->
+<!ELEMENT detail_ordres_permanents (num_cpte_src, num_cpte_dest, montant, frais, periodicite, intervale, statut)>
+<!ELEMENT num_cpte_src (#PCDATA)>
+<!ELEMENT num_cpte_dest (#PCDATA)>
+<!ELEMENT montant (#PCDATA)>
+<!ELEMENT frais (#PCDATA)>
+<!ELEMENT periodicite (#PCDATA)>
+<!ELEMENT intervale (#PCDATA)>
+<!ELEMENT statut (#PCDATA)>
+
+<!-- Rembouresment automatique -->
+<!ELEMENT rembourse_auto (detail_rembourse_auto*)>
+<!ATTLIST rembourse_auto nombre  CDATA #REQUIRED>
+
+<!-- Détails Rembouresment automatique -->
+<!ELEMENT detail_rembourse_auto (id_doss, id_ech, id_client, nom_client, compte, cap, int, pen, tot)>
+<!ELEMENT id_doss (#PCDATA)>
+<!ELEMENT id_ech (#PCDATA)>
+<!ELEMENT id_client (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT compte (#PCDATA)>
+<!ELEMENT cap (#PCDATA)>
+<!ELEMENT int (#PCDATA)>
+<!ELEMENT pen (#PCDATA)>
+<!ELEMENT tot (#PCDATA)>
+
+<!-- Déclassement de crédits -->
+<!ELEMENT declasse_credit (detail_declasse_credit*)>
+<!ATTLIST declasse_credit nombre  CDATA #REQUIRED>
+
+<!-- Détail déclassement de crédits -->
+<!ELEMENT detail_declasse_credit (id_doss, id_client, nom_client, solde, ancien, nouveau)>
+<!ELEMENT id_doss (#PCDATA)>
+<!ELEMENT id_client (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT solde (#PCDATA)>
+<!ELEMENT ancien (#PCDATA)>
+<!ELEMENT nouveau (#PCDATA)>
+
+<!-- Rembouresment automatique -->
+<!ELEMENT transaction_ferlo (detail_transaction_ferlo*)>
+<!ATTLIST transaction_ferlo nombre  CDATA #REQUIRED>
+
+<!-- Details des transactions FERLO-->
+<!ELEMENT detail_transaction_ferlo (type, compte, montant)>
+<!ELEMENT type (#PCDATA)>
+<!ELEMENT compte (#PCDATA)>
+<!ELEMENT montant (#PCDATA)>
+<!-- coherence compta compte interne de crédit -->
+<!ELEMENT coherence_compta_cpte_interne_credit (detail_coherence_compta_cpte_interne_credit*)>
+<!ELEMENT detail_coherence_compta_cpte_interne_credit (id_doss, compte, solde_cpt,solde_cap_compta,solde_diff)>
+<!-- coherence capital restant dû  compte interne de crédit -->
+<!ELEMENT coherence_cap_restant_cpte_interne_credit (detail_coherence_cap_restant_cpte_interne_credit*)>
+<!ELEMENT detail_coherence_cap_restant_cpte_interne_credit (id_doss, compte, solde_cpt,solde_cap_compta,solde_diff)>
+
+
+<!ELEMENT id_doss (#PCDATA)>
+<!ELEMENT compte (#PCDATA)>
+<!ELEMENT solde_cpt (#PCDATA)>
+<!ELEMENT solde_cap_compta (#PCDATA)>
+<!ELEMENT solde_diff (#PCDATA)>
+

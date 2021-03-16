@@ -1,0 +1,17 @@
+"N°d'ordre";"Code";"Libelle du Poste";"Compartiment";"N° d'ordre du Poste père";"Niveau";"Numero Compte Comptable"
+1;;"Line Code";1;;0;
+2;;"DESCRIPTIONS";1;;0;
+3;;"Amount";1;;0;
+4;"M.LRY.11";"10 Notes and Coins";1;2;;
+5;"M.LRY.12";"11+12 Balances With Banks and Other Financial Institutions";1;2;;"1.1/1.2"
+6;"M.LRY.13";"134 Term Treasury Loans up to 3 months";1;2;;
+7;"M.LRY.14";"135 Finance Loans to Banks an Other FI up to 3 months";1;2;;
+8;"M.LRY.15";"151 Assets in The Union Credit Group";1;2;;
+9;"M.LRY.16";"20 to 27 Performing Loans  up to 3 months";1;2;;
+10;"M.LRY.17";"331 Treasury Bills up to 3 months";1;2;;
+11;"M.LRY.18";"333 Other Securities up to 3 months";1;2;;
+12;"M.LRY.22";"201 to 203 Demand Deposits";2;2;;
+13;"M.LRY.23";"204 Savings Deposits up to 3 months";2;2;;"2.2.2"
+14;"M.LRY.24";"205 Deposits and Term Accounts (maximum 3 months)";2;2;;
+15;"M.LRY.25";"208 Colateral Deposits (maximum 3 months)";2;2;;
+16;"M.LRY.26";"143 to 145 Borrowings";2;2;;

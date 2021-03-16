@@ -1,0 +1,32 @@
+<!-- DTD pour le rapport recouvrement de creance BNR -->
+
+<!-- Element root -->
+<!ELEMENT recouvrement_creance_bnr (header, globals, creance, total)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+<!ELEMENT globals (devise)>
+<!ELEMENT devise (#PCDATA)>
+<!-- Criteres de recherche commun -->
+<!ENTITY % mod_criteres SYSTEM "criteres_recherche.dtd">
+%mod_criteres;
+
+<!-- Corps -->
+<!ELEMENT creance (index, libel_etat, annee_ecoulee,trim1,trim2,trim3,trim4,total_creance)>
+<!ELEMENT index (#PCDATA)>
+<!ELEMENT libel_etat (#PCDATA)>
+<!ELEMENT annee_ecoulee (#PCDATA)>
+<!ELEMENT trim1 (#PCDATA)>
+<!ELEMENT trim2 (#PCDATA)>
+<!ELEMENT trim3 (#PCDATA)>
+<!ELEMENT trim4 (#PCDATA)>
+<!ELEMENT total_creance (#PCDATA)>
+
+<!ELEMENT total (tot_annee_ecoulee, tot_trim1, tot_trim2, tot_trim3, tot_trim4, total_trim)>
+<!ELEMENT tot_annee_ecoulee (#PCDATA)>
+<!ELEMENT tot_trim1 (#PCDATA)>
+<!ELEMENT tot_trim2 (#PCDATA)>
+<!ELEMENT tot_trim3 (#PCDATA)>
+<!ELEMENT tot_trim4 (#PCDATA)>
+<!ELEMENT total_trim (#PCDATA)>

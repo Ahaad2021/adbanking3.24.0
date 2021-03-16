@@ -1,0 +1,44 @@
+<!-- DTD pour le rapport generaliste sur les credits -->
+
+<!-- Element root -->
+<!ELEMENT provisioncredit (header, header_contextuel, clients*,client_credit_gs*,total?)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- En-tete contextuel -->
+<!ELEMENT header_contextuel (criteres_recherche)>
+
+<!-- Criteres de recherche commun -->
+<!ENTITY % mod_criteres SYSTEM "criteres_recherche.dtd">
+%mod_criteres;
+
+<!-- Corps -->
+<!ELEMENT produit (libel_prod, clients, client_credit_gs, prod_nombre, prod_total_provision,   prod_capital_du)>
+<!ELEMENT libel_prod (#PCDATA)>
+<!ELEMENT prod_nombre (#PCDATA)>
+<!ELEMENT prod_total_provision (#PCDATA)>
+<!ELEMENT prod_capital_du (#PCDATA)>
+
+
+<!ELEMENT clients (num_doss, num_client, nom_client, prov_date, cre_etat,capital_du,prov_mnt,gar_num,cre_etat_date )>
+<!ELEMENT client_credit_gs (num_doss, num_client, nom_client, prov_date, cre_etat,capital_du,prov_mnt, membre_gs)>
+<!ELEMENT num_doss (#PCDATA)>
+<!ELEMENT num_client (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT lib_prod (#PCDATA)>
+<!ELEMENT prov_mnt (#PCDATA)>
+<!ELEMENT prov_date (#PCDATA)>
+<!ELEMENT cre_etat (#PCDATA)>
+<!ELEMENT capital_du (#PCDATA)>
+<!ELEMENT cre_etat_date (#PCDATA)>
+<!ELEMENT gar_num (#PCDATA)>
+<!ELEMENT membre_gs (#PCDATA)>
+
+<!ELEMENT total (nombre, total_provision, total_capital_du,total_gar_num)>
+<!ELEMENT nombre (#PCDATA)>
+<!ELEMENT total_provision (#PCDATA)>
+<!ELEMENT total_capital_du (#PCDATA)>
+<!ELEMENT total_gar_num (#PCDATA)>
+

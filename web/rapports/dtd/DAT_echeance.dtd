@@ -1,0 +1,40 @@
+<!-- DTD pour le rapport des DAT arrivant a echeance -->
+
+
+<!-- Element root -->
+<!ELEMENT DAT_echeance (header, header_contextuel, ligne_DAT*,total_general?)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- En-tete contextuel -->
+<!ELEMENT header_contextuel (criteres_recherche)>
+
+<!-- Criteres de recherche commun -->
+<!ENTITY % mod_criteres SYSTEM "criteres_recherche.dtd">
+%mod_criteres;
+
+<!ELEMENT ligne_DAT (groupe, ligne+, sous_total)>
+
+<!ELEMENT groupe (echeance)>
+<!ELEMENT echeance (#PCDATA)>
+
+<!ELEMENT ligne (num_compte,nom_client,num_client,solde_compte,date_echeance, taux_interet, proroge, decision)>
+
+<!ELEMENT num_compte (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT num_client (#PCDATA)>
+<!ELEMENT solde_compte (#PCDATA)>
+<!ELEMENT date_echeance (#PCDATA)>
+<!ELEMENT taux_interet (#PCDATA)>
+<!ELEMENT proroge (#PCDATA)>
+<!ELEMENT decision (#PCDATA)>
+
+<!ELEMENT sous_total (nombre, montant_total)>
+<!ELEMENT nombre (#PCDATA)>
+<!ELEMENT montant_total (#PCDATA)>
+
+<!ELEMENT total_general (total_nombre,total_montant)>
+<!ELEMENT total_nombre (#PCDATA)>
+<!ELEMENT total_montant (#PCDATA)>

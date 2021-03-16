@@ -1,0 +1,86 @@
+<!-- DTD pour le rapport sur la situation d'un client -->
+
+<!-- Element root -->
+<!ELEMENT situation_client (header, header_contextuel, ps?, epargnes?, ord?, garanties?, credits?)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- En-tete contextuel -->
+<!ELEMENT header_contextuel (num_client, nom_client, pp_date_naiss?, pp_lieu_naiss?, statut_juridique, qualite, etat_client, date_adhesion, nbre_ps, gestionnaire)>
+<!ELEMENT num_client (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT etat_client (#PCDATA)>
+<!ELEMENT date_adhesion (#PCDATA)>
+<!ELEMENT nbre_ps (#PCDATA)>
+<!ELEMENT gestionnaire (#PCDATA)>
+<!ATTLIST header_contextuel stat_jur CDATA #REQUIRED>
+
+<!-- Corps -->
+<!ELEMENT ps (situation_ps+)>
+
+<!ELEMENT epargnes (situation_epargne+)>
+
+<!ELEMENT ord (situation_ord+)>
+
+<!ELEMENT garanties (situation_garant+)>
+
+<!ELEMENT credits (situation_credit+)>
+
+<!ELEMENT situation_ps (num_complet_cpte, intitule_compte,id_client ,date_ouvert, prod_epargne, date_dern_mvt, solde_cpte, mnt_bloq, mnt_disp)>
+<!ELEMENT num_complet_cpte (#PCDATA)>
+<!ELEMENT intitule_compte (#PCDATA)>
+<!ELEMENT id_client (#PCDATA)>
+<!ELEMENT date_ouvert (#PCDATA)>
+<!ELEMENT prod_epargne (#PCDATA)>
+<!ELEMENT date_dern_mvt (#PCDATA)>
+<!ELEMENT solde_cpte (#PCDATA)>
+<!ELEMENT mnt_bloq (#PCDATA)>
+<!ELEMENT mnt_disp (#PCDATA)>
+
+<!ELEMENT situation_epargne (num_complet_cpte, intitule_compte,id_client ,date_ouvert, prod_epargne, date_dern_mvt, solde_cpte, mnt_bloq, mnt_disp)>
+<!ELEMENT num_complet_cpte (#PCDATA)>
+<!ELEMENT intitule_compte (#PCDATA)>
+<!ELEMENT id_client (#PCDATA)>
+<!ELEMENT date_ouvert (#PCDATA)>
+<!ELEMENT prod_epargne (#PCDATA)>
+<!ELEMENT date_dern_mvt (#PCDATA)>
+<!ELEMENT solde_cpte (#PCDATA)>
+<!ELEMENT mnt_bloq (#PCDATA)>
+<!ELEMENT mnt_disp (#PCDATA)>
+
+<!ELEMENT  situation_ord (num_cpte_ord, prod, date_ouverture, montant, periodicite, date_fin, mnt_solde)>
+<!ELEMENT num_cpte_ord (#PCDATA)>
+<!ELEMENT prod (#PCDATA)>
+<!ELEMENT date_ouverture (#PCDATA)>
+<!ELEMENT montant (#PCDATA)>
+<!ELEMENT periodicite (#PCDATA)>
+<!ELEMENT date_fin (#PCDATA)>
+<!ELEMENT mnt_solde (#PCDATA)>
+
+<!ELEMENT situation_credit (num_credit, prod_credit,id_client ,date_dem, date_approb?, date_debourse?, mnt_dem, mnt_octr?, etat_credit, nbre_ech, nbre_ech_remb)>
+<!ELEMENT num_credit (#PCDATA)>
+<!ELEMENT prod_credit (#PCDATA)>
+<!ELEMENT id_client (#PCDATA)>
+<!ELEMENT date_dem (#PCDATA)>
+<!ELEMENT date_approb (#PCDATA)>
+<!ELEMENT date_debourse (#PCDATA)>
+<!ELEMENT mnt_dem (#PCDATA)>
+<!ELEMENT mnt_octr (#PCDATA)>
+<!ELEMENT etat_credit (#PCDATA)>
+<!ELEMENT nbre_ech (#PCDATA)>
+<!ELEMENT nbre_ech_remb (#PCDATA)>
+<!ATTLIST situation_credit exist_date_approb  CDATA #REQUIRED
+                           exist_date_debourse  CDATA #REQUIRED
+                           exist_mnt_octr     CDATA #REQUIRED>
+             
+
+<!ELEMENT situation_garant (id_doss, id_client, nom_client, num_cpte, gar_num, mnt, etat)>
+<!ELEMENT id_doss (#PCDATA)>
+<!ELEMENT id_client (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT num_cpte (#PCDATA)>
+<!ELEMENT gar_num (#PCDATA)>
+<!ELEMENT mnt (#PCDATA)>
+<!ELEMENT etat (#PCDATA)>

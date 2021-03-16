@@ -1,0 +1,31 @@
+<!-- DTD pour le rapport des comptes d'epargne cloturés -->
+
+
+<!-- Element root -->
+<!ELEMENT histo_credit (header, header_contextuel, ligne, total)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- En-tete contextuel -->
+<!ELEMENT header_contextuel (criteres_recherche)>
+
+<!-- Criteres de recherche commun -->
+<!ENTITY % mod_criteres SYSTEM "criteres_recherche.dtd">
+%mod_criteres;
+
+<!ELEMENT ligne (num_cpte,num_client,nom_client,solde_clot,solde_clot_cv,date_clot,raison_clot,classe_comptable,produit)>
+
+
+<!ELEMENT num_cpte (#PCDATA)>
+<!ELEMENT num_client (#PCDATA)>
+<!ELEMENT nom_client (mnt_credit)>
+<!ELEMENT solde_clot (#PCDATA)>
+<!ELEMENT solde_clot_cv (#PCDATA)>
+<!ELEMENT date_clot (#PCDATA)>
+<!ELEMENT raison_clot (#PCDATA)>
+<!ELEMENT classe_comptable (#PCDATA)>
+<!ELEMENT produit (#PCDATA)>
+
+

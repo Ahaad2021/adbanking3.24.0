@@ -1,0 +1,28 @@
+<!-- DTD pour le bilan BNR -->
+
+<!-- Element root -->
+<!ELEMENT bilan_bnr (header, compartiment*,agences,enreg_agence)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!ELEMENT compartiment (entete,poste*)>
+<!ELEMENT entete (entete_1,entete_2,entete_3) >
+<!ELEMENT poste (code,libel,solde,amort_actif,net,niveau)>
+
+<!ELEMENT entete_1 (#PCDATA)>
+<!ELEMENT entete_2 (#PCDATA)>
+<!ELEMENT entete_3 (#PCDATA)>
+<!ELEMENT code (#PCDATA)>
+<!ELEMENT libel (#PCDATA)>
+<!ELEMENT solde (#PCDATA)>
+<!ELEMENT amort_actif (#PCDATA)>
+<!ELEMENT net (#PCDATA)>
+<!ELEMENT niveau (#PCDATA)>
+
+<!ELEMENT agences (agences)>
+<!ELEMENT enreg_agence (id_ag,libel_ag,date_max)>
+<!ELEMENT id_ag (#PCDATA)>
+<!ELEMENT libel_ag (#PCDATA)>
+<!ELEMENT date_max (#PCDATA)>

@@ -1,0 +1,35 @@
+<!-- DTD pour une cloture periodique -->
+
+<!-- Element root -->
+<!ELEMENT commission_hist (header, header_contextuel, depot*, retrait*, client*)>
+
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- En-tete contextuel -->
+<!ELEMENT header_contextuel (criteres_recherche)>
+<!-- Criteres de recherche commun -->
+<!ENTITY % mod_criteres SYSTEM "criteres_recherche.dtd">
+%mod_criteres;
+
+<!-- En-tete contextuel -->
+<!ELEMENT depot (his*)>
+<!ELEMENT retrait (his*)>
+<!ELEMENT client (his*)>
+
+<!ELEMENT his (date_mod, type_comm, palier*)>
+<!ELEMENT date_mod (#PCDATA)>
+<!ELEMENT type_comm (#PCDATA)>
+
+<!ELEMENT palier (id_palier, mnt_min, mnt_max, comm_agent_prc, comm_agent_mnt, comm_inst_prc, comm_inst_mnt, comm_tot_prc, comm_tot_mnt, date_creation)>
+<!ELEMENT id_palier (#PCDATA)>
+<!ELEMENT mnt_min (#PCDATA)>
+<!ELEMENT mnt_max (#PCDATA)>
+<!ELEMENT comm_agent_prc (#PCDATA)>
+<!ELEMENT comm_agent_mnt (#PCDATA)>
+<!ELEMENT comm_inst_prc (#PCDATA)>
+<!ELEMENT comm_inst_mnt (#PCDATA)>
+<!ELEMENT comm_tot_prc (#PCDATA)>
+<!ELEMENT comm_tot_mnt (#PCDATA)>
+<!ELEMENT date_creation (#PCDATA)>
+

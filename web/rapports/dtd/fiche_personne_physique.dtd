@@ -1,0 +1,48 @@
+<!-- DTD pour la fiche d'un client personne physique -->
+
+<!-- Element root -->
+<!ELEMENT fiche_personne_physique (header, fiche_pp,liste_groupe)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- Corps -->
+<!ELEMENT fiche_pp (photo_pp,num_pp,etat_pp,stat_jur_pp,qualite_pp,anc_num_pp,date_adh_pp,date_cre_pp,gest_pp,lang_corres_pp,nom_pp,prenom_pp,sexe_pp,etat_civil_pp,date_nais_pp,lieu_nais_pp,pays_nais_pp,nationalite_pp,type_piece_pp,num_piece_pp,date_expir_pp,adresse_pp,loc1_pp,loc2_pp,code_postal_pp,ville_pp,pays_pp,num_tel_pp,fax_pp,email_pp,sect_act_pp,activ_prof_pp, zone)>
+<!ELEMENT photo_pp (#PCDATA)>
+<!ELEMENT num_pp (#PCDATA)>
+<!ELEMENT etat_pp (#PCDATA)>
+<!ELEMENT stat_jur_pp (#PCDATA)>
+<!ELEMENT qualite_pp (#PCDATA)>
+<!ELEMENT anc_num_pp (#PCDATA)>
+<!ELEMENT date_adh_pp (#PCDATA)>
+<!ELEMENT date_cre_pp (#PCDATA)>
+<!ELEMENT gest_pp (#PCDATA)>
+<!ELEMENT lang_corres_pp (#PCDATA)>
+<!ELEMENT nom_pp (#PCDATA)>
+<!ELEMENT prenom_pp (#PCDATA)>
+<!ELEMENT sexe_pp (#PCDATA)>
+<!ELEMENT etat_civil_pp (#PCDATA)>
+<!ELEMENT date_nais_pp (#PCDATA)>
+<!ELEMENT lieu_nais_pp (#PCDATA)>
+<!ELEMENT pays_nais_pp (#PCDATA)>
+<!ELEMENT nationalite_pp (#PCDATA)>
+<!ELEMENT type_piece_pp (#PCDATA)>
+<!ELEMENT num_piece_pp (#PCDATA)>
+<!ELEMENT date_expir_pp (#PCDATA)>
+<!ELEMENT adresse_pp (#PCDATA)>
+<!ELEMENT loc1_pp (#PCDATA)>
+<!ELEMENT loc2_pp (#PCDATA)>
+<!ELEMENT code_postal_pp (#PCDATA)>
+<!ELEMENT ville_pp (#PCDATA)>
+<!ELEMENT pays_pp (#PCDATA)>
+<!ELEMENT num_tel_pp (#PCDATA)>
+<!ELEMENT fax_pp (#PCDATA)>
+<!ELEMENT email_pp (#PCDATA)>
+<!ELEMENT sect_act_pp (#PCDATA)>
+<!ELEMENT activ_prof_pp (#PCDATA)>
+<!ELEMENT zone (#PCDATA)>
+
+<!ELEMENT  liste_groupe (num_groupe, nom_groupe)>
+<!ELEMENT num_groupe (#PCDATA)>
+<!ELEMENT nom_groupe (#PCDATA)>

@@ -1,0 +1,19 @@
+<!-- DTD pour le rapport des etats d'execution budgetaire -->
+
+<!-- Element root -->
+<!ELEMENT atm_carte_a_imprimer (header,carte_imprimer)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!--<!ELEMENT infos_synthetiques (devise)>-->
+<!--<!ELEMENT devise (#PCDATA)>-->
+
+<!-- Corps -->
+<!ELEMENT carte_imprimer (details)>
+<!ELEMENT details (no_client,compte,nom,date_demande)>
+<!ELEMENT no_client (#PCDATA)>
+<!ELEMENT compte (#PCDATA)>
+<!ELEMENT nom (#PCDATA)>
+<!ELEMENT date_demande (#PCDATA)>

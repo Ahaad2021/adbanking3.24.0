@@ -1,0 +1,30 @@
+<!-- DTD pour les rapports liste des chéquiers commandés et envoyés impression -->
+
+<!-- Element root -->
+<!ELEMENT chequiers_commande_envoye_impression (header, infos_synthetique,infos_tot_frais, footer, header_contextuel, cmd_chequiers_data)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!ELEMENT infos_synthetique (ligne_synthese*)>
+<!ELEMENT ligne_synthese (etat_cmd_cheq, nb_chequiers,tot_frais) >
+<!ELEMENT etat_cmd_cheq (#PCDATA)>
+<!ELEMENT nb_chequiers (#PCDATA)>
+<!ELEMENT tot_frais (#PCDATA)>
+
+
+
+
+<!ELEMENT cmd_chequiers_data (type_rapport, ligne_cmd_chequier*)>
+<!ELEMENT type_rapport (#PCDATA)>
+<!ELEMENT ligne_cmd_chequier (ordre, date_commande,num_client, num_cpte, nom_client,  frais?, date_envoi_impr?,total_frais)>
+
+<!ELEMENT ordre (#PCDATA)>
+<!ELEMENT date_commande (#PCDATA)>
+<!ELEMENT num_client (#PCDATA)>
+<!ELEMENT num_cpte (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT frais (#PCDATA)>
+<!ELEMENT date_envoi_impr (#PCDATA)>
+<!ELEMENT total_frais (#PCDATA)>

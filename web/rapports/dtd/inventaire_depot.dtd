@@ -1,0 +1,45 @@
+<!-- DTD pour les recus (retrait, depot et depot cheque) -->
+
+        <!-- Element root -->
+        <!ELEMENT inventaire_depot (header,header_contextuel, body)>
+
+
+        <!-- Un en-tete commun a tous -->
+        <!ENTITY % mod_header SYSTEM "header.dtd">
+        %mod_header;
+
+        <!-- En-tete contextuel -->
+        <!ELEMENT header_contextuel (informations_synthetiques)>
+
+        <!ENTITY % mod_criteres SYSTEM "informations_synthetiques.dtd">
+        %mod_criteres;
+
+        <!-- Corps -->
+        <!ELEMENT body (produit_epargne*)>
+
+        <!ELEMENT produit_epargne (epargne,ligne_produit*,totals)>
+        <!ELEMENT epargne (#PCDATA)>
+
+        <!ELEMENT ligne_produit (num, num_cpte, nom_client, sexe, solde_debut_periode, total_mouvement_depot, total_mouvement_retrait, solde_fin_periode, date_naissance, etat_civile, sector, cell, village, tel, idnumber)>
+
+        <!ELEMENT num (#PCDATA)>
+        <!ELEMENT num_cpte (#PCDATA)>
+        <!ELEMENT nom_client (#PCDATA)>
+        <!ELEMENT sexe (#PCDATA)>
+        <!ELEMENT solde_debut_periode (#PCDATA)>
+        <!ELEMENT total_mouvement_depot (#PCDATA)>
+        <!ELEMENT total_mouvement_retrait (#PCDATA)>
+        <!ELEMENT solde_fin_periode (#PCDATA)>
+        <!ELEMENT date_naissance (#PCDATA)>
+        <!ELEMENT etat_civile (#PCDATA)>
+        <!ELEMENT sector (#PCDATA)>
+        <!ELEMENT cell (#PCDATA)>
+        <!ELEMENT village (#PCDATA)>
+        <!ELEMENT tel (#PCDATA)>
+        <!ELEMENT idnumber (#PCDATA)>
+
+        <!ELEMENT totals (tot_solde_debut,tot_mouvement_depot,tot_mouvement_retrait,tot_solde_fin)>
+        <!ELEMENT tot_solde_debut (#PCDATA)>
+        <!ELEMENT tot_mouvement_depot (#PCDATA)>
+        <!ELEMENT tot_mouvement_retrait (#PCDATA)>
+        <!ELEMENT tot_solde_fin (#PCDATA)>

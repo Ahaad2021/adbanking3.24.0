@@ -1,0 +1,19 @@
+<!-- DTD pour la balance journalière -->
+
+<!-- Element root -->
+<!ELEMENT balance_journaliere (header, compte*)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!ELEMENT compte (num, libel, total_debits, total_credits, calcul_debit, calcul_credit, solde?)>
+
+<!ELEMENT num (#PCDATA)>
+<!ELEMENT libel (#PCDATA)>
+<!ELEMENT total_debits (#PCDATA)>
+<!ELEMENT total_credits (#PCDATA)>
+<!ELEMENT calcul_debit (#PCDATA)>
+<!ELEMENT calcul_credit (#PCDATA)>
+<!ELEMENT solde_debit (#PCDATA)>
+<!ELEMENT solde_credit (#PCDATA)>

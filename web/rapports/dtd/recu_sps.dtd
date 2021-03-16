@@ -1,0 +1,28 @@
+<!-- DTD pour les recus (retrait, depot et depot cheque) -->
+
+<!-- Element root -->
+<!ELEMENT recu_adhesion (header, body)>
+<!ATTLIST recu type CDATA #REQUIRED>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- Corps -->
+<!ELEMENT body (num_client, lib_set, sous_set , nom_client, nbre_parts, nbre_parts_lib, prix_part, total_ps, total_ps_restant, num_cpte_base, solde_cpte_base, num_cpte_ps, nbre_total_ps, solde_cpte_ps, num_trans)>
+<!ELEMENT num_client (#PCDATA)>
+<!ELEMENT lib_set (#PCDATA)>
+<!ELEMENT sous_set (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT num_cpte_base (#PCDATA)>
+<!ELEMENT num_cpte_ps (#PCDATA)>
+<!ELEMENT solde_cpte_base (#PCDATA)>
+<!ELEMENT solde_cpte_ps (#PCDATA)>
+<!ELEMENT nbre_parts (#PCDATA)>
+<!ELEMENT nbre_parts_lib (#PCDATA)>
+<!ELEMENT prix_part (#PCDATA)>
+<!ELEMENT total_ps (#PCDATA)>
+<!ELEMENT total_ps_restant (#PCDATA)>
+<!ELEMENT nbre_total_ps (#PCDATA)>
+<!ELEMENT num_trans (#PCDATA)>
+

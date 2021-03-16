@@ -1,0 +1,51 @@
+<!-- DTD pour le rapport des credits arrivant a echeance -->
+
+
+<!-- Element root -->
+<!ELEMENT credit_echeance (header, header_contextuel, ligne_credit*,total_general?)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- En-tete contextuel -->
+<!ELEMENT header_contextuel (criteres_recherche)>
+
+<!-- Criteres de recherche commun -->
+<!ENTITY % mod_criteres SYSTEM "criteres_recherche.dtd">
+%mod_criteres;
+
+
+<!ELEMENT ligne_credit (echeance, ligne+, sous_total)>
+
+<!-- ELEMENT groupe (echeance) -->
+<!ELEMENT echeance (#PCDATA)>
+
+
+<!ELEMENT ligne (num_doss,num_client,nom_client ,date_ech,mnt_cap, mnt_int, mnt_reech, solde_cap,devise?,groupe_gs,membre_gs)>
+
+<!ELEMENT num_doss (#PCDATA)>
+<!ELEMENT num_client (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT date_ech (#PCDATA)>
+<!ELEMENT mnt_cap (#PCDATA)>
+<!ELEMENT mnt_int (#PCDATA)>
+<!ELEMENT mnt_reech (#PCDATA)>
+<!ELEMENT solde_cap (#PCDATA)>
+<!ELEMENT devise (#PCDATA)>
+<!ELEMENT groupe_gs (#PCDATA)>
+<!ELEMENT membre_gs (#PCDATA)>
+
+<!ELEMENT sous_total (nombre,montant ,interet,reech,solde)>
+<!ELEMENT nombre (#PCDATA)>
+<!ELEMENT montant (#PCDATA)>
+<!ELEMENT interet (#PCDATA)>
+<!ELEMENT reech (#PCDATA)>
+<!ELEMENT solde (#PCDATA)>
+
+<!ELEMENT total_general (total_nombre,total_montant,total_interet,total_reech,total_solde)>
+<!ELEMENT total_nombre (#PCDATA)>
+<!ELEMENT total_montant (#PCDATA)>
+<!ELEMENT total_interet (#PCDATA)>
+<!ELEMENT total_reech (#PCDATA)>
+<!ELEMENT total_solde (#PCDATA)>

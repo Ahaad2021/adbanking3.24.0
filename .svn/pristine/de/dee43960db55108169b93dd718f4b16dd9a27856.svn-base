@@ -1,0 +1,33 @@
+<!-- DTD pour le rapports des credits accordes aux dirigeants -->
+
+<!-- Element root -->
+<!ELEMENT liste_credits_dirs (header, details_dir)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!ELEMENT details_dir (total, client*)>
+
+<!ELEMENT client (index, id_client, nom, solde_cap, cre_etat, mnt_pen, groupe_gs, membre_gs, cre_retard_etat_max_jour, gar_tot, cre_mnt_octr, date_dem)>
+
+<!ELEMENT index (#PCDATA)>
+<!ELEMENT id_client (#PCDATA)>
+<!ELEMENT id_doss (#PCDATA)>
+<!ELEMENT nom (#PCDATA)>
+<!ELEMENT solde_cap (#PCDATA)>
+<!ELEMENT cre_etat (#PCDATA)>
+<!ELEMENT mnt_pen (#PCDATA)>
+<!ELEMENT cre_retard_etat_max_jour (#PCDATA)>
+<!ELEMENT gar_tot (#PCDATA)>
+<!ELEMENT date_dem (#PCDATA)>
+<!ELEMENT cre_mnt_octr (#PCDATA)>
+<!ELEMENT groupe_gs (#PCDATA)>
+<!ELEMENT membre_gs (#PCDATA)>
+<!ELEMENT provision (#PCDATA)>
+
+<!ELEMENT total (total_solde_cap, total_mnt_octr, total_retard)>
+
+<!ELEMENT total_solde_cap (#PCDATA)>
+<!ELEMENT total_mnt_octr (#PCDATA)>
+<!ELEMENT total_retard (#PCDATA)>

@@ -1,0 +1,33 @@
+<!-- DTD pour le rapport chequiers en opposition -->
+
+<!-- Element root -->
+<!ELEMENT chequiers_en_opposition (header, infos_synthetique, footer, header_contextuel, chequiers_opposition_data, cheques_opposition_data)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!ELEMENT infos_synthetique (nb_chequiers_en_opposition, nb_cheques_en_opposition)>
+<!ELEMENT nb_chequiers_en_opposition (#PCDATA)>
+<!ELEMENT nb_cheques_en_opposition (#PCDATA)>
+
+<!ELEMENT chequiers_opposition_data (ligne_chequier*)>
+<!ELEMENT ligne_chequier (num_client, num_cpte, nom_client, date_opposition, id_chequier, num_deb_cheq, num_fin_cheq, description)>
+<!ELEMENT num_client (#PCDATA)>
+<!ELEMENT num_cpte (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT date_opposition (#PCDATA)>
+<!ELEMENT id_chequier (#PCDATA)>
+<!ELEMENT num_deb_cheq (#PCDATA)>
+<!ELEMENT num_fin_cheq (#PCDATA)>
+<!ELEMENT description (#PCDATA)>
+
+<!ELEMENT cheques_opposition_data (ligne_cheque*)>
+<!ELEMENT ligne_cheque (num_client_ch, num_cpte_ch, nom_client_ch, date_opposition_ch, id_cheque_ch, libel_etat_cheque_ch, description_ch)>
+<!ELEMENT num_client_ch (#PCDATA)>
+<!ELEMENT num_cpte_ch (#PCDATA)>
+<!ELEMENT nom_client_ch (#PCDATA)>
+<!ELEMENT date_opposition_ch (#PCDATA)>
+<!ELEMENT id_cheque_ch (#PCDATA)>
+<!ELEMENT libel_etat_cheque_ch (#PCDATA)>
+<!ELEMENT description_ch (#PCDATA)>

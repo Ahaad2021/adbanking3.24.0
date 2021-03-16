@@ -1,0 +1,40 @@
+<!-- DTD pour les recus (retrait, depot et depot cheque) -->
+
+<!-- Element root -->
+<!ELEMENT recu (header, body)>
+<!ATTLIST recu type CDATA #REQUIRED>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- Corps -->
+<!ELEMENT body (donneur,beneficaires,transfert,communication,remarque)>
+
+<!ELEMENT donneur (idClient?,nomClient,donneurOrdre,numCpte,montant,solde)>
+<!ELEMENT idClient (#PCDATA)>
+<!ELEMENT nomClient (#PCDATA)>
+<!ELEMENT donneurOrdre (#PCDATA)>
+<!ELEMENT numCpte (#PCDATA)>
+<!ELEMENT montant (#PCDATA)>
+<!ELEMENT solde (#PCDATA)>
+
+<!ELEMENT transfert (frais,frais_minimum_2retrait,numTransa,dateTransa,TypeTransfert )>
+<!ELEMENT frais (#PCDATA)>
+<!ELEMENT frais_minimum_2retrait (#PCDATA)>
+<!ELEMENT numTransa (#PCDATA)>
+<!ELEMENT dateTransa (#PCDATA)>
+<!ELEMENT TypeTransfert (#PCDATA)>
+
+
+<!ELEMENT beneficiaires (nomBeneficaire,numCpteBeneficaire,dateDemandeVir,mntPreleve,mntBeneficaire,frais)>
+<!ELEMENT nomBeneficaire (#PCDATA)>
+<!ELEMENT numCpteBeneficaire (#PCDATA)>
+<!ELEMENT dateDemandeVir (#PCDATA)>
+<!ELEMENT mntPreleve (#PCDATA)>
+<!ELEMENT mntBeneficaire (#PCDATA)>
+<!ELEMENT frais (#PCDATA)>
+
+
+<!ELEMENT remarque (#PCDATA)>
+<!ELEMENT communication (#PCDATA)>

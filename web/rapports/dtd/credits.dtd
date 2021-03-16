@@ -1,0 +1,35 @@
+<!-- DTD pour le rapport generaliste sur les credits -->
+
+<!-- Element root -->
+<!ELEMENT credits (header, header_contextuel, credit*)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- En-tete contextuel -->
+<!ELEMENT header_contextuel (criteres_recherche, infos_synthetiques)>
+
+<!-- Criteres de recherche commun -->
+<!ENTITY % mod_criteres SYSTEM "criteres_recherche.dtd">
+%mod_criteres;
+
+<!-- Informations synthetiques -->
+<!ELEMENT infos_synthetiques (nbre_total)>
+<!ELEMENT nbre_total (#PCDATA)>
+
+<!-- Corps -->
+<!ELEMENT credit (num_doss, num_client, nom_client, lib_prod, tx_int, mnt_octr, total_cap_du, total_int_du, total_pen_du, nbre_ech_retard, mnt_proch_vers, date_proch_vers)>
+<!ELEMENT num_doss (#PCDATA)>
+<!ELEMENT num_client (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT lib_prod (#PCDATA)>
+<!ELEMENT tx_int (#PCDATA)>
+<!ELEMENT mnt_octr (#PCDATA)>
+<!ELEMENT total_cap_du (#PCDATA)>
+<!ELEMENT total_int_du (#PCDATA)>
+<!ELEMENT total_pen_du (#PCDATA)>
+<!ELEMENT nbre_ech_retard (#PCDATA)>
+<!ELEMENT mnt_proch_vers (#PCDATA)>
+<!ELEMENT date_proch_vers (#PCDATA)>
+

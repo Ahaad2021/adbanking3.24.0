@@ -1,0 +1,41 @@
+<!-- DTD pour le rapport des nouveaux clients mobile lending -->
+
+<!-- Element root -->
+<!ELEMENT mobile_lending_nouveaux_clients (header,header_contextuel, new_client)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- En-tete contextuel -->
+<!ELEMENT header_contextuel (criteres_recherche)>
+
+<!-- Criteres de recherche commun -->
+<!ENTITY % mod_criteres SYSTEM "criteres_recherche.dtd">
+%mod_criteres;
+
+<!ELEMENT new_client (credit_en_cours*,credit_solde*)>
+
+<!ELEMENT credit_en_cours (num_client,nom_client,telephone1, dossier,mnt_credit,duree,etat,mnt_eche,date_eche)>
+<!ELEMENT num_client (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT telephone1 (#PCDATA)>
+<!ELEMENT dossier (#PCDATA)>
+<!ELEMENT mnt_credit (#PCDATA)>
+<!ELEMENT duree (#PCDATA)>
+<!ELEMENT etat (#PCDATA)>
+<!ELEMENT mnt_eche (#PCDATA)>
+<!ELEMENT date_eche (#PCDATA)>
+
+<!ELEMENT credit_solde (num_client_solde,nom_client_solde,telephone_solde, dossier_solde,mnt_credit_solde,duree_solde,etat_solde,mnt_eche_solde,date_eche_solde)>
+<!ELEMENT num_client_solde (#PCDATA)>
+<!ELEMENT nom_client_solde (#PCDATA)>
+<!ELEMENT telephone_solde (#PCDATA)>
+<!ELEMENT dossier_solde (#PCDATA)>
+<!ELEMENT mnt_credit_solde (#PCDATA)>
+<!ELEMENT duree_solde (#PCDATA)>
+<!ELEMENT etat_solde (#PCDATA)>
+<!ELEMENT mnt_eche_solde (#PCDATA)>
+<!ELEMENT date_eche_solde (#PCDATA)>
+
+

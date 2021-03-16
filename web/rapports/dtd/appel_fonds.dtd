@@ -1,0 +1,66 @@
+<!--
+ *
+ * DTD pour le rapport Appel de Fonds
+ *
+ * Voir Demamde d'amelioration client https://devel.adbanking.org/ticket/1024
+ *
+ * Version : 3.0
+ * Crée le : Octobre 2007
+ * Auteur  : Stefano AMEKOUDI
+ *
+-->
+
+<!-- Element root -->
+<!ELEMENT appel_fonds (header, header_contextuel, gestionnaire*)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- En-tete contextuel -->
+<!ELEMENT header_contextuel (criteres_recherche)>
+
+<!-- Criteres de recherche commun -->
+<!ENTITY % mod_criteres SYSTEM "criteres_recherche.dtd">
+%mod_criteres;
+
+<!ELEMENT gestionnaire (agent_gest,ligneCredit*,recapitulatif*)>
+<!ELEMENT agent_gest (#PCDATA)>
+
+<!ELEMENT ligneCredit (infosCreditSolidiaire*,detailCredit*)>
+
+<!ELEMENT infosCreditSolidiaire (
+    num_client,nom_client,no_dossier, prd_credit, date_dde,
+    montant_dde,obj_dde,detail_obj_dde, duree,
+    etat,date_decision?,montant_octr?, motif?)>
+
+<!ELEMENT detailCredit (
+    num_client,nom_client,no_dossier, prd_credit, date_dde,
+    montant_dde,obj_dde,detail_obj_dde, duree,
+    etat,date_decision?,montant_octr?, motif?,membre_gs?)>
+
+<!ELEMENT num_client (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT no_dossier (#PCDATA)>
+<!ELEMENT prd_credit (#PCDATA)>
+<!ELEMENT date_dde (#PCDATA)>
+<!ELEMENT devise (#PCDATA)>
+<!ELEMENT montant_dde (#PCDATA)>
+<!ELEMENT obj_dde (#PCDATA)>
+<!ELEMENT detail_obj_dde (#PCDATA)>
+<!ELEMENT duree (#PCDATA)>
+<!ELEMENT etat (#PCDATA)>
+<!ELEMENT date_decision (#PCDATA)>
+<!ELEMENT montant_octr (#PCDATA)>
+<!ELEMENT motif (#PCDATA)>
+<!ELEMENT membre_gs (#PCDATA)>
+
+<!ELEMENT recapitulatif (
+		nb_total_credit, nb_credit_ordinaire, nb_credit_solidaire,
+		mnt_total_credit, mnt_credit_ordinaire, mnt_credit_solidaire)>
+<!ELEMENT nb_total_credit (#PCDATA)>
+<!ELEMENT nb_credit_ordinaire (#PCDATA)>
+<!ELEMENT nb_credit_solidaire (#PCDATA)>
+<!ELEMENT mnt_total_credit (#PCDATA)>
+<!ELEMENT mnt_credit_ordinaire (#PCDATA)>
+<!ELEMENT mnt_credit_solidaire (#PCDATA)>

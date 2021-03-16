@@ -1,0 +1,24 @@
+<!-- DTD pour le rapport generaliste sur la repartition des credits -->
+
+<!-- Element root -->
+<!ELEMENT repartition_credit (header, header_contextuel, tranche*, total)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- En-tete contextuel -->
+<!ELEMENT header_contextuel (critere)>
+<!ELEMENT critere (#PCDATA)>
+
+
+<!-- Corps -->
+<!ELEMENT tranche (lib_tranche, nbre, nbre_prc, mnt, mnt_prc, retard, retard_prc)>
+<!ELEMENT total (nbre, mnt, retard)>
+<!ELEMENT nbre (#PCDATA)>
+<!ELEMENT mnt (#PCDATA)>
+<!ELEMENT retard (#PCDATA)>
+<!ELEMENT lib_tranche (#PCDATA)>
+<!ELEMENT nbre_prc (#PCDATA)>
+<!ELEMENT mnt_prc (#PCDATA)>
+<!ELEMENT retard_prc (#PCDATA)>

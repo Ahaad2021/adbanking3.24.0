@@ -1,0 +1,16 @@
+<!-- DTD pour Simulation intermédiaire  -->
+
+<!-- Element root -->
+<!ELEMENT simulation_intermediaire (header, compte*)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!ELEMENT compte (numero,libel,mn,me,tot)>
+
+<!ELEMENT numero (#PCDATA)>
+<!ELEMENT libel (#PCDATA)>
+<!ELEMENT mn (#PCDATA)>
+<!ELEMENT me (#PCDATA)>
+<!ELEMENT tot (#PCDATA)>

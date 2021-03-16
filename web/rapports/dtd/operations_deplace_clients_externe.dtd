@@ -1,0 +1,76 @@
+<!-- DTD pour le rapport local/clients externe des transactions en deplacé -->
+
+<!-- Element root -->
+<!ELEMENT operations_deplace_clients_externe (header, footer, header_contextuel, transactions, summary)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- transactions -->
+<!ELEMENT transactions (infos_agences, transaction*)>
+
+<!-- infos agences -->
+<!ELEMENT infos_agences (nom_agence_local)>
+<!ELEMENT nom_agence_local (#PCDATA)>
+
+<!-- Details des transactions -->
+<!ELEMENT transaction (date_transac, his_data_local*, his_data_distant*)>
+<!ELEMENT date_transac (#PCDATA)>
+
+<!ELEMENT his_data_local (trans_local, login_local, agence_local, ligne_ecritures_local*)>
+
+<!ELEMENT his_data_distant (trans_distant, login_distant, agence_distant, client_distant, ligne_ecritures_distant*)>
+
+
+<!-- local -->
+<!ELEMENT trans_local (#PCDATA)>
+<!ELEMENT login_local (#PCDATA)>
+<!ELEMENT agence_local (#PCDATA)>
+
+<!ELEMENT ligne_ecritures_local (ecriture_local* )>
+<!ELEMENT ecriture_local (libel_ecriture_local, ligne_mouvements_local*)>
+
+<!ELEMENT libel_ecriture_local (#PCDATA)>
+
+<!ELEMENT ligne_mouvements_local (mouvement_local*)>
+<!ELEMENT mouvement_local (compte_local, montant_debit_local, montant_credit_local)>
+<!ELEMENT compte_local (#PCDATA)>
+<!ELEMENT montant_debit_local (#PCDATA)>
+<!ELEMENT montant_credit_local (#PCDATA)>
+
+<!-- distant -->
+<!ELEMENT trans_distant (#PCDATA)>
+<!ELEMENT login_distant (#PCDATA)>
+<!ELEMENT agence_distant (#PCDATA)>
+<!ELEMENT client_distant (#PCDATA)>
+
+<!ELEMENT ligne_ecritures_distant (ecriture_distant* )>
+<!ELEMENT ecriture_distant (libel_ecriture_distant, ligne_mouvements_distant*)>
+
+<!ELEMENT libel_ecriture_distant (#PCDATA)>
+
+<!ELEMENT ligne_mouvements_distant (mouvement_distant*)>
+<!ELEMENT mouvement_distant (compte_distant, compte_client_distant, montant_debit_distant, montant_credit_distant)>
+<!ELEMENT compte_distant (#PCDATA)>
+<!ELEMENT compte_client_distant (#PCDATA)>
+<!ELEMENT montant_debit_local (#PCDATA)>
+<!ELEMENT montant_credit_local (#PCDATA)>
+
+<!-- Sommaire -->
+
+<!ELEMENT summary (rows_summary*, grand_summary*)>
+
+<!ELEMENT rows_summary (row*)>
+<!ELEMENT row (agence_locale, agence_externe, total_depot, total_retrait)>
+
+<!ELEMENT grand_summary (agence, grand_total_depot, grand_total_retrait)>
+
+<!ELEMENT agence_locale (#PCDATA)>
+<!ELEMENT agence_externe (#PCDATA)>
+<!ELEMENT total_depot (#PCDATA)>
+<!ELEMENT total_retrait (#PCDATA)>
+
+<!ELEMENT agence (#PCDATA)>
+<!ELEMENT grand_total_depot (#PCDATA)>
+<!ELEMENT grand_total_retrait (#PCDATA)>

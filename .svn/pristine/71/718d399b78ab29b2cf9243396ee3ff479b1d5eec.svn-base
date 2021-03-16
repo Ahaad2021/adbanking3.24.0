@@ -1,0 +1,197 @@
+<!-- DTD pour le rapport journalier -->
+
+<!-- Element root -->
+<!ELEMENT journaux (header, journalier*)>
+
+<!ELEMENT journalier (adhesions, defections, ouvertures, clotures, dat_prolonges, dat_non_prolonges, dossiers_credit, dcr_approuves, dcr_rejetes, dcr_annules, dcr_debourses, dcr_repris ,ps_repris, comptes_ajustes, app_caisses, delest_caisses, situation_coffre, situation_dep)>
+<!ATTLIST journalier jour  CDATA #REQUIRED>
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- Nouvelles adhesions -->
+<!ELEMENT adhesions (detail_adhesion*)>
+<!ATTLIST adhesions nombre  CDATA #REQUIRED>
+
+<!-- Details adhesions -->
+<!ELEMENT detail_adhesion (id_client, nom_client, stat_jur, sect_act, gestionnaire)>
+<!ELEMENT id_client (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT stat_jur (#PCDATA)>
+<!ELEMENT sect_act (#PCDATA)>
+<!ELEMENT gestionnaire (#PCDATA)>
+
+<!-- Nouvelles defections -->
+<!ELEMENT defections (detail_defection*)>
+<!ATTLIST defections nombre  CDATA #REQUIRED>
+
+<!-- Details defections -->
+<!ELEMENT detail_defection (id_client, nom_client, stat_jur, sect_act, gestionnaire, date_adh, raison_defection)>
+
+<!ELEMENT date_adh (#PCDATA)>
+<!ELEMENT raison_defection (#PCDATA)>
+
+<!-- Nouvelles ouvertures de comptes -->
+<!ELEMENT ouvertures (detail_ouverture*)>
+<!ATTLIST ouvertures nombre  CDATA #REQUIRED>
+
+<!-- Details ouvertures -->
+<!ELEMENT detail_ouverture (num_cpte, id_client, nom_client, produit_epargne, solde)>
+<!ELEMENT num_cpte (#PCDATA)>
+<!ELEMENT produit_epargne (#PCDATA)>
+<!ELEMENT solde (#PCDATA)>
+
+<!-- Nouvelles clotures de comptes -->
+<!ELEMENT clotures (detail_cloture*)>
+<!ATTLIST clotures nombre  CDATA #REQUIRED>
+
+<!-- Details clotures -->
+<!ELEMENT detail_cloture (num_cpte, id_client, nom_client, produit_epargne, date_ouverture, raison_cloture, solde)>
+<!ELEMENT date_ouverture (#PCDATA)>
+<!ELEMENT raison_cloture (#PCDATA)>
+
+<!-- Nouvelles demandes de prolongation de DAT -->
+<!ELEMENT dat_prolonges (detail_dat_prolonge*)>
+<!ATTLIST dat_prolonges nombre  CDATA #REQUIRED>
+
+<!-- Details DAT prolonges -->
+<!ELEMENT detail_dat_prolonge (num_cpte, id_client, nom_client, produit_epargne, solde, terme_initial, interets, prochain_terme)>
+<!ELEMENT prochain_terme (#PCDATA)>
+<!ELEMENT terme_initial (#PCDATA)>
+<!ELEMENT interets (#PCDATA)>
+
+<!-- Notifications de non-prolongations de DAT -->
+<!ELEMENT dat_non_prolonges (detail_dat_non_prolonge*)>
+<!ATTLIST dat_non_prolonges nombre  CDATA #REQUIRED>
+
+<!-- Details DAT prolonges -->
+<!ELEMENT detail_dat_non_prolonge (num_cpte, id_client, nom_client, produit_epargne, solde, terme, interets, nbre_jours)>
+<!ELEMENT terme (#PCDATA)>
+<!ELEMENT nbre_jours (#PCDATA)>
+
+<!-- Nouveaux dossiers de credit mis en place -->
+<!ELEMENT dossiers_credit (detail_dossier_credit_sans_mnt_octr*)>
+<!ATTLIST dossiers_credit nombre  CDATA #REQUIRED>
+
+<!-- Nouveaux dossiers de credit approuves -->
+<!ELEMENT dcr_approuves (detail_dossier_credit_avec_mnt_octr*)>
+<!ATTLIST dcr_approuves nombre  CDATA #REQUIRED>
+
+<!-- Nouveaux dossiers de credit rejetes -->
+<!ELEMENT dcr_rejetes (detail_dossier_credit_rejete*)>
+<!ATTLIST dcr_rejetes nombre  CDATA #REQUIRED>
+
+<!-- Nouveaux dossiers de credit annules -->
+<!ELEMENT dcr_annules (detail_dossier_credit_rejete*)>
+<!ATTLIST dcr_annules nombre  CDATA #REQUIRED>
+
+<!-- Nouveaux dossiers de credit debourses -->
+<!ELEMENT dcr_debourses (detail_dossier_credit_avec_mnt_octr*)>
+<!ATTLIST dcr_debourses nombre  CDATA #REQUIRED>
+
+<!-- Details dossiers de credit sans mnt_octr-->
+<!ELEMENT detail_dossier_credit_sans_mnt_octr (id_doss, id_client, nom_client, produit_credit, montant_demande, duree, objet_dem, gestionnaire)>
+
+<!-- Details dossiers de credit avec mnt_octr-->
+<!ELEMENT detail_dossier_credit_avec_mnt_octr (id_doss, id_client, nom_client, produit_credit, montant_demande, montant_octroye, duree, objet_dem, gestionnaire)>
+
+<!-- Details dossiers de credit rejetes ou annules-->
+<!ELEMENT detail_dossier_credit_rejete (id_doss, id_client, nom_client, produit_credit, montant_demande, duree, objet_dem, gestionnaire, motif)>
+
+<!-- Elements d'un dossier de credit -->
+<!ELEMENT id_doss (#PCDATA)>
+<!ELEMENT produit_credit (#PCDATA)>
+<!ELEMENT montant_demande (#PCDATA)>
+<!ELEMENT montant_octroye (#PCDATA)>
+<!ELEMENT duree (#PCDATA)>
+<!ELEMENT objet_dem (#PCDATA)>
+<!ELEMENT motif (#PCDATA)>
+
+<!-- Credits repris -->
+<!ELEMENT dcr_repris (detail_crd_repris*)>
+<!ATTLIST dcr_repris nombre  CDATA #REQUIRED>
+
+<!-- Details credits repris -->
+<!ELEMENT detail_crd_repris (id_client, nom_client, id_doss, cre_etat, libel_prod, mnt_octr, cap_remb, int_remb, pen_remb, cap_restant, int_restant, pen_restant)>
+<!ELEMENT id_client (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT id_doss (#PCDATA)>
+<!ELEMENT cre_etat (#PCDATA)>
+<!ELEMENT libel_prod (#PCDATA)>
+<!ELEMENT mnt_octr (#PCDATA)>
+<!ELEMENT cap_remb (#PCDATA)>
+<!ELEMENT int_remb (#PCDATA)>
+<!ELEMENT pen_remb (#PCDATA)>
+<!ELEMENT cap_restant (#PCDATA)>
+<!ELEMENT int_restant (#PCDATA)>
+<!ELEMENT pen_restant (#PCDATA)>
+
+<!-- Parts sociales reprises -->
+<!ELEMENT ps_repris (detail_ps_repris*)>
+<!ATTLIST ps_repris nombre  CDATA #REQUIRED>
+
+<!-- Details Parts sociales -->
+<!ELEMENT detail_ps_repris (id_client, nom_client, sect_act,nbre_parts, gestionnaire)>
+<!ELEMENT id_client (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT sect_act (#PCDATA)>
+<!ELEMENT nbre_parts (#PCDATA)>
+<!ELEMENT gestionnaire (#PCDATA)>
+
+
+
+<!-- Comptes nouvellement ajustes -->
+<!ELEMENT comptes_ajustes (detail_compte_ajuste*)>
+<!ATTLIST comptes_ajustes nombre  CDATA #REQUIRED>
+
+<!-- Comptes ajustes -->
+<!ELEMENT detail_compte_ajuste (heure, login, id_client, nom_client, num_compte, anc_solde, nouv_solde)>
+<!ELEMENT anc_solde (#PCDATA)>
+<!ELEMENT nouv_solde (#PCDATA)>
+<!ELEMENT heure (#PCDATA)>
+<!ELEMENT login (#PCDATA)>
+
+
+<!-- Approvisionnement des caisses -->
+<!ELEMENT app_caisses (detail_app_caisses*)>
+<!ATTLIST app_caisses nombre  CDATA #REQUIRED>
+
+<!-- Detail approvisionnement -->
+<!ELEMENT detail_app_caisses (id_gui, libel_gui, montant, devise)>
+<!ELEMENT id_gui (#PCDATA)>
+<!ELEMENT libel_gui (#PCDATA)>
+<!ELEMENT montant (#PCDATA)>
+<!ELEMENT devise (#PCDATA)>
+
+<!-- Delestage des caisses -->
+<!ELEMENT delest_caisses (detail_delest_caisses*)>
+<!ATTLIST delest_caisses nombre  CDATA #REQUIRED>
+
+<!-- Detail approvisionnement -->
+<!ELEMENT detail_delest_caisses (id_gui, libel_gui, montant, devise)>
+<!ELEMENT id_gui (#PCDATA)>
+<!ELEMENT libel_gui (#PCDATA)>
+<!ELEMENT montant (#PCDATA)>
+<!ELEMENT devise (#PCDATA)>
+
+<!-- Situation du coffre-fort -->
+<!ELEMENT situation_coffre (detail_situation_coffre*)>
+<!ATTLIST situation_coffre nombre  CDATA #REQUIRED>
+
+<!-- Detail situation du coffre-fort -->
+<!ELEMENT detail_situation_coffre (solde, montant_deb, montant_cred, devise)>
+<!ELEMENT solde (#PCDATA)>
+<!ELEMENT montant_deb (#PCDATA)>
+<!ELEMENT montant_cred (#PCDATA)>
+<!ELEMENT devise (#PCDATA)>
+
+<!-- Situation des dépenses -->
+<!ELEMENT situation_dep (detail_situation_dep*)>
+<!ATTLIST situation_dep nombre  CDATA #REQUIRED>
+
+<!-- Detail situation des dépenses -->
+<!ELEMENT detail_situation_dep (libel_ecriture, montant, devise)>
+<!ELEMENT libel_ecriture (#PCDATA)>
+<!ELEMENT montant (#PCDATA)>
+<!ELEMENT devise (#PCDATA)>
+

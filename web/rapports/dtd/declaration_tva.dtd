@@ -1,0 +1,32 @@
+<!-- DTD pour le journal des operations comptables -->
+
+<!-- Element root -->
+<!ELEMENT declaration_tva (header, header_contextuel, ligne*)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- En-tete contextuel -->
+<!ELEMENT header_contextuel (criteres_recherche, infos_synthetiques*)>
+<!ELEMENT infos_synthetiques (libel, valeur)>
+<!-- Criteres de recherche commun -->
+<!ENTITY % mod_criteres SYSTEM "criteres_recherche.dtd">
+%mod_criteres;
+
+<!-- Corps -->
+<!ELEMENT ligne (date_comptable, fonction, operation, compte, libel_cpte,(montant_debit | montant_credit), num_transaction, num_piece)>
+<!ELEMENT date_comptable (#PCDATA)>
+<!ELEMENT fonction (#PCDATA)>
+<!ELEMENT operation (#PCDATA)>
+<!ELEMENT compte (#PCDATA)>
+<!ELEMENT libel_cpte (#PCDATA)>
+<!ELEMENT montant_debit (#PCDATA)>
+<!ELEMENT montant_credit (#PCDATA)>
+<!ELEMENT num_transaction (#PCDATA)>
+<!ELEMENT num_piece (#PCDATA)>
+<!-- Pied -->
+<!ELEMENT ligne_totaux (totaux, total_debit, total_credit)>
+<!ELEMENT totaux (#PCDATA)>
+<!ELEMENT total_debit (#PCDATA)>
+<!ELEMENT total_credit (#PCDATA)>

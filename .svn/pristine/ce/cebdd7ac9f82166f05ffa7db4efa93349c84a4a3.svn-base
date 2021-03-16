@@ -1,0 +1,25 @@
+<!-- DTD pour le rapport sur les comptes dormants -->
+
+    <!-- Element root -->
+    <!ELEMENT rapport_compte_dormant (header, infos_synthetique, details_compte_dormant*)>
+
+    <!-- Un en-tete commun a tous -->
+    <!ENTITY % mod_header SYSTEM "header.dtd">
+    %mod_header;
+
+    <!ELEMENT infos_synthetique (nombre_comptes_dormants_total, solde_comptes_dormants_total)>
+    <!ELEMENT nombre_comptes_dormants_total (#PCDATA)>
+    <!ELEMENT solde_comptes_dormants_total (#PCDATA)>
+
+    <!ELEMENT details_compte_dormant (lib_prod, ligne_compte_dormant*, xml_total)>
+    <!ELEMENT lib_prod (#PCDATA)>
+
+    <!ELEMENT ligne_compte_dormant (num_client, num_compte, nom_client, solde_compte, date_blocage)>
+    <!ELEMENT num_client (#PCDATA)>
+    <!ELEMENT num_compte (#PCDATA)>
+    <!ELEMENT nom_client (#PCDATA)>
+    <!ELEMENT solde_compte (#PCDATA)>
+    <!ELEMENT date_blocage (#PCDATA)>
+
+    <!ELEMENT xml_total (tot_solde_cpte)>
+    <!ELEMENT tot_solde_cpte (#PCDATA)>

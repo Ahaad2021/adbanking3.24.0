@@ -1,0 +1,22 @@
+<!-- DTD pour le cloture de compte -->
+
+<!-- Element root -->
+<!ELEMENT recu_cloture_compte (header, body)>
+
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- Corps -->
+<!ELEMENT body (num_client,nom_client, num_cpte,detination ,solde,frais_tenue_cpte,frais_fermeture,penalites,impot_mobilier,historique)>
+<!ELEMENT num_client (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT num_cpte (#PCDATA)>
+<!ELEMENT detination (#PCDATA)>
+<!ELEMENT solde (#PCDATA)>
+<!ELEMENT frais_tenue_cpte (#PCDATA)>
+<!ELEMENT frais_fermeture (#PCDATA)>
+<!ELEMENT penalites (#PCDATA)>
+<!ELEMENT impot_mobilier (#PCDATA)>
+<!ELEMENT historique (#PCDATA)>

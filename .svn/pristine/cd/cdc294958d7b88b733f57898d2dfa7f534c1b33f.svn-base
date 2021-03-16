@@ -1,0 +1,5 @@
+<!-- Criteres de recherche -->
+<!ELEMENT informations_synthetiques (critere*)>
+<!ELEMENT critere (champs, valeur)>
+<!ELEMENT champs (#PCDATA)>
+<!ELEMENT valeur (#PCDATA)>
