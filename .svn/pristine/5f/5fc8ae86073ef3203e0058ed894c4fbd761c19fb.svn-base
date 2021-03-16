@@ -1,0 +1,24 @@
+<!-- DTD pour le rapports operations diverses -->
+
+<!-- Element root -->
+<!ELEMENT rapport_op_div (header,header_contextuel,total, details*)>
+<!ELEMENT total (#PCDATA)>
+<!-- Un en-tete commun a tous -->
+
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- En-tete contextuel -->
+<!ELEMENT header_contextuel (criteres_recherche)>
+<!-- Criteres de recherche commun -->
+<!ENTITY % mod_criteres SYSTEM "criteres_recherche.dtd">
+%mod_criteres;
+
+<!ELEMENT ligne (details)>
+<!ELEMENT details (num_transaction, login, date, libel_ecriture, num_client, montant)>
+<!ELEMENT num_transaction (#PCDATA)>
+<!ELEMENT login (#PCDATA)>
+<!ELEMENT date (#PCDATA)>
+<!ELEMENT libel_ecriture (#PCDATA)>
+<!ELEMENT num_client (#PCDATA)>
+<!ELEMENT montant (#PCDATA)>

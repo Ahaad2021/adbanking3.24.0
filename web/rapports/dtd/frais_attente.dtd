@@ -1,0 +1,30 @@
+<!-- DTD pour le rapport liste des frais en attente -->
+
+<!-- Element root -->
+<!ELEMENT frais_attente (header, header_contextuel, attente*)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- En-tete contextuel -->
+<!ELEMENT header_contextuel (criteres_recherche, infos_synthetiques)>
+
+<!-- Criteres de recherche commun -->
+<!ENTITY % mod_criteres SYSTEM "criteres_recherche.dtd">
+%mod_criteres;
+
+<!-- Informations synthetiques -->
+<!ELEMENT infos_synthetiques (total_attente,totla_frais)>
+<!ELEMENT total_attente (#PCDATA)>
+<!ELEMENT total_frais (#PCDATA)>
+
+<!-- Corps -->
+<!ELEMENT attente (type_frais,date_frais, mnt_frais, num_compte, num_client, nom_client)>
+<!ELEMENT type_frais (#PCDATA)>
+<!ELEMENT date_frais (#PCDATA)>
+<!ELEMENT mnt_frais (#PCDATA)>
+<!ELEMENT num_compte (#PCDATA)>
+<!ELEMENT num_client (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+

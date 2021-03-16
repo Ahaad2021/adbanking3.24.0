@@ -1,0 +1,22 @@
+#!/bin/bash
+source ${ADB_INSTALL_DIR:="/usr/share/adbanking"}/web/lib/bash/misc.sh
+let ${DBUSER:=adbanking}
+let ${DBNAME:=$DBUSER}
+
+# Script de mise à jour ADbanking  2.2.x => 2.4
+echo -e "Mise à jour ADbanking \033[1mv2.2.x -> v2.4\033[0m"
+
+# Relecture des triggers
+execute_psql 0 Dump2.4/triggers.sql
+
+# Mise à jour structure
+execute_psql 0 updata2.4.sql
+
+# Relecture des fonctions et des écrans
+
+execute_psql 0 Dump2.4/calcul_interets_debiteurs.sql
+execute_psql 0 Dump2.4/frais_tenue_cpt.sql
+execute_psql 0 Dump2.4/fonctions.sql
+execute_psql 0 Dump2.4/tableliste.sql
+execute_psql 0 Dump2.4/menus.sql
+

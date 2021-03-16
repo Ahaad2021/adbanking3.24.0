@@ -1,0 +1,23 @@
+<!-- DTD pour le compte de résultat -->
+
+<!-- Element root -->
+<!ELEMENT compte_de_resultat (header, compte*,agences,enreg_agence)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!ELEMENT compte (compte_charge, libel_charge, solde_charge, compte_produit, libel_produit, solde_produit)>
+
+<!ELEMENT compte_charge (#PCDATA)>
+<!ELEMENT libel_charge (#PCDATA)>
+<!ELEMENT solde_charge (#PCDATA)>
+<!ELEMENT compte_produit (#PCDATA)>
+<!ELEMENT libel_produit (#PCDATA)>
+<!ELEMENT solde_produit (#PCDATA)>
+
+<!ELEMENT agences (agences)>
+<!ELEMENT enreg_agence (id_ag,libel_ag,date_max)>
+<!ELEMENT id_ag (#PCDATA)>
+<!ELEMENT libel_ag (#PCDATA)>
+<!ELEMENT date_max (#PCDATA)>

@@ -1,0 +1,26 @@
+<!-- DTD pour le compte de resultat BNR -->
+
+<!-- Element root -->
+<!ELEMENT compte_resultat (header, compartiment*,agences,enreg_agence)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!ELEMENT compartiment (entete,poste*)>
+<!ELEMENT entete (entete_1,entete_2,entete_3) >
+<!ELEMENT poste (code,libel,solde,niveau)>
+
+<!ELEMENT entete_1 (#PCDATA)>
+<!ELEMENT entete_2 (#PCDATA)>
+<!ELEMENT entete_3 (#PCDATA)>
+<!ELEMENT code (#PCDATA)>
+<!ELEMENT libel (#PCDATA)>
+<!ELEMENT solde (#PCDATA)>
+<!ELEMENT niveau (#PCDATA)>
+
+<!ELEMENT agences (agences)>
+<!ELEMENT enreg_agence (id_ag,libel_ag,date_max)>
+<!ELEMENT id_ag (#PCDATA)>
+<!ELEMENT libel_ag (#PCDATA)>
+<!ELEMENT date_max (#PCDATA)>

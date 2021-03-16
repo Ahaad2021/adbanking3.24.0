@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- DTD pour le rapport (extraits de compte pour le netbank -->
+
+<!-- Element root -->
+<!ELEMENT extrait_cpte_netbank (details)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!ELEMENT details (client*)>
+
+<!ELEMENT client (id_extrait_cpte, id_his, montant, num_complet_cpte, intitule_compte, num_client, nom_client, libel_operation, date_exec, date_valeur, eft_id_extrait, eft_id_mvt, taux, mnt_frais, mnt_comm_change, information, cptie_num_cpte, cptie_nom,cptie_adresse, cptie_cp, cptie_ville, cptie_pays, cptie_mnt, cptie_devise, eft_id_client, eft_annee_oper, eft_dern_solde, eft_dern_date, eft_nouv_solde, eft_sceau, communication, devise)>
+
+<!ELEMENT id_extrait_cpte (#PCDATA)>
+<!ELEMENT id_his (#PCDATA)>
+<!ELEMENT montant (#PCDATA)>
+<!ELEMENT num_complet_cpte (#PCDATA)>
+<!ELEMENT intitule_compte (#PCDATA)>
+<!ELEMENT num_client (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT libel_operation (#PCDATA)>
+<!ELEMENT date_exec (#PCDATA)>
+<!ELEMENT date_valeur (#PCDATA)>
+<!ELEMENT eft_id_extrait (#PCDATA)>
+<!ELEMENT eft_id_mvt (#PCDATA)>
+<!ELEMENT eft_id_client (#PCDATA)>
+<!ELEMENT eft_annee_oper (#PCDATA)>
+<!ELEMENT eft_dern_solde (#PCDATA)>
+<!ELEMENT eft_dern_date (#PCDATA)>
+<!ELEMENT eft_nouv_solde (#PCDATA)>
+<!ELEMENT eft_sceau (#PCDATA)>
+<!ELEMENT communication (#PCDATA)>
+<!ELEMENT taux (#PCDATA)>
+<!ELEMENT mnt_frais (#PCDATA)>
+<!ELEMENT mnt_comm_change (#PCDATA)>
+<!ELEMENT information (#PCDATA)>
+<!ELEMENT cptie_num_cpte (#PCDATA)>
+<!ELEMENT cptie_nom (#PCDATA)>
+<!ELEMENT cptie_adresse (#PCDATA)>
+<!ELEMENT cptie_cp (#PCDATA)>
+<!ELEMENT cptie_ville (#PCDATA)>
+<!ELEMENT cptie_pays (#PCDATA)>
+<!ELEMENT cptie_mnt (#PCDATA)>
+<!ELEMENT cptie_devise (#PCDATA)>
+<!ELEMENT devise (#PCDATA)>

@@ -1,0 +1,21 @@
+<!-- DTD pour les recus (demande autorisation de retrait sup au plafond) -->
+
+<!-- Element root -->
+<!ELEMENT recu_demande_auto_dep (header, body)>
+<!ATTLIST recu_dep type CDATA #REQUIRED>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- Corps -->
+<!ELEMENT body (nom_client_distant, num_cpte_distant,nom_agence_distant, montant_retrait,date_demande, utilisateur_demande, num_transaction)>
+<!ELEMENT nom_client_distant (#PCDATA)>
+<!ELEMENT num_cpte_distant (#PCDATA)>
+<!ELEMENT nom_agence_distant (#PCDATA)>
+<!ELEMENT montant_retrait (#PCDATA)>
+<!ELEMENT date_demande (#PCDATA)>
+<!ELEMENT utilisateur_demande (#PCDATA)>
+<!ELEMENT num_transaction (#PCDATA)>
+
+

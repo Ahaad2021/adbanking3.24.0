@@ -1,0 +1,32 @@
+<!-- DTD pour les recus (retrait, depot et depot cheque) -->
+
+<!-- Element root -->
+<!ELEMENT recu (header, body)>
+<!ATTLIST recu type CDATA #REQUIRED>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- Corps -->
+<!ELEMENT body (nom_client, donneur_ordre, num_cpte, num_carte_ferlo?, montant, tranche_frais, num_trans, frais?, fraisDureeMin?, frais_attente, solde?, remarque?, communication?, info_cheque?)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT donneur_ordre (#PCDATA)>
+<!ELEMENT num_cpte (#PCDATA)>
+<!ELEMENT num_carte_ferlo (#PCDATA)>
+<!ELEMENT montant (#PCDATA)>
+<!ELEMENT tranche_frais (#PCDATA)>
+<!ELEMENT num_trans (#PCDATA)>
+<!ELEMENT frais (#PCDATA)>
+<!ELEMENT fraisDureeMin (#PCDATA)>
+<!ELEMENT frais_attente (#PCDATA)>
+<!ELEMENT solde (#PCDATA)>
+<!ELEMENT remarque (#PCDATA)>
+<!ELEMENT communication (#PCDATA)>
+
+<!ELEMENT info_cheque (num_cheque, banque_cheque, date_cheque,beneficiaire?)>
+<!ELEMENT num_cheque (#PCDATA)>
+<!ELEMENT banque_cheque (#PCDATA)>
+<!ELEMENT date_cheque (#PCDATA)>
+<!ELEMENT beneficiaire (#PCDATA)>
+

@@ -1,0 +1,35 @@
+<!-- DTD pour le rapports des plus grands emprunteurs de l'institution -->
+
+<!-- Element root -->
+<!ELEMENT liste_plus_grds_emp (header, globals, details)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!ELEMENT globals (frequency, devise)>
+<!ELEMENT frequency (#PCDATA)>
+<!ELEMENT devise (#PCDATA)>
+
+<!ELEMENT tot_mnt_pret (#PCDATA)>
+<!ELEMENT tot_solde (#PCDATA)>
+<!ELEMENT tot_mnt_retard (#PCDATA)>
+<!ELEMENT tot_mnt_prov (#PCDATA)>
+
+
+<!ELEMENT details (client*, total)>
+<!ELEMENT total (tot_mnt_pret, tot_solde, tot_mnt_retard, tot_mnt_prov)>
+
+<!ELEMENT client (index, nom, date_pret, mnt_pret,echeances,solde, mnt_retard, garanties, mnt_prov, groupe_gs, membre_gs)>
+
+<!ELEMENT index (#PCDATA)>
+<!ELEMENT nom (#PCDATA)>
+<!ELEMENT date_pret (#PCDATA)>
+<!ELEMENT mnt_pret (#PCDATA)>
+<!ELEMENT echeances (#PCDATA)>
+<!ELEMENT solde (#PCDATA)>
+<!ELEMENT mnt_retard (#PCDATA)>
+<!ELEMENT garanties (#PCDATA)>
+<!ELEMENT mnt_prov (#PCDATA)>
+<!ELEMENT groupe_gs (#PCDATA)>
+<!ELEMENT membre_gs (#PCDATA)>

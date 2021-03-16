@@ -1,0 +1,27 @@
+<!-- DTD pour le rapport etats des chequiers imprimes -->
+
+<!-- Element root -->
+<!ELEMENT etat_chequiers_imprime (header, infos_synthetique, footer, header_contextuel, etat_chequiers_data)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!ELEMENT infos_synthetique (ligne_synthese*)>
+<!ELEMENT ligne_synthese (etat_cheq, nb_chequiers) >
+<!ELEMENT etat_cheq (#PCDATA)>
+<!ELEMENT nb_chequiers (#PCDATA)>
+
+<!ELEMENT etat_chequiers_data (ligne_chequier*)>
+<!ELEMENT ligne_chequier (ordre,date_livraison,etat_chequier,num_client, num_cpte, nom_client,  id_chequier, num_deb_cheq, num_fin_cheq, nb_cheq)>
+
+<!ELEMENT ordre (#PCDATA)>
+<!ELEMENT date_livraison (#PCDATA)>
+<!ELEMENT etat_chequier (#PCDATA)>
+<!ELEMENT num_client (#PCDATA)>
+<!ELEMENT num_cpte (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT id_chequier (#PCDATA)>
+<!ELEMENT num_deb_cheq (#PCDATA)>
+<!ELEMENT num_fin_cheq (#PCDATA)>
+<!ELEMENT nb_cheq (#PCDATA)>

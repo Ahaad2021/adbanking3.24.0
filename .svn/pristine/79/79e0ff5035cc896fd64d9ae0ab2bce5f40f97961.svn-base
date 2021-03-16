@@ -1,0 +1,54 @@
+<!-- DTD pour le rapport generaliste sur les clients -->
+
+<!-- Element root -->
+<!ELEMENT clients (header, footer, statut_juridique*)>
+<!ATTLIST clients exist_statut_juridique  CDATA #REQUIRED
+                  exist_sect_activite     CDATA #REQUIRED
+                  exist_gestionnaire      CDATA #REQUIRED
+                  exist_etat      				CDATA #REQUIRED
+                  exist_nbr_membres	      CDATA #REQUIRED>
+  <!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+ <!-- Un pied de page commun a tous -->
+ <!ENTITY % mod_footer SYSTEM "footer.dtd">
+ %mod_footer;
+
+<!ELEMENT statut_juridique (header, footer, header_contextuel,stat_jur,client*)>
+<!ATTLIST statut_juridique exist_date_crea  CDATA #REQUIRED >
+
+<!-- En-tete contextuel -->
+<!ELEMENT header_contextuel (criteres_recherche, infos_synthetiques)>
+
+<!-- Criteres de recherche commun -->
+<!ENTITY % mod_criteres SYSTEM "criteres_recherche.dtd">
+%mod_criteres;
+
+<!-- Informations synthetiques -->
+<!ELEMENT infos_synthetiques (nbre_total, nbre_homme, nbre_femme, nbre_pm, nbre_gi,nbre_gs,total_mbre_gi ,total_mbre_gs)>
+<!ELEMENT nbre_total (#PCDATA)>
+<!ELEMENT nbre_homme (#PCDATA)>
+<!ELEMENT nbre_femme (#PCDATA)>
+<!ELEMENT nbre_pm (#PCDATA)>
+<!ELEMENT nbre_gi (#PCDATA)>
+<!ELEMENT nbre_gs (#PCDATA)>
+<!ELEMENT total_mbre_gi (#PCDATA)>
+<!ELEMENT total_mbre_gs (#PCDATA)>
+
+
+<!ELEMENT stat_jur (#PCDATA)>
+
+<!-- Corps -->
+<!ELEMENT client (num_client, nom_client, sexe, date_adhesion, date_naissance?, date_crea?, nbr_membres?, etat?, gestionnaire?, sect_activite?)>
+<!ELEMENT num_client (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT sexe (#PCDATA)>
+<!ELEMENT date_adhesion (#PCDATA)>
+<!-- <!ELEMENT statut_juridique (#PCDATA)>-->
+<!ELEMENT sect_activite (#PCDATA)>
+<!ELEMENT date_naissance (#PCDATA)>
+<!ELEMENT gestionnaire (#PCDATA)>
+<!ELEMENT date_crea (#PCDATA)>
+<!ELEMENT nbr_membres (#PCDATA)>
+<!ELEMENT etat (#PCDATA)>

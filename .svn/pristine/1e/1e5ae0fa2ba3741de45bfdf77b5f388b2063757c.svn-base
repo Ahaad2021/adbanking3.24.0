@@ -1,0 +1,178 @@
+-- Function: get_rapport_mobile_lending(integer[], integer[])
+
+-- DROP FUNCTION get_rapport_mobile_lending(integer[], integer[]);
+
+CREATE OR REPLACE FUNCTION get_rapport_mobile_lending(
+    integer[],
+    integer[])
+  RETURNS SETOF view_rapport_mobile_lending AS
+$BODY$
+  DECLARE
+
+  etat_mobile_lending ALIAS FOR $1;
+  cre_etat_param ALIAS FOR $2;
+
+  v_id_client integer;
+  v_id_doss integer;
+  v_etat_doss_mob integer;
+  v_nom_agence text;
+  v_nom_imf text;
+  v_id_agent integer;
+  v_nbre_credit integer;
+  v_mnt_dem numeric(30,2);
+  v_date_debours date;
+  v_nbre_ech integer;
+  v_retard_eche_1 integer;
+  v_retard_eche_2 integer;
+  v_retard_eche_3 integer;
+  v_mnt_restant_du numeric(30,2);
+  v_penalite_a_payer numeric(30,2);
+  v_score_retard_credit float;
+  v_score_client float;
+  v_commentaire text;
+
+v_localisation text;
+v_tranche_localisation integer;
+v_sexe text;
+v_tranche_sexe integer;
+v_sal_moy numeric(30,6);
+v_tranche_sal_moy integer;
+v_lg_histo integer;
+v_somm_tot_emprunter numeric(30,2);
+v_tranche_somm_tot_emprunter integer;
+v_tranche_nbre_credit integer;
+v_age integer;
+v_tranche_age integer;
+v_tx_irregularite float;
+v_tranche_tx_irregularite integer;
+v_tranche_lg_histo integer;
+
+  ligne RECORD;
+
+  mise_a_jour_donnees view_rapport_mobile_lending;
+  output INTEGER :=0;
+
+  C1 refcursor;
+
+  BEGIN
+
+  IF array_length(cre_etat_param, 1) > 0 THEN
+    OPEN C1 FOR SELECT * from ml_demande_credit m INNER JOIN ad_dcr d on d.id_client = m.id_client and d.id_doss = m.id_doss WHERE m.statut_demande = ANY(etat_mobile_lending) and d.cre_etat = ANY(cre_etat_param);
+  ELSE
+    OPEN C1 FOR SELECT * from ml_demande_credit WHERE statut_demande = ANY(etat_mobile_lending);
+  END IF;
+
+
+
+
+  --OPEN C1 ;
+  FETCH C1 INTO ligne;
+  WHILE FOUND LOOP
+
+    -- ID client
+  v_id_client := ligne.id_client;
+
+ -- id_ doss
+ v_id_doss := ligne.id_doss;
+
+ -- etat dossier mobile lending
+ v_etat_doss_mob := ligne.statut_demande;
+
+  -- libel Agence et IMF
+  SELECT INTO v_nom_agence,v_nom_imf libel_institution,libel_ag FROM ad_agc;
+
+  -- id_agent
+  SELECT INTO v_id_agent id_agent_gest FROM ad_dcr where id_doss = ligne.id_doss;
+
+ -- nombre credit
+ SELECT INTO v_nbre_credit count(*) FROM ml_demande_credit where id_client = ligne.id_client and statut_demande not IN (2,4,5);
+
+  --Montant demande
+  v_mnt_dem = ligne.mnt_dem;
+
+  -- date remboursement
+ SELECT INTO v_date_debours cre_date_debloc FROM ad_dcr where id_doss = ligne.id_doss;
+
+ -- nombre echeance
+ SELECT INTO v_nbre_ech count(*) FROM ad_etr WHERE id_doss = ligne.id_doss;
+
+ -- retard echeance 1
+ SELECT INTO v_retard_eche_1 date(now()) - date(date_ech) FROM ad_etr where id_ech = 1 and id_doss = ligne.id_doss;
+ IF v_retard_eche_1 IS NULL THEN
+ v_retard_eche_1 := 0;
+ ELSEIF v_retard_eche_1 < 0 THEN
+  v_retard_eche_1 := 0;
+ END IF;
+
+ -- retard echeance 2
+ SELECT INTO v_retard_eche_2  date(now()) - date(date_ech) FROM ad_etr where id_ech = 2 and id_doss = ligne.id_doss;
+ IF v_retard_eche_2 IS NULL THEN
+ v_retard_eche_2 := 0;
+ ELSEIF v_retard_eche_2 < 0 THEN
+  v_retard_eche_2 := 0;
+ END IF;
+
+ -- retard echeance 2
+ SELECT INTO v_retard_eche_3 date(now()) - date(date_ech) FROM ad_etr where id_ech = 3 and id_doss = ligne.id_doss;
+ IF v_retard_eche_3 IS NULL THEN
+ v_retard_eche_3 := 0;
+ ELSEIF v_retard_eche_3 < 0 THEN
+  v_retard_eche_3 := 0;
+ END IF;
+
+ --montant restant du
+ SELECT INTO v_mnt_restant_du sum(solde_cap+solde_int+solde_gar+solde_pen) FROM ad_etr where id_doss = ligne.id_doss;
+
+ --penalite a payer
+ SELECT INTO v_penalite_a_payer sum(solde_pen) FROM ad_etr where id_doss = ligne.id_doss;
+
+ -- score_retard_credit
+ IF v_nbre_ech > 0 THEN
+   v_score_retard_credit = 100 - 1/v_nbre_ech * (v_retard_eche_1+v_retard_eche_2+v_retard_eche_3);
+ ELSE
+   v_score_retard_credit = 0;
+ END IF;
+
+ -- score client =
+  SELECT INTO v_score_client score_final FROM ml_donnees_client_abonnees where client = ligne.id_client;
+
+ -- commentaire agent
+ SELECT INTO v_commentaire details_motif FROM ad_dcr where id_doss = ligne.id_doss;
+
+ -- localisation
+ SELECT INTO v_tranche_localisation ml_localisation FROM ad_agc;
+ IF v_tranche_localisation = 1 THEN
+  v_localisation = 'Urbaine';
+ ELSE
+  v_localisation = 'Rurale';
+ END IF;
+
+ -- selection des tranches dans la table ml_donnees_client_abonnees
+ SELECT INTO v_tranche_sexe,v_sal_moy,v_tranche_sal_moy,v_lg_histo,v_somm_tot_emprunter,v_tranche_somm_tot_emprunter,v_tranche_nbre_credit,v_age,v_tx_irregularite,v_tranche_tx_irregularite, v_tranche_age, v_tranche_lg_histo
+  tranche_sexe,salaire_moyen,tranche_sal_moyen,lg_histo,mnt_tot_emprunter,tranche_tot_emprunter,tranche_nbre_credit,age,tx_irregularite,tranche_irregularite, tranche_age, tranche_lg_histo  FROM ml_donnees_client_abonnees WHERE client = v_id_client;
+
+  --recuperation sexe
+  IF  v_tranche_sexe = 1 THEN
+  v_sexe := 'Homme';
+  ELSE
+  v_sexe := 'Femme';
+  END IF;
+
+ SELECT INTO mise_a_jour_donnees v_id_client,v_id_doss,v_etat_doss_mob,v_nom_agence,v_nom_imf,v_id_agent,v_localisation,v_tranche_localisation,v_sexe,v_tranche_sexe,v_sal_moy,v_tranche_sal_moy,v_lg_histo,v_somm_tot_emprunter,v_tranche_somm_tot_emprunter,v_nbre_credit,v_tranche_nbre_credit,v_age,v_tx_irregularite,v_tranche_tx_irregularite,v_nbre_credit,v_mnt_dem,v_date_debours,v_nbre_ech,v_retard_eche_1,v_retard_eche_2,v_retard_eche_3,
+v_mnt_restant_du,v_penalite_a_payer,v_score_retard_credit,v_score_client,v_commentaire, v_tranche_age, v_tranche_lg_histo;
+
+RETURN NEXT mise_a_jour_donnees;
+
+ FETCH C1 INTO ligne;
+  END LOOP;
+  CLOSE C1;
+
+
+  RETURN;
+  END;
+  $BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION get_rapport_mobile_lending(integer[], integer[])
+  OWNER TO postgres;

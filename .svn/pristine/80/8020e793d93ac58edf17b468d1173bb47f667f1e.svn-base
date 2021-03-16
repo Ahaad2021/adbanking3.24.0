@@ -1,0 +1,72 @@
+<!-- DTD pour le rapport d'un echeancier (theorique avec le suivit de remboursement), uniquement pour les dossiers qui ont etes debourses-->
+
+<!-- Element root -->
+<!ELEMENT echeancier (header, infos_doss*)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!ELEMENT infos_doss (header_contextuel, (echeance|reech)*, total?)>
+
+<!-- En-tete contextuel -->
+<!ELEMENT header_contextuel (num_client?, nom_client?, num_credit?, etat_credit?, date_demande?, date_approb?, date_debours, produit, montant, taux_int, delais_grace, montant_gar?, differe_jours?,devise?)>
+<!ELEMENT num_client (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT num_credit (#PCDATA)>
+<!ELEMENT etat_credit (#PCDATA)>
+<!ELEMENT date_demande (#PCDATA)>
+<!ELEMENT date_approb (#PCDATA)>
+<!ELEMENT date_debours (#PCDATA)>
+<!ELEMENT produit (#PCDATA)>
+<!ELEMENT montant (#PCDATA)>
+<!ELEMENT taux_int (#PCDATA)>
+<!ELEMENT delais_grace (#PCDATA)>
+<!ELEMENT montant_gar (#PCDATA)>
+<!ELEMENT differe_jours (#PCDATA)>
+<!ELEMENT devise (#PCDATA)>
+
+<!-- Corps -->
+<!ELEMENT echeance (ech_theo, suivi_remb*, xml_total)>
+
+<!ELEMENT ech_theo (date_ech, cap_du, int_du, total_du, solde_cap, solde_int, solde_pen, solde_total)>
+<!ELEMENT date_ech (#PCDATA)>
+<!ELEMENT cap_du (#PCDATA)>
+<!ELEMENT int_du (#PCDATA)>
+<!ELEMENT total_du (#PCDATA)>
+<!ELEMENT solde_cap (#PCDATA)>
+<!ELEMENT solde_int (#PCDATA)>
+<!ELEMENT solde_pen (#PCDATA)>
+<!ELEMENT solde_total (#PCDATA)>
+
+<!ELEMENT suivi_remb (date_suivi, mnt_cap, mnt_int, mnt_pen, mnt_total)>
+<!ELEMENT date_suivi (#PCDATA)>
+<!ELEMENT mnt_cap (#PCDATA)>
+<!ELEMENT mnt_int (#PCDATA)>
+<!ELEMENT mnt_pen (#PCDATA)>
+<!ELEMENT mnt_total (#PCDATA)>
+
+<!ELEMENT reech (date_reech, mnt_reech)>
+<!ELEMENT date_reech (#PCDATA)>
+<!ELEMENT mnt_reech (#PCDATA)>
+
+<!ELEMENT total (total_cap, total_int, total_credit)>
+<!ELEMENT total_cap (#PCDATA)>
+<!ELEMENT total_int (#PCDATA)>
+<!ELEMENT total_credit (#PCDATA)>
+
+
+<!ELEMENT xml_total (tot_cap_du, tot_int_du, tot_total_du, tot_cap, tot_int, tot_pen, tot_total, tot_remb_cap, tot_remb_int, tot_remb_pen, tot_remb_total)>
+
+<!ELEMENT tot_cap_du (#PCDATA)>
+<!ELEMENT tot_int_du (#PCDATA)>
+<!ELEMENT tot_total_du (#PCDATA)>
+<!ELEMENT tot_cap (#PCDATA)>
+<!ELEMENT tot_int (#PCDATA)>
+<!ELEMENT tot_pen (#PCDATA)>
+<!ELEMENT tot_total (#PCDATA)>
+<!ELEMENT tot_remb_cap (#PCDATA)>
+<!ELEMENT tot_remb_int (#PCDATA)>
+<!ELEMENT tot_remb_pen (#PCDATA)>
+<!ELEMENT tot_remb_total (#PCDATA)>
+

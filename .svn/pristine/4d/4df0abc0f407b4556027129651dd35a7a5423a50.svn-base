@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:fo="http://www.w3.org/1999/XSL/Format">
+    <xsl:template match="/">
+        <fo:root>
+            <xsl:call-template name="page_layout_A4_portrait_no_region"></xsl:call-template>
+            <xsl:apply-templates select="recu_dep"/>
+        </fo:root>
+    </xsl:template>
+
+    <xsl:include href="page_layout.xslt"/>
+    <xsl:include href="header.xslt"/>
+    <xsl:include href="signature_retrait_deplace.xslt"/>
+    <xsl:include href="footer.xslt"/>
+    <xsl:include href="lib.xslt"/>
+    <xsl:template match="recu_dep">
+
+        <fo:page-sequence master-reference="main" font-size="10pt" font-family="Helvetica">
+            <fo:flow flow-name="xsl-region-body">
+                <xsl:apply-templates select="header" mode="no_region"/>
+                <fo:block space-before.optimum="0.5cm"/>
+                <xsl:apply-templates select="body"/>
+            </fo:flow>
+        </fo:page-sequence>
+
+    </xsl:template>
+
+
+    <xsl:template match="body">
+        <fo:list-block>
+            <fo:list-item>
+                <fo:list-item-label><fo:block></fo:block></fo:list-item-label>
+                <fo:list-item-body><fo:block space-before.optimum="0.3cm">Nom du client: <xsl:value-of select="nom_client_distant"/></fo:block></fo:list-item-body>
+            </fo:list-item>
+            <fo:list-item>
+                <fo:list-item-label><fo:block></fo:block></fo:list-item-label>
+                <fo:list-item-body><fo:block space-before.optimum="0.3cm">Numéro de compte: <xsl:value-of select="num_cpte_distant"/></fo:block></fo:list-item-body>
+            </fo:list-item>
+            <fo:list-item>
+                <fo:list-item-label><fo:block></fo:block></fo:list-item-label>
+                <fo:list-item-body><fo:block space-before.optimum="0.3cm">Nom agence cliente: <xsl:value-of select="nom_agence_distant"/></fo:block></fo:list-item-body>
+            </fo:list-item>
+            <fo:list-item>
+                <fo:list-item-label><fo:block></fo:block></fo:list-item-label>
+                <fo:list-item-body><fo:block space-before.optimum="0.3cm">Montant retrait: <xsl:value-of select="montant_retrait"/></fo:block></fo:list-item-body>
+            </fo:list-item>
+            <fo:list-item>
+                <fo:list-item-label><fo:block></fo:block></fo:list-item-label>
+                <fo:list-item-body><fo:block space-before.optimum="0.3cm">Date de demande: <xsl:value-of select="date_demande"/></fo:block></fo:list-item-body>
+            </fo:list-item>
+            <fo:list-item>
+                <fo:list-item-label><fo:block></fo:block></fo:list-item-label>
+                <fo:list-item-body><fo:block space-before.optimum="0.3cm">Utilisateur: <xsl:value-of select="utilisateur_demande"/></fo:block></fo:list-item-body>
+            </fo:list-item>
+            <fo:list-item>
+                <fo:list-item-label><fo:block></fo:block></fo:list-item-label>
+                <fo:list-item-body><fo:block space-before.optimum="0.3cm">Numéro de transaction: <xsl:value-of select="num_transaction"/></fo:block></fo:list-item-body>
+            </fo:list-item>
+        </fo:list-block>
+
+        <fo:block space-before.optimum="1cm"/>
+
+        <xsl:call-template name="signature"/>
+    </xsl:template>
+
+</xsl:stylesheet>

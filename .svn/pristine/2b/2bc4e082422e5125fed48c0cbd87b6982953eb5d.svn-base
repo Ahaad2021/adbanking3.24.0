@@ -1,0 +1,47 @@
+<!-- DTD pour le rapport activite de l'agence -->
+
+<!-- Element root -->
+<!ELEMENT resultat_trimestriel (header, infos_globales,trimestre,enreg_agence)>
+
+<!-- Un en-tete commun a tous -->
+<!--<!ENTITY % mod_header SYSTEM "header.dtd">-->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+
+%mod_header;
+<!--Infos globales -->
+<!ELEMENT infos_globales (debut_periode, fin_periode)>
+<!ELEMENT debut_periode (#PCDATA)>
+<!ELEMENT fin_periode (#PCDATA)>
+
+<!ELEMENT enreg_agence (id_ag,libel_ag,date_max)>
+<!ELEMENT id_ag (#PCDATA)>
+<!ELEMENT libel_ag (#PCDATA)>
+<!ELEMENT date_max (#PCDATA)>
+<!-- Corps -->
+<!ELEMENT usagers ( nbre_homme_t1,nbre_homme_t2,nbre_homme_t3,nbre_homme_t4,nbre_femme_t1,nbre_femme_t2,nbre_femme_t3,nbre_femme_t4,nbre_g_homme_t1,nbre_g_homme_t2,nbre_g_homme_t3,nbre_g_homme_t4,nbre_g_femme_t1,nbre_g_femme_t2,nbre_g_femme_t3,nbre_g_femme_t4,nbre_g_mixte_t1,nbre_g_mixte_t2,nbre_g_mixte_t3,nbre_g_mixte_t4)>
+<!ELEMENT epargnants ( nbre_homme_t1,nbre_homme_t2,nbre_homme_t3,nbre_homme_t4,nbre_femme_t1,nbre_femme_t2,nbre_femme_t3,nbre_femme_t4,nbre_g_homme_t1,nbre_g_homme_t2,nbre_g_homme_t3,nbre_g_homme_t4,nbre_g_femme_t1,nbre_g_femme_t2,nbre_g_femme_t3,nbre_g_femme_t4,nbre_g_mixte_t1,nbre_g_mixte_t2,nbre_g_mixte_t3,nbre_g_mixte_t4)>
+<!ELEMENT credits_accordes ( nbre_homme_t1,nbre_homme_t2,nbre_homme_t3,nbre_homme_t4,nbre_femme_t1,nbre_femme_t2,nbre_femme_t3,nbre_femme_t4,nbre_g_homme_t1,nbre_g_homme_t2,nbre_g_homme_t3,nbre_g_homme_t4,nbre_g_femme_t1,nbre_g_femme_t2,nbre_g_femme_t3,nbre_g_femme_t4,nbre_g_mixte_t1,nbre_g_mixte_t2,nbre_g_mixte_t3,nbre_g_mixte_t4)>
+<!ELEMENT credit_en_cours ( nbre_homme_t1,nbre_homme_t2,nbre_homme_t3,nbre_homme_t4,nbre_femme_t1,nbre_femme_t2,nbre_femme_t3,nbre_femme_t4,nbre_g_homme_t1,nbre_g_homme_t2,nbre_g_homme_t3,nbre_g_homme_t4,nbre_g_femme_t1,nbre_g_femme_t2,nbre_g_femme_t3,nbre_g_femme_t4,nbre_g_mixte_t1,nbre_g_mixte_t2,nbre_g_mixte_t3,nbre_g_mixte_t4)>
+<!ELEMENT exploitation ( nbre_homme_t1,nbre_homme_t2,nbre_homme_t3,nbre_homme_t4,nbre_femme_t1,nbre_femme_t2,nbre_femme_t3,nbre_femme_t4,nbre_g_homme_t1,nbre_g_homme_t2,nbre_g_homme_t3,nbre_g_homme_t4,nbre_g_femme_t1,nbre_g_femme_t2,nbre_g_femme_t3,nbre_g_femme_t4,nbre_g_mixte_t1,nbre_g_mixte_t2,nbre_g_mixte_t3,nbre_g_mixte_t4)>
+
+
+<!ELEMENT nbre_homme_t1 (#PCDATA)>
+<!ELEMENT nbre_femme_t1 (#PCDATA)>
+<!ELEMENT nbre_g_homme_t1 (#PCDATA)>
+<!ELEMENT nbre_g_femme_t1 (#PCDATA)>
+<!ELEMENT nbre_g_mixte_t1 (#PCDATA)>
+<!ELEMENT nbre_homme_t2 (#PCDATA)>
+<!ELEMENT nbre_femme_t2 (#PCDATA)>
+<!ELEMENT nbre_g_homme_t2 (#PCDATA)>
+<!ELEMENT nbre_g_femme_t2 (#PCDATA)>
+<!ELEMENT nbre_g_mixte_t2 (#PCDATA)>
+<!ELEMENT nbre_homme_t3 (#PCDATA)>
+<!ELEMENT nbre_femme_t3 (#PCDATA)>
+<!ELEMENT nbre_g_homme_t3 (#PCDATA)>
+<!ELEMENT nbre_g_femme_t3 (#PCDATA)>
+<!ELEMENT nbre_g_mixte_t3 (#PCDATA)>
+<!ELEMENT nbre_homme_t4 (#PCDATA)>
+<!ELEMENT nbre_femme_t4 (#PCDATA)>
+<!ELEMENT nbre_g_homme_t4 (#PCDATA)>
+<!ELEMENT nbre_g_femme_t4 (#PCDATA)>
+<!ELEMENT nbre_g_mixte_t4 (#PCDATA)>

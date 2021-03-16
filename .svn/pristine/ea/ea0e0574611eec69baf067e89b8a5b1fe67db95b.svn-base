@@ -1,0 +1,1423 @@
+<?php
+/*
+
+Retrait d'un compte d'épargne client
+
+Description :
+Ce module crée 3 écrans :
+* Rcp-1 : Choix d'un compte pour le retrait
+* Rcp-2 : Retrait du compte avec mouvements des comptes
+
+
+HD - 06/02/2002
+*/
+
+require_once 'lib/dbProcedures/epargne.php';
+require_once 'modules/epargne/recu.php';
+require_once 'lib/html/FILL_HTML_GEN2.php';
+require_once 'modules/rapports/xml_devise.php';
+require_once 'lib/dbProcedures/billetage.php';
+require_once 'lib/dbProcedures/cheque_interne.php';
+
+//-----------------------------------------------------------------
+//------- Ecran Rcp-1 Choix du compte et du type de retrait -------
+//-----------------------------------------------------------------
+if ($global_nom_ecran == "Rcp-1") {
+  $SESSION_VARS=NULL;
+  //afficher la liste des comptes du client
+
+
+  // Création du formulaire
+  $html = new HTML_GEN2();
+  $html->setTitle(_("Retrait sur un compte : choix du compte"));
+
+  //affichage de tous les comptes du client et s'il n'y a rien...ne rien faire
+  //retirer de la liste les comptes à retrait unique
+  $TempListeComptes = get_comptes_epargne($global_id_client);
+  $choix = array();
+  if (isset($TempListeComptes)) {
+    $ListeComptes = getComptesRetraitPossible($TempListeComptes);
+    if (isset($ListeComptes)) {
+      //index par id_cpte pour la listbox
+      foreach($ListeComptes as $key=>$value) $choix[$key] = $value["num_complet_cpte"]." ".$value["intitule_compte"];
+    }
+  }
+  $html->addField("NumCpte", _("Numéro de compte"), TYPC_LSB);
+  $html->setFieldProperties("NumCpte", FIELDP_ADD_CHOICES, $choix);
+  $html->setFieldProperties("NumCpte", FIELDP_IS_REQUIRED, true);
+
+  // Ajout des champs ornementaux
+  $xtra1 = "<b>"._("Choix du compte")."</b>";
+  $html->addHTMLExtraCode ("htm1", $xtra1);
+  $html->setHTMLExtraCodeProperties ("htm1",HTMP_IN_TABLE, true);
+  $xtra2 = "<b>"._("Choix du type de retrait")."</b>";
+  $html->addHTMLExtraCode ("htm2", $xtra2);
+  $html->setHTMLExtraCodeProperties ("htm2",HTMP_IN_TABLE, true);
+
+  // Gestion des champs liés au type de produit choisi
+  $html->addTable("ad_cpt", OPER_INCLUDE, array("etat_cpte"));
+  $html->addTable("adsys_produit_epargne", OPER_INCLUDE, array("libel", "duree_min_retrait_jour", "devise"));
+  $html->setFieldProperties("libel", FIELDP_WIDTH, 40);
+
+  //mettre les champs en label
+  $fieldslabel = array("libel", "etat_cpte","duree_min_retrait_jour", "devise");
+  foreach($fieldslabel as $value) {
+    $html->setFieldProperties($value, FIELDP_IS_LABEL, true);
+    $html->setFieldProperties($value, FIELDP_IS_REQUIRED, false);
+  };
+
+  //en fonction du choix du compte, afficher les infos avec le onChange javascript
+  $codejs = "
+            function getInfoCompte()
+          {
+            ";
+  if (isset($ListeComptes)) {
+    foreach($ListeComptes as $key=>$value) {
+      $codejs .= "
+                 if (document.ADForm.HTML_GEN_LSB_NumCpte.value == $key)
+                 {
+                 document.ADForm.HTML_GEN_LSB_etat_cpte.value = " . $value["etat_cpte"] . ";
+                 document.ADForm.libel.value = \"".$value["libel"] . "\";
+                 document.ADForm.HTML_GEN_LSB_devise.value = '".$value["devise"] . "';";
+      if ($value["duree_min_retrait_jour"] > 0) $codejs .= "
+            document.ADForm.duree_min_retrait_jour.value = " . $value["duree_min_retrait_jour"].";";
+      else $codejs .= "
+                        document.ADForm.duree_min_retrait_jour.value = '0';";
+      $codejs .= "
+               };";
+    }
+  }
+  $codejs .= "
+           }
+             getInfoCompte();";
+
+  $html->setFieldProperties("NumCpte", FIELDP_JS_EVENT, array("onChange"=>"getInfoCompte();"));
+  $html->addJS(JSP_FORM, "JS1", $codejs);
+
+  // Gestion du type de retrait
+  $html->addField("type_retrait", _("Type de retrait"), TYPC_LSB);
+  $html->setFieldProperties("type_retrait", FIELDP_IS_REQUIRED, true);
+  $choix2=array();
+  //les clés des choix correspondent à la table $adsys['adsys_type_piece_payement']
+  $choix2[1]=_('Retrait Cash avec impression reçu');
+  $choix2[15]=_('Retrait Cash sur présentation d\'un chèque guichet');
+  $choix2[4]=_('Retrait Cash sur présentation d\'une autorisation de retrait sans livret/chèque');
+  $choix2[5]=_('Retrait en Travelers Cheque');
+  $choix2[8]=_('Retrait par chèque certifié');
+
+  $html->setFieldProperties("type_retrait", FIELDP_ADD_CHOICES, $choix2);
+
+  //ordonner les champs
+  $html->setOrder(NULL, array("htm1", "NumCpte", "libel", "devise", "etat_cpte", "duree_min_retrait_jour", "htm2","type_retrait"));
+
+  //Boutons
+  $html->addFormButton(1, 1, "ok", _("Valider"), TYPB_SUBMIT);
+  $html->addFormButton(1, 2, "cancel", _("Annuler"), TYPB_SUBMIT);
+  $html->setFormButtonProperties("cancel", BUTP_CHECK_FORM, false);
+  $html->setFormButtonProperties("ok", BUTP_PROCHAIN_ECRAN, 'Rcp-2');
+  $html->setFormButtonProperties("cancel", BUTP_PROCHAIN_ECRAN, 'Gen-10');
+
+  $html->buildHTML();
+  echo $html->getHTML();
+}
+//-----------------------------------------------------------------
+//------------ Ecran Rcp-2 Introduction du montant ----------------
+//-----------------------------------------------------------------
+else if ($global_nom_ecran == "Rcp-2") {
+
+    global $global_id_client,$global_id_agence;
+
+    $html = new HTML_GEN2();
+
+    unset($SESSION_VARS['id_dem']);
+    $communication = $remarque = "";
+    if (isset($_GET['id_dem']) && $_GET['id_dem'] > 0) {
+
+        $SESSION_VARS['id_dem'] = $_GET['id_dem'];
+
+        $infoRetraitAttente = getRetraitAttenteOrdinaireAutorise($SESSION_VARS['id_dem'], $global_id_client);
+
+        $type_retrait = trim($infoRetraitAttente['choix_retrait']);
+        $mnt = recupMontant($infoRetraitAttente['montant_retrait']);
+        $devise = trim($infoRetraitAttente['devise']);
+        $AG = getAgenceDatas($global_id_agence);
+        if ($AG['code_devise_reference'] == $devise && $infoRetraitAttente['mnt_devise'] == null){
+          $mnt_devise = recupMontant($mnt);
+        }else{
+          $mnt_devise = recupMontant($infoRetraitAttente['mnt_devise']);
+        }
+        $mnt_reste = recupMontant($infoRetraitAttente['mnt_reste']);
+        $taux_devise = recupMontant($infoRetraitAttente['taux_devise']);
+        $taux_commission = recupMontant($infoRetraitAttente['taux_commission']);
+        $dest_reste = trim($infoRetraitAttente['dest_reste']);
+        $frais_retrait_cpt = recupMontant($infoRetraitAttente['frais_retrait_cpt']);
+        $mandat = isset($infoRetraitAttente['mandat'])?trim($infoRetraitAttente['mandat']):0;
+//        $mandat = str_replace('&apos;', "\'", $mandat);
+        $beneficiaire = trim($infoRetraitAttente['beneficiaire']);
+        $nom_ben = trim($infoRetraitAttente['nom_ben']);
+        $num_chq = trim($infoRetraitAttente['num_chq']);
+        $date_chq = pg2phpDate($infoRetraitAttente['date_chq']);
+        $id_pers_ext = trim($infoRetraitAttente['id_pers_ext']);
+        $id_ben = trim($infoRetraitAttente['id_ben']);
+        $denomination = trim($infoRetraitAttente['denomination']);
+        $communication = trim($infoRetraitAttente['communication']);
+        $remarque = trim($infoRetraitAttente['remarque']);
+        $cpte = trim($infoRetraitAttente['id_cpte']);
+
+        if ($cpte != ''){
+          $NumCpte = trim($infoRetraitAttente['id_cpte']);
+        }
+        else {
+          $NumCpte = getBaseAccountID($global_id_client);
+        }
+
+        if ($infoRetraitAttente['beneficiaire'] == 'EXT'){
+          $SESSION_VARS['tib']['beneficiaire']= 't';
+          $SESSION_VARS['tib']['tireur'] = 'f';
+          $SESSION_VARS['tib']['denomination'] = $infoRetraitAttente['nom_ben'] ;
+          $SESSION_VARS['tib']['num_piece'] = $infoRetraitAttente['num_piece'];
+          $SESSION_VARS['tib']['lieu_delivrance'] = $infoRetraitAttente['lieu_delivrance'];
+
+        }
+
+
+        $jsPreLoadData = "
+                    // Default values
+                    if (document.ADForm.mnt) {
+                        document.ADForm.mnt.value = '$mnt';
+                        document.ADForm.mnt.readOnly = true;
+                    }
+                    if (document.ADForm.mnt_cv) {
+                        document.ADForm.mnt_cv.value = '$mnt_devise';
+                        document.ADForm.mnt_cv.readOnly = true;
+                    }
+                    if (document.ADForm.mnt_cv_reste) {
+                        document.ADForm.mnt_cv_reste.value = '$mnt_reste';
+                        document.ADForm.mnt_cv_reste.readOnly = true;
+                    }
+                    if (document.ADForm.frais_retrait_cpt) {
+                        document.ADForm.frais_retrait_cpt.value = '$frais_retrait_cpt';
+                        if (document.ADForm.frais_retrait_cpt.value > 0) {
+                            document.ADForm.frais_retrait_cpt.disabled = false;
+                        }
+                    }
+                    if (document.ADForm.HTML_GEN_LSB_beneficiaire) {
+                        document.ADForm.HTML_GEN_LSB_beneficiaire.value = '$beneficiaire';
+                    }
+                    if (document.ADForm.nom_ben) {
+                        document.ADForm.nom_ben.value = '$nom_ben';
+                    }
+                    if (document.ADForm.num_chq) {
+                        document.ADForm.num_chq.value = '$num_chq';
+                        document.ADForm.num_chq.readOnly = true;
+                    }
+                    if (document.ADForm.HTML_GEN_date_date_chq) {
+                        document.ADForm.HTML_GEN_date_date_chq.value = '$date_chq';
+                        document.ADForm.HTML_GEN_date_date_chq.readOnly = true;
+                    }
+                    if (document.ADForm.HTML_GEN_LSB_mandat) {
+                        document.ADForm.HTML_GEN_LSB_mandat.value = '$mandat';
+                    }
+                    if (document.ADForm.denomination) {
+                        document.ADForm.denomination.value = '$denomination';
+                    }
+                    if (document.ADForm.id_pers_ext) {
+ 		                document.ADForm.id_pers_ext.value = '$id_pers_ext';
+                    }
+                    if (document.ADForm.id_ben) {
+ 		                document.ADForm.id_ben.value = '$id_ben';
+                    }
+        ";
+
+        $html->addJS(JSP_FORM, "JS_PRELOAD_DATA", $jsPreLoadData);
+    }
+
+  //Enregistrement des informations postées en Rcp-1
+  if (isset($NumCpte))      $SESSION_VARS["NumCpte"]      = $NumCpte;
+  if (isset($type_retrait)) $SESSION_VARS["type_retrait"] = $type_retrait;
+
+  switch ($SESSION_VARS['type_retrait']) {
+  case 1:
+    $charTitre=_("Retrait compte : montant");
+    $charMnt=_("du compte");
+    $charCv=_("à remettre au guichet");
+    break;
+  case 15:
+    $charTitre=_("Retrait par chèque : montant");
+    $charMnt=_("du compte");
+    $charCv=_("à remettre au guichet");
+    $charCheque=_("Informations chèque guichet");
+    break;
+  case 4:
+    $charTitre=_("Retrait par chèque-guichet : montant");
+    $charMnt=_("Montant du chèque");
+    $charCv=_("à remettre au guichet");
+    $charCheque=_("Informations Autorisation de retrait");
+    break;
+  case 5:
+    $charTitre=_("Retrait de Travelers Cheque : montant");
+    $charMnt=_("du compte");
+    $charCv=_("Valeur des Travelers cheque");
+    $charCheque=_("Informatation Travelers cheque");
+    break;
+  case 8:
+      $charTitre=_("Retrait par chèque certifié : montant");
+      $charMnt=_("Montant du chèque");
+      $charCv=_("à remettre au guichet");
+      $charCheque=_("Informations Autorisation de retrait");
+      break;
+  default:
+    $charTitre=_("Erreur ecran Rcp-2");
+    $charMnt=_("montant dans la devise du compte");
+    $charCv=_("contrevaleur à donner au guichet");
+    break;
+  }
+
+  $html->setTitle($charTitre);
+
+  // Ajout des champs ornementaux
+  $xtra1 = "<b>"._("Informations compte")."</b>";
+  $html->addHTMLExtraCode ("htm1", $xtra1);
+  $html->setHTMLExtraCodeProperties ("htm1",HTMP_IN_TABLE, true);
+  $xtra2 = "<b>"._("Montant à retirer")."</b>";
+  $html->addHTMLExtraCode ("htm2", $xtra2);
+  $html->setHTMLExtraCodeProperties ("htm2",HTMP_IN_TABLE, true);
+
+  //Informations compte
+  $cpteSource=getAccountDatas($SESSION_VARS['NumCpte']);
+  $soldeCptSource = $cpteSource["solde"];
+  $soldeDispo=getSoldeDisponible($cpteSource['id_cpte']);// - $cpteSource['frais_retrait_cpt'];
+  $DEV_SRC = getInfoDevise($cpteSource['devise']);
+  $precision_dev_src = $DEV_SRC["precision"];
+  setMonnaieCourante($cpteSource['devise']);
+
+  $infoCpte=getAccountDatas($SESSION_VARS['NumCpte']);
+ 	$MANDATS = getListeMandatairesActifsV2($SESSION_VARS['NumCpte'],null,true);
+    foreach($MANDATS as $key=>$value) {
+        $MANDATS[$key]["libelle"] = str_replace('&apos;', "'", $MANDATS[$key]["libelle"]);
+    }
+ 	if ($MANDATS != NULL) {
+ 	   foreach($MANDATS as $key=>$value) {
+ 	    $MANDATS_LSB[$key] = $value['libelle'];
+      if ($key == 'CONJ_id'){
+        $MANDATS_LSB[$key] = $value['id'];
+      }
+ 	    elseif ($key == 'CONJ') {
+          $JS_open .= "if (document.ADForm.HTML_GEN_LSB_mandat.value == '$key')
+        {
+          OpenBrw('$SERVER_NAME/modules/externe/info_mandat.php?m_agc=".$_REQUEST['m_agc']."&id_cpte=".$SESSION_VARS['NumCpte']."');
+          return false;
+        }";
+      } else {
+        $JS_open .=
+          "if (document.ADForm.HTML_GEN_LSB_mandat.value == $key)
+        {
+          OpenBrw('$SERVER_NAME/modules/externe/info_mandat.php?m_agc=".$_REQUEST['m_agc']."&id_mandat=$key');
+          return false;
+        }";
+      }
+  }
+ }
+  $JS_change =
+ 		    "if (document.ADForm.HTML_GEN_LSB_mandat.value != 'EXT')
+ 		  {
+ 		    document.ADForm.denomination.value = '';
+ 		    document.ADForm.id_pers_ext.value = '';
+ 		  }";
+  if (in_array($SESSION_VARS['type_retrait'], array(8,15))) {
+      $html->addField("beneficiaire", _("Bénéficiaire"), TYPC_LSB);
+      $html->setFieldProperties("beneficiaire", FIELDP_IS_REQUIRED, true);
+      $html->setFieldProperties("beneficiaire", FIELDP_ADD_CHOICES, array("TITS" => _("Titulaire") . " (" . getClientName($global_id_client) . ")"));
+
+      $html->setFieldProperties("beneficiaire", FIELDP_HAS_CHOICE_AUCUN, true);
+      $html->setFieldProperties("beneficiaire", FIELDP_HAS_CHOICE_TOUS, false);
+      $html->setFieldProperties("beneficiaire", FIELDP_DEFAULT, $SESSION_VARS['id_mandat']);
+
+      $JS_change_benef =
+          "if (document.ADForm.HTML_GEN_LSB_beneficiaire.value == '0')
+ 		  {
+ 		    document.ADForm.nom_ben.value = '';
+ 		    document.ADForm.id_ben.value = '';
+ 		  }else if (document.ADForm.HTML_GEN_LSB_beneficiaire.value == 'TITS')
+ 		  {
+ 		    document.ADForm.nom_ben.value = '" . getClientName($global_id_client) . "';
+ 		    document.ADForm.id_ben.value = '" . $global_id_client . "';
+ 		  }else if (document.ADForm.HTML_GEN_LSB_beneficiaire.value == 'EXT')
+ 		  {
+ 		    document.ADForm.nom_ben.value = '';
+ 		    document.ADForm.id_ben.value = '';
+ 		  }";
+  }
+  $html->addField("mandat", _("Donneur d'ordre"), TYPC_LSB);
+  $html->setFieldProperties("mandat", FIELDP_ADD_CHOICES, array("0" => _("Titulaire")." (".getClientName($global_id_client).")"));
+
+  if ($MANDATS_LSB != NULL) {
+  	$MANDATS_LSB = array_flip($MANDATS_LSB); // array(valeur = >cle) au lieu de array(cle => valeur)
+    unset($MANDATS_LSB[getClientName($global_id_client)]); //on supprime le nom du titulaire dans la liste déroulante
+    $MANDATS_LSB = array_flip($MANDATS_LSB); // on remet le array(cle => valeur)
+      $LSB_MANDATS = $MANDATS_LSB;
+      unset($LSB_MANDATS['CONJ_id']);
+//      foreach($LSB_MANDATS as $key => $value){
+//          $LSB_MANDATS[$key] = str_replace('&apos;', "'", $LSB_MANDATS[$key]);
+//      }
+//      var_dump($LSB_MANDATS);
+      $html->setFieldProperties("mandat", FIELDP_ADD_CHOICES, $LSB_MANDATS);
+      if (in_array($SESSION_VARS['type_retrait'], array(8,15))) {
+          $html->setFieldProperties("beneficiaire", FIELDP_ADD_CHOICES, $LSB_MANDATS);
+
+          foreach ($MANDATS_LSB as $key => $value) {
+              $JS_change_benef .= "
+                 else if (document.ADForm.HTML_GEN_LSB_beneficiaire.value == $key)
+                 {
+                   document.ADForm.nom_ben.value = '" . $value . "';
+                   document.ADForm.id_ben.value = '" . $key . "';
+                 }";
+          }
+      }
+  }
+
+  if (in_array($SESSION_VARS['type_retrait'], array(8,15))) {
+      $html->setFieldProperties("beneficiaire", FIELDP_ADD_CHOICES, array("EXT" => _("Personne non cliente")));
+      $html->setFieldProperties("beneficiaire", FIELDP_JS_EVENT, array("onchange" => $JS_change_benef));
+  }
+
+  $html->setFieldProperties("mandat", FIELDP_HAS_CHOICE_AUCUN, false);
+
+  $html->setFieldProperties("mandat", FIELDP_HAS_CHOICE_TOUS, false);
+
+  if (isset($SESSION_VARS['denomination_conj']) && $SESSION_VARS['denomination_conj'] != null){
+    $html->setFieldProperties("mandat", FIELDP_DEFAULT, "CONJ");
+  }
+  else{
+    $html->setFieldProperties("mandat", FIELDP_DEFAULT, $SESSION_VARS['id_mandat']);
+  }
+
+  $html->setFieldProperties("mandat", FIELDP_JS_EVENT, array("onchange" => $JS_change));
+
+  $html->setFieldProperties("mandat", FIELDP_ADD_CHOICES, array("EXT" => _("Personne non cliente")));
+
+  $html->addJS(JSP_BEGIN_CHECK, "limitation_check", $JS_check);
+  $html->addLink("mandat", "afficher", _("Afficher"), "#");
+  $html->setLinkProperties("afficher", LINKP_JS_EVENT, array("onclick" => $JS_open));
+
+  $SESSION_VARS['mandat'] = $MANDATS_LSB;
+ 	$JS_rech =
+ 	    "if (document.ADForm.HTML_GEN_LSB_mandat.value == 'EXT')
+ 		  {
+ 		    OpenBrw('$SERVER_NAME/modules/externe/gest_pers_ext.php?m_agc=".$_REQUEST['m_agc']."&denom=denomination&pers_ext=id_pers_ext');
+ 		    return false;
+ 		  }";
+
+ 	 $include = array("denomination");
+ 	 $html->addTable("ad_pers_ext", OPER_INCLUDE, $include);
+ 	 $html->setFieldProperties("denomination", FIELDP_IS_LABEL, true);
+ 	 $html->setFieldProperties("denomination", FIELDP_IS_REQUIRED, false);
+ 	 $html->setFieldProperties("denomination", FIELDP_DEFAULT, $SESSION_VARS['denomination']);
+ 	 $html->addLink("denomination", "rech_pers_ext", _("Rechercher"), "#");
+ 	 $html->setLinkProperties("rech_pers_ext", LINKP_JS_EVENT, array("onclick" => $JS_rech));
+
+ 	 $html->addHiddenType("id_pers_ext", $SESSION_VARS['id_pers_ext']);
+
+ 	 $JS_check =
+ 	    "if (document.ADForm.HTML_GEN_LSB_mandat.value == 'EXT' && document.ADForm.id_pers_ext.value == '')
+ 	  {
+ 	    msg += '"._("- Vous devez choisir une personne non cliente")."\\n';
+ 	    ADFormValid=false;
+ 	  }";
+ 	$html->addJS(JSP_BEGIN_CHECK, "JS2", $JS_check);
+
+ 	$html->addHTMLExtraCode("mandat_sep", "<br/>");
+ 	$champsProduit = array ("libel");
+ 	$champsCpte = array("num_complet_cpte", "intitule_compte", "etat_cpte");
+ 	$ordre = array("mandat", "denomination", "mandat_sep", "htm1", "num_complet_cpte", "libel", "intitule_compte", "etat_cpte");
+ 	$labelField = array ("num_complet_cpte", "intitule_compte", "etat_cpte", "libel");
+
+  $access_solde = get_profil_acces_solde($global_id_profil, $cpteSource['id_prod']);
+  $access_solde_vip = get_profil_acces_solde_vip($global_id_profil, $global_id_client);
+	if(manage_display_solde_access($access_solde, $access_solde_vip)){
+		array_push($champsCpte, "solde");
+    array_push($ordre, "solde");
+    array_push($labelField, "solde");
+	}
+  if ($cpteSource['mnt_min_cpte'] > 0) {
+    array_push($champsCpte, "mnt_min_cpte");
+    array_push($ordre, "mnt_min_cpte");
+    array_push($labelField, "mnt_min_cpte");
+  }
+    if ($cpteSource['mnt_bloq'] > 0) {
+        array_push($champsCpte, "mnt_bloq");
+        array_push($ordre, "mnt_bloq");
+        array_push($labelField, "mnt_bloq");
+    }
+    if ($cpteSource['mnt_bloq_cre'] > 0) {
+        array_push($champsCpte, "mnt_bloq_cre");
+        array_push($ordre, "mnt_bloq_cre");
+        array_push($labelField, "mnt_bloq_cre");
+    }
+  if ($cpteSource['decouvert_max'] > 0) {
+    array_push($champsCpte, "decouvert_max");
+    array_push($ordre, "decouvert_max");
+    array_push($labelField, "decouvert_max");
+  }
+
+	if(manage_display_solde_access($access_solde, $access_solde_vip)){
+	  $html->addField("solde_dispo", _("Solde disponible"), TYPC_MNT);
+	  $html->setFieldProperties("solde_dispo", FIELDP_DEFAULT, $soldeDispo);
+	  array_push($ordre, "solde_dispo");
+	  array_push($labelField, "solde_dispo");
+	  $cpteSource['solde_dispo'] = $soldeDispo;
+	}
+    $frais_spec = $cpteSource['frais_retrait_spec'];
+
+ if ($frais_spec == 'f' ) {
+       $html->addTable("adsys_produit_epargne", OPER_INCLUDE,array("frais_retrait_cpt"));
+       $html->setFieldProperties("frais_retrait_cpt", FIELDP_DEFAULT, recupMontant($cpteSource['frais_retrait_cpt']));
+       $html->setFieldProperties("frais_retrait_cpt", FIELDP_IS_LABEL, true);
+       $html->setFieldProperties("frais_retrait_cpt", FIELDP_CAN_MODIFY, true);
+
+       $SESSION_VARS["Frais"]= recupMontant($cpteSource['frais_retrait_cpt']);
+    }
+    else {
+        $code_abo='epargne';
+
+        $html->addTable("adsys_produit_epargne", OPER_INCLUDE,array("frais_retrait_cpt"));
+
+        $type_de_frais = 'EPG_RET_ESPECES';
+        if (in_array($SESSION_VARS['type_retrait'], array(1))) {
+            $type_de_frais = 'EPG_RET_ESPECES';
+        }
+        elseif (in_array($SESSION_VARS['type_retrait'], array(15,4))){
+            $type_de_frais = 'EPG_RET_CHEQUE_INTERNE';
+        }
+        elseif (in_array($SESSION_VARS['type_retrait'], array(5))) {
+            $type_de_frais = 'EPG_RET_CHEQUE_TRAVELERS';
+        }
+        elseif (in_array($SESSION_VARS['type_retrait'], array(8))) {
+            $type_de_frais = 'EPG_RET_CHEQUE_INTERNE_CERTIFIE';
+        }
+
+        $retrait_frais = getFraisRetrait($code_abo,$type_de_frais);
+        $html->setFieldProperties("frais_retrait_cpt", FIELDP_DEFAULT, $retrait_frais['valeur']);
+        $html->setFieldProperties("frais_retrait_cpt", FIELDP_IS_LABEL, true);
+        $html->setFieldProperties("frais_retrait_cpt", FIELDP_CAN_MODIFY, true);
+
+
+        $SESSION_VARS["Frais"] = $retrait_frais['valeur'];
+    }
+
+    array_push($ordre, "frais_retrait_cpt");
+    array_push($labelField, "frais_retrait_cpt");
+
+
+  $html->addTable("ad_cpt", OPER_INCLUDE, $champsCpte);
+  $fill=new FILL_HTML_GEN2();
+  $fill->addFillClause("cpteSource", "ad_cpt");
+  $fill->addCondition("cpteSource", "id_cpte", $SESSION_VARS['NumCpte']);
+  $fill->addManyFillFields("cpteSource", OPER_INCLUDE, $champsCpte);
+  $fill->fill($html);
+
+  $html->addTable("adsys_produit_epargne", OPER_INCLUDE, $champsProduit);
+  $fill2 = new FILL_HTML_GEN2();
+  $fill2->addFillClause("produit", "adsys_produit_epargne");
+  $fill2->addCondition("produit", "id", $cpteSource['id_prod']);
+  $fill2->addManyFillFields("produit", OPER_INCLUDE, $champsProduit);
+  $fill2->fill($html);
+
+
+  // Montant à retirer
+  $html->addField("mnt",$charMnt,TYPC_MNT);
+  $html->setFieldProperties("mnt",  FIELDP_IS_REQUIRED, true);
+  array_push($ordre, "htm2", "mnt");
+  if ($global_multidevise) {
+      if (isset($_GET['id_dem']) && $_GET['id_dem'] > 0) { //Ticket AT-141 : apres la demande et l'approbation d'un rétrait
+          //de récupérer et preload les informations qui ont été stocké dans la base
+          $html->addField("mnt_cv",$charCv._(" (en ".$devise.")"),TYPC_TXT);
+          $html->addField("mnt_cv_reste",_("du compte (reste)"),TYPC_MNT);
+          $html->setFieldProperties("mnt_cv",  FIELDP_IS_REQUIRED, true);
+          $html->addHiddenType("HTML_GEN_dvr_mnt_cv", $devise);
+          $html->addHiddenType("taux", $taux_devise);
+          $html->addHiddenType("commission", $taux_commission);
+          $html->addHiddenType("dest_reste", $dest_reste);
+          array_push($ordre, "mnt_cv", "mnt_cv_reste");
+      }
+      else{
+          $html->addField("mnt_cv",$charCv,TYPC_DVR);
+          $html->linkFieldsChange("mnt_cv","mnt","vente",1,true);
+          $html->setFieldProperties("mnt_cv",  FIELDP_IS_REQUIRED, true);
+      }
+  }
+
+  // Informations chèque
+  // dans les cas : chèque guichet/autorisation de retrait/travelers cheque
+  if ($SESSION_VARS['type_retrait']==8 || $SESSION_VARS['type_retrait']==15 || $SESSION_VARS['type_retrait']==4 || $SESSION_VARS['type_retrait']==5) {
+    $xtra3 = "<b>$charCheque</b>";
+    $html->addHTMLExtraCode ("htm3", $xtra3);
+    $html->setHTMLExtraCodeProperties ("htm3",HTMP_IN_TABLE, true);
+
+    $html->addField("num_chq", _("Numéro"), TYPC_TXT);
+    $html->setFieldProperties("num_chq",  FIELDP_IS_REQUIRED, true);
+
+    //Dans le cas du chèque, on rajoute les informations : date, correspondant et bénéficiaire.
+    if (in_array($SESSION_VARS['type_retrait'], array(8,15))) {
+      $html->addField("date_chq", _("Date du chèque"), TYPC_DTE);
+      // FIXME Bernard : il serait peut-être intéressant de préalimenter la date du jour.
+      $html->setFieldProperties("date_chq",  FIELDP_HAS_CALEND, false);
+      $html->setFieldProperties("date_chq",  FIELDP_IS_REQUIRED, true);
+      $html->addLink("date_chq", "calendrier1", _("Calendrier"), "#");
+
+      //Données du bénéficiaire
+      $html->addHiddenType("id_ben");
+      $html->addField("nom_ben", _("Nom du bénéficiaire"), TYPC_TXT);
+      array_push($labelField, "nom_ben");
+      $html->addLink("nom_ben", "rechercher", _("Rechercher"), "#");
+      $html->setLinkProperties("rechercher", LINKP_JS_EVENT, array("onclick" => "if (document.ADForm.HTML_GEN_LSB_beneficiaire.value != 'EXT') { alert('La recherche permet de rechercher un bénéficiaire qui soit une personne non cliente.'); return false; } else OpenBrw('$SERVER_NAME/modules/externe/rech_benef.php?m_agc=".$_REQUEST['m_agc']."&field_name=nom_ben&field_id=id_ben&type=r&m_agc=".$_REQUEST['m_agc']."&prochain_ecran=Tib-3', '"._("Recherche")."');return false;"));
+      if (in_array($SESSION_VARS['type_retrait'], array(8,15))) {
+          array_push($ordre, "htm3", "num_chq", "date_chq", "beneficiaire", "nom_ben");
+      } else {
+          array_push($ordre, "htm3", "num_chq", "date_chq", "nom_ben");
+      }
+    } else {
+      array_push($ordre, "htm3", "num_chq");
+    }
+  }
+
+  $xtra4 = "<b>"._("Communication / remarque")."</b>";
+  $html->addHTMLExtraCode ("htm4", $xtra4);
+  $html->setHTMLExtraCodeProperties ("htm4",HTMP_IN_TABLE, true);
+
+  $html->addField("communication", _("Communication"), TYPC_TXT);
+  $html->setFieldProperties("communication", FIELDP_DEFAULT, $communication);
+  $html->addField("remarque", _("Remarque"), TYPC_ARE);
+  $html->setFieldProperties("remarque", FIELDP_DEFAULT, $remarque);
+
+  array_push($ordre, "htm4", "communication", "remarque");
+
+  //mise en ordre et en label des champs affichés
+  $html->setOrder(NULL, $ordre);
+  foreach($labelField as $key=>$value) {
+    $html->setFieldProperties($value, FIELDP_IS_LABEL, true);
+  }
+
+  //Code JavaScript
+  $ChkJS = "
+           if (recupMontant(document.ADForm.mnt.value) > ".$soldeDispo." - recupMontant(document.ADForm.frais_retrait_cpt.value))
+         {
+           msg += '- "._("Le montant du retrait augmenté des frais de retrait est supérieur au solde disponible")."\\n';
+           ADFormValid=false;
+         }
+           if (document.ADForm.etat_cpte.value=='3')
+         {
+           msg += '- "._("Le compte est bloqué")."\\n';
+           ADFormValid=false;
+         }";
+
+  if (in_array($SESSION_VARS['type_retrait'], array(8,15))) {
+
+    $listeChequeInterne = ChequeCertifie::getChequeCertifieClient($NumCpte, ChequeCertifie::ETAT_CHEQUE_CERTIFIE_TOUS);
+    $chqValidite = getValidityChequeDate();
+    $chqOrdVal = $chqValidite['validite_chq_ord'];
+    $chqCertVal = $chqValidite['validite_chq_cert'];
+
+    $ChkJS .= "
+              if (document.ADForm.HTML_GEN_date_date_chq.value == '')
+            {
+              msg += '- "._("La date du chèque n\'est pas renseignée")."\\n';
+              ADFormValid=false;
+            }
+              if (!isDate(document.ADForm.HTML_GEN_date_date_chq.value))
+            {
+              msg += '- "._("Le format de la date du chèque est incorrect")."\\n';
+              ADFormValid=false;
+            }
+              if (isBefore('".date("d/m/Y")."', document.ADForm.HTML_GEN_date_date_chq.value))
+            {
+              msg += '- "._("la date du chèque doit être antérieure ou égale à la date du jour")."\\n';
+              ADFormValid=false;
+            }
+              if (document.ADForm.id_ben.value == '')
+            {
+              msg += ' - "._("Vous devez choisir un bénéficiaire")."\\n';
+              ADFormValid=false;
+            };";
+
+      // Validation date validité chèques
+      $ChkJS .= "\n var etatChqArray = [\n";
+
+      foreach($listeChequeInterne as $key=>$value)
+      {
+          $ChkJS .= "{ num_chq: $key, date_chq: '". pg2phpDate($value['date_cheque']) ."', mnt_chq: ". recupMontant($value['montant']) ." },\n";
+      }
+      $ChkJS .= "];\n ";
+
+      $ChkJS .= "function lookupChqArray( index , arr, output)
+                 {
+                     for(var i = 0, len = arr.length; i < len; i++)
+                     {
+                         if( arr[ i ].num_chq == index )
+                         {
+                            if (output == 'date')
+                            {
+                                return arr[ i ].date_chq;
+                            }
+                            else if (output == 'mnt')
+                            {
+                                return arr[ i ].mnt_chq;
+                            }
+                            else
+                            {
+                                return true;
+                            }
+                         }
+                     }
+                     return false;
+                 };\n ";
+
+      $ChkJS .= "
+                  function validChqDate(){
+                    var date_chq = document.ADForm.HTML_GEN_date_date_chq;
+
+                      if(date_chq.value != '' )
+                      {
+                          var now = \"" . date("d/m/Y") . "\"
+                          var isValid = checkDateRange($chqOrdVal, date_chq.value, now);
+
+                          if(!isValid)
+                          {
+                            msg += ' - La validité du chèque dépasse le nombre de jours autorisé !\\n';
+                            ADFormValid=false;
+                          }
+                      }
+                    return false;
+                  }
+
+                  function validChqCertifie(){
+                    var num_chq = document.ADForm.num_chq;
+                    var mnt_chq = document.ADForm.mnt;
+                    var date_chq = document.ADForm.HTML_GEN_date_date_chq;
+
+                      if(num_chq.value != '' && date_chq.value != '' )
+                      {
+                          var now = \"" . date("d/m/Y") . "\"
+                          var isChqCert = lookupChqArray(num_chq.value, etatChqArray, 0);
+                          var isValid = checkDateRange(isChqCert?$chqCertVal:$chqOrdVal, date_chq.value, now);
+
+                          if(!isValid)
+                          {
+                            msg += ' - La validité du chèque dépasse le nombre de jours autorisé !\\n';
+                            ADFormValid=false;
+                          }
+                          else
+                          {
+                            if(isChqCert)
+                            {
+                              if(lookupChqArray(num_chq.value, etatChqArray, 'date') != date_chq.value)
+                              {
+                                msg += ' - La Date du chèque saisie ne correspond pas à la date chèque certifié !\\n';
+                                ADFormValid=false;
+                              }
+                              else if(mnt_chq.value != '' && lookupChqArray(num_chq.value, etatChqArray, 'mnt') != recupMontant(mnt_chq.value))
+                              {
+                                msg += ' - Le Montant du chèque saisie ne correspond pas au montant du chèque certifié !\\n';
+                                ADFormValid=false;
+                              }
+                            }
+                            else
+                            {
+                              msg += ' - Le Numéro chèque saisie n\'est pas un chèque certifié valide pour ce client !\\n';
+                              ADFormValid=false;
+                            }
+                          }
+                      }
+                  }";
+      if ($SESSION_VARS['type_retrait'] == 8) {
+          $ChkJS .= "\n validChqCertifie(); ";
+      }elseif ($SESSION_VARS['type_retrait'] == 15) {
+          $ChkJS .= "\n validChqDate(); ";
+      }
+
+    $codejs = "
+              if (! isDate(document.ADForm.HTML_GEN_date_date_chq.value)) document.ADForm.HTML_GEN_date_date_chq.value='';
+              open_calendrier(getMonth(document.ADForm.HTML_GEN_date_date_chq.value), getYear(document.ADForm.HTML_GEN_date_date_chq.value), $calend_annee_passe, $calend_annee_futur, 'HTML_GEN_date_date_chq');return false;";
+    $html->setLinkProperties("calendrier1", LINKP_JS_EVENT, array("onclick" => $codejs));
+  }
+
+
+  //$html->setFieldProperties("frais_retrait_cpt", FIELDP_CAN_MODIFY, true);
+
+  $ChkJS .= "
+              if (ADFormValid == true) {
+                if (document.ADForm.nom_ben) {
+                    document.ADForm.nom_ben.disabled = false;
+                }
+                if (document.ADForm.denomination) {
+                    document.ADForm.denomination.disabled = false;
+                }
+              }
+            ";
+
+  $html->addJS(JSP_BEGIN_CHECK, "JS1",$ChkJS);
+
+  // Boutons
+  $html->addFormButton(1, 1, "ok", _("Valider"), TYPB_SUBMIT);
+  $html->addFormButton(1, 2, "retour", _("Précédent"), TYPB_SUBMIT);
+  $html->addFormButton(1, 3, "cancel", _("Annuler"), TYPB_SUBMIT);
+  $html->setFormButtonProperties("cancel", BUTP_CHECK_FORM, false);
+  $html->setFormButtonProperties("retour", BUTP_CHECK_FORM, false);
+  $html->setFormButtonProperties("ok", BUTP_PROCHAIN_ECRAN, 'Rcp-3');
+  $html->setFormButtonProperties("retour", BUTP_PROCHAIN_ECRAN,'Rcp-1');
+  $html->setFormButtonProperties("cancel", BUTP_PROCHAIN_ECRAN, 'Gen-10');
+
+  $html->buildHTML();
+  echo $html->getHTML();
+}
+//-----------------------------------------------------------------
+//------------ Ecran Rcp-3 Confirmation du montant ----------------
+//-----------------------------------------------------------------
+else if ($global_nom_ecran == "Rcp-3") {
+
+    if (in_array($SESSION_VARS['type_retrait'], array(8,15))) {
+        if ($HTML_GEN_LSB_beneficiaire == 'TITS') { //Si le beneficiaire est un titulaire
+            $CLI = getClientDatas($id_ben);
+            $DATA['beneficiaire'] = 't';
+            $DATA['tireur'] = 'f';
+            $DATA['denomination'] = $CLI['pp_prenom'] . " " . $CLI['pp_nom'];
+            $DATA['adresse'] = $CLI['adresse'];
+            $DATA['code_postal'] = $CLI['code_postal'];
+            $DATA['ville'] = $CLI['ville'];
+            $DATA['pays'] = $CLI['pays'];
+            $DATA['num_tel'] = $CLI['num_tel'];
+            $DATA['type_piece'] = $CLI['pp_type_piece_id'];
+            $DATA['num_piece'] = $CLI['pp_nm_piece_id'];
+            $DATA['lieu_delivrance'] = $CLI['pp_lieu_delivrance_id'];
+            foreach ($DATA as $key => $value) {
+                if ($DATA[$key] == '') unset($DATA[$key]);
+            }
+            $SESSION_VARS['tib'] = $DATA;
+        } else if ($HTML_GEN_LSB_beneficiaire != 'EXT') { //Si le beneficiaire est un mandataire
+            $MANDATAIRE = getInfosMandat($id_ben);
+            $DATA['beneficiaire'] = 't';
+            $DATA['tireur'] = 'f';
+            $DATA['denomination'] = $MANDATAIRE['denomination'];
+            $DATA['adresse'] = $MANDATAIRE['adresse'];
+            $DATA['code_postal'] = $MANDATAIRE['code_postal'];
+            $DATA['ville'] = $MANDATAIRE['ville'];
+            $DATA['pays'] = $MANDATAIRE['pays'];
+            $DATA['num_tel'] = $MANDATAIRE['num_tel'];
+            $DATA['type_piece'] = $MANDATAIRE['type_piece_id'];
+            $DATA['num_piece'] = $MANDATAIRE['num_piece_id'];
+            $DATA['lieu_delivrance'] = $MANDATAIRE['lieu_piece_id'];
+            foreach ($DATA as $key => $value) {
+                if ($DATA[$key] == '') unset($DATA[$key]);
+            }
+            $SESSION_VARS['tib'] = $DATA;
+        }
+    }
+
+  if ($mandat != 0 && $mandat != 'CONJ') {
+    $SESSION_VARS['id_mandat'] = $mandat;
+    $infos_pers_ext = getInfosMandat($SESSION_VARS['id_mandat']);
+    $SESSION_VARS['id_pers_ext'] = $infos_pers_ext['id_pers_ext'];
+  } else {
+    $SESSION_VARS['id_mandat'] = NULL;
+  }
+  if ($mandat == 'EXT') {
+ 	    $SESSION_VARS['id_pers_ext'] = $id_pers_ext;
+ 	    $SESSION_VARS['denomination'] = $denomination;
+ 	    
+ 	}
+ 	if(isset($SESSION_VARS['denomination_conj'])) {
+ 		unset ($SESSION_VARS['denomination_conj']);
+ 	}
+ 	if($mandat == 'CONJ') {
+ 	   $SESSION_VARS['denomination_conj']=$SESSION_VARS['mandat']['CONJ'];
+ 	}
+  // sauvegarde des données postées
+  $erreurGuichet=false;
+  if ($_POST['mnt_cv']['cv'] != '') // A-t-on réalisé une opération de change ?
+    $change_effectue = true;
+  else
+    $change_effectue = false;
+
+  //on sauvegarde la devise du montant à donner au guichet
+  if ($_POST['mnt_cv']['devise'] != '')
+    $SESSION_VARS['devise']= $_POST['mnt_cv']['devise'];
+  else
+    $SESSION_VARS['devise']= $global_monnaie;
+
+  if ($change_effectue) {
+    debug($SESSION_VARS);
+    debug("<===");
+
+    $SESSION_VARS['change']= $_POST['mnt_cv'];
+    if (isset($mnt_cv_reste)){ //AT-141 - si c'est en multi-devise et on est passé par une demande et approbation de la processus,
+        //il faut utiliser les informations qui ont été stocké dans la base
+      $SESSION_VARS['change']['reste'] = $mnt_cv_reste;
+      $SESSION_VARS['change']['taux'] = $taux;
+      $SESSION_VARS['change']['comm_nette'] = $commission;
+      $SESSION_VARS['change']['dest_reste'] = $dest_reste;
+      $SESSION_VARS['print_recu_change'] = 1;
+      $SESSION_VARS['envoi_reste'] = 1;
+  }
+    // on vérifie si le guichet dans la devise du retrait est correctement approvisionné.
+    if ($SESSION_VARS['change']['devise'] != $global_monnaie) {
+      $cpteGuichet=getCompteCptaGui($global_id_guichet);
+      $cpteDevise=$cpteGuichet.".".$SESSION_VARS['change']['devise'];
+      $param['num_cpte_comptable']=$cpteDevise;
+      $infoCpteGuichet=getComptesComptables($param);
+      $infoCpteGuichet = $infoCpteGuichet[$cpteDevise];
+      debug($infoCpteGuichet);
+      if (isset($infoCpteGuichet)) {
+        if (($SESSION_VARS["type_retrait"] != 5) && ($SESSION_VARS['change']['cv'] + $infoCpteGuichet['solde']) > 0) {
+          $erreurGuichet=true;
+          $charTitle=_("Solde guichet insuffisant");
+          setMonnaieCourante($SESSION_VARS['change']['devise']);
+          $message =  _("Solde insuffisant sur le guichet en")." ".$SESSION_VARS['change']['devise']." (".afficheMontant(-$infoCpteGuichet['solde'],true).")";
+        }
+      } else {
+        $erreurGuichet=true;
+        $charTitle=_("Guichet inexistant");
+        $message = _("le guichet dans la devise finale n'existe pas")." (".$SESSION_VARS['change']['devise'].")" ;
+      }
+    }
+  }
+
+  $SESSION_VARS["remarque"] = $remarque;
+  $SESSION_VARS["communication"] = $communication;
+
+  // REL-63 : Ajout verification limitation retrait pour le mandataire choisit
+  $Liste_mandataires = getListeMandatairesActifsV2($SESSION_VARS["NumCpte"],null,true);
+  $retrait_impossible = false;
+  if (isset($mandat)){
+    if ($mandat > 0){ //Type seule
+      if (isset($Liste_mandataires[$mandat]) && $Liste_mandataires[$mandat] != null && $Liste_mandataires[$mandat]['limitation'] > 0){
+        if (recupMontant($Liste_mandataires[$mandat]['limitation']) < recupMontant($mnt)){ //si le montant à retirer est superieure au limit de retrait pour ce mandataire
+          $retrait_impossible = true;
+          $titre = "Retrait impossible pour le mandataire (".$Liste_mandataires[$mandat]['libelle'].") de type seule";
+        }
+      }
+    }
+    if ($mandat == 'CONJ'){ //Type conjointe
+      if (isset($Liste_mandataires[$mandat]) && $Liste_mandataires[$mandat] != null){
+        $liste_mandats = getMandats($SESSION_VARS['NumCpte']);
+        $liste_CONJ_id = explode('-',$SESSION_VARS['mandat']['CONJ_id']);
+        $mnt_limite = 0;
+        $limitation = 0;
+        foreach ($liste_CONJ_id as $conj_id => $value) {
+          if ($value != null) {
+            $mnt_limite = recupMontant($liste_mandats[$value]['limitation']);
+            if ($mnt_limite != null && $mnt_limite != 0) {
+            if ($limitation == 0) {
+              $limitation = $mnt_limite;
+            }
+            $limitation = min($limitation, $mnt_limite); // Si on a plusieurs mandataires conjointe on prend le minimum des montants limitation
+          }
+          }
+        }
+        if ($limitation != null && $limitation != 0){
+          if ($limitation < recupMontant($mnt)) { //si le montant à retirer est superieure au limit de retrait pour ce mandataire
+            $retrait_impossible = true;
+            $titre = "Retrait impossible pour le(s) mandataire(s) (" . $Liste_mandataires[$mandat]['libelle'] . ") de type conjointe";
+            $mnt_conj_limite = "(" . number_format($limitation, 0, '.', ' ') . ")";
+          }
+        }
+      }
+    }
+    if ($retrait_impossible){
+      $msg = "Le montant ($mnt) à retirer est supérieure au limite $mnt_conj_limite de rétrait!! Veuillez cliquer le bouton OK pour re-saisir le montant sur l'ecran precedent!";
+      $html_err = new HTML_erreur($titre);
+      $html_err->setMessage($msg);
+      $html_err->addButton("BUTTON_OK", "Rcp-2");
+      $html_err->buildHTML();
+      echo $html_err->HTML_code;
+      exit;
+    }
+  }
+
+  // Verifier le chèque
+  if (in_array($SESSION_VARS['type_retrait'], array(8,15))) {
+  	$rep = valideCheque($_REQUEST["num_chq"],$SESSION_VARS["NumCpte"]);
+  	debug($rep->errCode!= NO_ERR); 
+  	if($rep->errCode != NO_ERR ) {
+  		debug($rep);
+  		$titre=_("Retrait impossible")." ";
+  		$ecran_retour="Rcp-2";
+  		sendMsgErreur ($titre,$rep,$ecran_retour );
+  	} else {
+        if ($SESSION_VARS['type_retrait'] == 8)
+        {
+            // Vérifié l'existence du numéro du chèque
+            if (ChequeCertifie::isChequeCertifie($_REQUEST["num_chq"], ChequeCertifie::ETAT_CHEQUE_CERTIFIE_TRAITE)) {
+                $titre = "Retrait chèque certifié impossible ";
+                $ecran_retour = "Gen-10";
+                sendMsgErreur($titre, "Ce chèque certifié a déjà été utilisé !", $ecran_retour);
+            }
+        }
+    }
+  	
+  }
+
+  if (!$erreurGuichet) {
+    $SESSION_VARS["mnt"] = recupMontant($mnt);
+    if ($SESSION_VARS["type_retrait"] == 8 || $SESSION_VARS["type_retrait"] == 15 || $SESSION_VARS["type_retrait"] == 4 || $SESSION_VARS["type_retrait"] == 5) {
+      $SESSION_VARS["num_chq"] = $num_chq;
+    }
+    if ($SESSION_VARS["type_retrait"] == 8 || $SESSION_VARS["type_retrait"] == 15 || $SESSION_VARS["type_retrait"] == 4) {
+      $SESSION_VARS["date_chq"] = $date_chq;
+      debug($id_ben,_("Id du bénéficiaire est")." ");
+      if (isset($id_ben)) $SESSION_VARS['id_ben']=$id_ben;
+    }
+
+    if (isset($frais_retrait_cpt))
+      $SESSION_VARS['Frais'] = recupMontant($frais_retrait_cpt);
+
+    //Alimentation des zones d'affichage
+    if (isset($SESSION_VARS['change'])) {
+      switch ($SESSION_VARS['type_retrait']) {
+      case 1:
+      case 15:
+        $charTitle=_("Confirmation retrait");
+        $charMnt=_("Montant à débiter du compte");
+        $charMntCV =_("Montant guichet");
+        break;
+      case 8:
+          $charTitle=_("Confirmation retrait chèque certifié");
+          $charMnt=_("Montant à débiter du compte");
+          $charMntCV =_("Montant guichet");
+          break;
+      case 4:
+        $charTitle=_("Confirmation retrait-chèque");
+        $charMnt=_("Montant du chèque");
+        $charMntCV =_("Montant guichet");
+        break;
+      case 5:
+        $charTitle=_("Confirmation retrait Travelers");
+        $charMnt=_("Montant à débiter du compte");
+        $charMntCV =_("Montant des Travelers cheque");
+        break;
+      }
+    } else {
+      switch ($SESSION_VARS['type_retrait']) {
+      case 1:
+      case 15:
+        $charTitle=_("Confirmation retrait");
+        $charMnt=_("Montant à retirer");
+        break;
+      case 8:
+          $charTitle=_("Confirmation retrait chèque certifié");
+          $charMnt=_("Montant à retirer");
+          break;
+      case 4:
+        $charTitle=_("Confirmation retrait-chèque");
+        $charMnt=_("Montant du chèque");
+        break;
+      case 5:
+        $charTitle=_("Confirmation retrait Travelers");
+        $charMnt=_("Montant des Travelers");
+        break;
+      }
+    }
+    $charMntReel=_("Confirmation montant");
+
+    //récupérer le infos sur le produit associé au compte sélectionné
+    $InfoCpte = getAccountDatas($SESSION_VARS["NumCpte"]);
+
+    //Affichage du titre
+    $html = new HTML_GEN2($charTitle); 
+
+    //Crontôler si le montant à retirer ne dépasse pas le montant plafond de retrait autorisé s'il y a lieu
+	  global $global_nom_login, $global_id_agence, $colb_tableau;
+	  $info_login = get_login_full_info($global_nom_login);
+	  $info_agence = getAgenceDatas($global_id_agence);
+	  $msg = "";
+	  if (!isset($SESSION_VARS['id_dem']) && $info_agence['plafond_retrait_guichet'] == 't'){
+	    if($info_login['depasse_plafond_retrait'] == 'f' && $SESSION_VARS["mnt"] > $info_agence['montant_plafond_retrait']){
+	   		//$msg = "<center>"._("Le montant demandé dépasse le montant plafond de retrait autorisé. Ce login n'est pas habilité à le faire.");
+	   		//$msg .= " "._("Veuillez contacter votre administrateur.")."</center>";
+
+            // Affichage de la confirmation
+            $html_msg = new HTML_message("Demande autorisation de retrait");
+
+            $html_msg->setMessage("<center><span style='color: #FF0000;'><br />Le montant demandé dépasse le montant plafond de retrait autorisé.</span><br /><br />Montant demandé = <span style='color: #FF0000;font-weight: bold;'>".afficheMontant($SESSION_VARS["mnt"], true)."</span><br/>Montant plafond de retrait autorisé = ".afficheMontant($info_agence['montant_plafond_retrait'], true)."<br /><br />Veuillez choisir une option ci-dessous ?<br /><br/></center><input type=\"hidden\" name=\"montant_retrait\" value=\"".recupMontant($mnt)."\" /><input type=\"hidden\" name=\"devise\" value=\"".trim($mnt_cv['devise'])."\" /><input type=\"hidden\" name=\"mnt_devise\" value=\"".recupMontant($mnt_cv['cv'])."\" /><input type=\"hidden\" name=\"mnt_reste\" value=\"".recupMontant($mnt_cv['reste'])."\" /><input type=\"hidden\" name=\"taux_devise\" value=\"".recupMontant($mnt_cv['taux'])."\" /><input type=\"hidden\" name=\"taux_commission\" value=\"".recupMontant($mnt_cv['comm_nette'])."\" /><input type=\"hidden\" name=\"dest_reste\" value=\"".recupMontant($mnt_cv['dest_reste'])."\" /><input type=\"hidden\" name=\"frais_retrait_cpt\" value=\"".recupMontant($frais_retrait_cpt)."\" /><input type=\"hidden\" name=\"type_retrait\" value=\"1\" /><input type=\"hidden\" name=\"choix_retrait\" value=\"".$SESSION_VARS['type_retrait']."\" /><input type=\"hidden\" name=\"num_chq\" value=\"".trim($num_chq)."\" /><input type=\"hidden\" name=\"communication\" value=\"".trim($communication)."\" /><input type=\"hidden\" name=\"remarque\" value=\"".trim($remarque)."\" /><input type=\"hidden\" name=\"id_pers_ext\" value=\"".trim($id_pers_ext)."\" /><input type=\"hidden\" name=\"id_ben\" value=\"".trim($id_ben)."\" /><input type=\"hidden\" name=\"date_chq\" value=\"".trim($date_chq)."\" /><input type=\"hidden\" name=\"mandat\" value=\"".trim($mandat)."\" /><input type=\"hidden\" name=\"beneficiaire\" value=\"".trim($beneficiaire)."\" /><input type=\"hidden\" name=\"nom_ben\" value=\"".trim($nom_ben)."\" /><input type=\"hidden\" name=\"denomination\" value=\"".trim($denomination)."\" /><input type=\"hidden\" name=\"num_piece\" value=\"".trim($SESSION_VARS['tib']['num_piece'])."\" /><input type=\"hidden\" name=\"lieu_delivrance\" value=\"".trim($SESSION_VARS['tib']['lieu_delivrance'])."\" />");
+
+            $html_msg->addCustomButton("btn_demande_autorisation_retrait", "Demande d’autorisation", 'Rex-4');
+            $html_msg->addCustomButton("btn_annuler", "Annuler", 'Gen-8');
+
+            $html_msg->buildHTML();
+
+            echo $html_msg->HTML_code;
+            die();
+        }
+	  }
+		/*if ($msg != "") {
+			 $html = new HTML_erreur(_("Retrait impossible")." ");
+			 $html->setMessage($msg);
+			 $html->addButton(BUTTON_OK, "Rcp-2");
+			 $html->buildHTML();
+			 echo $html->HTML_code;
+			 exit();
+		}*/
+
+    if (isset($SESSION_VARS['change'])) { // operation multi devises
+        $html->addField("mnt",$charMnt,TYPC_MNT);
+        $html->setFieldProperties("mnt", FIELDP_DEFAULT, $SESSION_VARS["mnt"]);
+        $html->setFieldProperties("mnt", FIELDP_IS_LABEL, true);
+        
+        setMonnaieCourante($SESSION_VARS['devise']);
+        $html->addField("mntCV",$charMntCV,TYPC_MNT);
+        $html->setFieldProperties("mntCV", FIELDP_DEFAULT, $SESSION_VARS['change']['cv']);
+        $html->setFieldProperties("mntCV", FIELDP_IS_LABEL, true);
+        
+        $html->addField("mnt_reel",$charMntReel,TYPC_MNT);
+        $html->setFieldProperties("mnt_reel", FIELDP_IS_REQUIRED, true);
+        $html->setFieldProperties("mnt_reel", FIELDP_DEVISE, $mnt_cv["devise"]);
+         
+        global $global_billet_req;
+        
+        if ($global_billet_req && $SESSION_VARS["type_retrait"] != 5) {
+            $html->setFieldProperties("mnt_reel", FIELDP_HAS_BILLET, true);
+            $html->setFieldProperties("mnt_reel", FIELDP_SENS_BIL, SENS_BIL_OUT);
+        }
+        
+        if($SESSION_VARS['change']['reste']>0) {
+            debug($SESSION_VARS["change"]);
+            setMonnaieCourante($global_monnaie);
+            $html->addField("reste",_("Reste à toucher"),TYPC_MNT);
+            $html->setFieldProperties("reste", FIELDP_DEFAULT, $SESSION_VARS["change"]['reste']);
+            $html->setFieldProperties("reste", FIELDP_IS_LABEL, true);
+            if ($SESSION_VARS["change"]["dest_reste"] == 1) { // Le reste doit etre remis en cash
+                $html->addField("conf_reste", _("Confirmation du reste remis au guichet"), TYPC_MNT);
+                $html->setFieldProperties("conf_reste", FIELDP_HAS_BILLET, true);
+                $html->setFieldProperties("conf_reste", FIELDP_IS_REQUIRED, true);
+            }
+        }    
+    }
+    else {
+        
+        $champ_mnt = "mnt";
+        
+        //confirmation du montant à retirer
+        setMonnaieCourante($InfoCpte['devise']);
+        $html->addField("mnt",$charMnt,TYPC_MNT);
+        $html->setFieldProperties("mnt", FIELDP_DEFAULT, $SESSION_VARS["mnt"]);
+        $html->setFieldProperties("mnt", FIELDP_IS_LABEL, true);
+        
+        $html->addField("mnt_reel",$charMntReel,TYPC_MNT);
+        $html->setFieldProperties("mnt_reel", FIELDP_IS_REQUIRED, true);
+        setMonnaieCourante($SESSION_VARS['devise']);        
+        // Au cas où on fait un retrait autre qu'un retrait en traveler's, il faudra saisir le billetage
+        global $global_billet_req;
+        if ($global_billet_req && $SESSION_VARS["type_retrait"] != 5) {
+            $html->setFieldProperties("mnt_reel", FIELDP_HAS_BILLET, true);
+            $html->setFieldProperties("mnt_reel", FIELDP_SENS_BIL, SENS_BIL_OUT);
+        }
+    }
+    
+    // Frais
+    setMonnaieCourante($InfoCpte['devise']);
+    $html->addField("frais_retrait", _("Frais de retrait"), TYPC_MNT);
+    $html->setFieldProperties("frais_retrait", FIELDP_DEFAULT, $SESSION_VARS["Frais"]);
+    $html->setFieldProperties("frais_retrait", FIELDP_IS_LABEL, true);
+    
+    // Printer Type
+    $html->addField("type_imprimante", _("Type de imprimante"), TYPC_LSB);
+    $html->setFieldProperties("type_imprimante", FIELDP_IS_REQUIRED, true);
+    $html->setFieldProperties("type_imprimante", FIELDP_DEFAULT, $SESSION_VARS["type_imprimante"]);
+    $choixImprimante=array();
+    //les clés des choix correspondent à la table $adsys['adsys_type_piece_payement']
+    $choixImprimante['A4']=_('A4 Format');
+    $choixImprimante['A5']=_('A5 Format');
+    $choixImprimante['A6']=_('A6 Format');
+    $choixImprimante['CT']=_('COOPEC TWIZIGAMIRE');
+    $choixImprimante['JALI']=_('Jali');
+    $choixImprimante['TWG']=_('Twizigamire');
+    $choixImprimante['DTB']=_('Duterimbere');
+    $html->setFieldProperties("type_imprimante", FIELDP_ADD_CHOICES, $choixImprimante);
+
+    //code JavaScript
+    if (isset($SESSION_VARS['change'])) {
+      $ChkJS = "
+               if (recupMontant(document.ADForm.mnt_reel.value) != recupMontant(document.ADForm.mntCV.value))
+             {
+               msg += '- "._("Le montant saisi ne correspond pas au montant à retirer")."\\n';
+               ADFormValid=false;
+             };
+               ";
+      if ($SESSION_VARS["change"]["reste"] > 0 && $SESSION_VARS["change"]["dest_reste"] == 1)
+        $ChkJS .= "
+                 if (recupMontant(document.ADForm.reste.value) != recupMontant(document.ADForm.conf_reste.value))
+                 {
+                 msg += '- "._("Le montant du reste saisi ne correspond pas au montant du reste")."\\n';
+                 ADFormValid=false;
+               };
+                 ";
+    } else {
+      $ChkJS = "
+               if (recupMontant(document.ADForm.mnt_reel.value) != recupMontant(document.ADForm.mnt.value))
+             {
+               msg += '- "._("Le montant saisi ne correspond pas au montant à retirer")."\\n';
+               ADFormValid=false;
+             };
+               ";
+    }
+    $html->addJS(JSP_BEGIN_CHECK, "JS1",$ChkJS);
+
+    //Boutons
+    $html->addFormButton(1, 1, "ok", _("Valider"), TYPB_SUBMIT);
+    $html->addFormButton(1, 2, "retour", _("Précédent"), TYPB_SUBMIT);
+    $html->addFormButton(1, 3, "cancel", _("Annuler"), TYPB_SUBMIT);
+    $html->setFormButtonProperties("cancel", BUTP_CHECK_FORM, false);
+    $html->setFormButtonProperties("retour", BUTP_CHECK_FORM, false);
+    $SESSION_VARS['envoi'] = 0;
+    $html->setFormButtonProperties("ok", BUTP_PROCHAIN_ECRAN, 'Rcp-4');
+    $html->setFormButtonProperties("retour", BUTP_PROCHAIN_ECRAN,'Rcp-2');
+    $html->setFormButtonProperties("cancel", BUTP_PROCHAIN_ECRAN, 'Gen-10');
+
+    $html->buildHTML();
+    echo $html->getHTML();
+  } else {
+    $html_err = new HTML_erreur($charTitle);
+    $html_err->setMessage($message);
+    $html_err->addButton("BUTTON_OK", "Rcp-2");
+    $html_err->buildHTML();
+    echo $html_err->HTML_code;
+  }
+}
+//-----------------------------------------------------------------
+//------------ Ecran Rcp-4 Confirmation du retrait ----------------
+//-----------------------------------------------------------------
+else if ($global_nom_ecran == "Rcp-4") {
+    global $report_backup_path;
+
+    $isbilletage = getParamAffichageBilletage();
+	// capturer des types de billets de la bd et nombre de billets saisie par l'utilisateur
+	$valeurBilletArr = array();
+	$dev = $SESSION_VARS['devise'];
+
+        // $type_imprimante = $SESSION_VARS['type_imprimante'];
+        $type_imprimante = $_POST['type_imprimante'];
+
+	$listTypesBilletArr = buildBilletsVect($dev);
+	$total_billetArr = array();
+	
+	$hasBilletageRecu = true;
+	$hasBilletageChange = false;
+
+  if (!isset($SESSION_VARS['ecran_prec'])) { // ticket 805 ajout if statement
+    //insert nombre billet into array
+    for ($x = 0; $x < 20; $x++) {
+      if (isset($_POST['mnt_reel_billet_' . $x]) && trim($_POST['mnt_reel_billet_' . $x]) != '') {
+        $valeurBilletArr[] = trim($_POST['mnt_reel_billet_' . $x]);
+      } else {
+        if (isset($listTypesBilletArr[$x]['libel']) && trim($listTypesBilletArr[$x]['libel']) != '') {
+          $valeurBilletArr[] = 'XXXX';
+        }
+      }
+    }
+    $SESSION_VARS['valeurBilletArr'] = $valeurBilletArr; // ticket 805
+    // calcul total pour chaque billets
+    for ($x = 0; $x < 20; $x++) {
+
+      if ($valeurBilletArr [$x] == 'XXXX') {
+        $total_billetArr [] = 'XXXX';
+      } else {
+        if (isset ($listTypesBilletArr [$x] ['libel']) && trim($listTypesBilletArr [$x] ['libel']) != '' && isset ($valeurBilletArr [$x] ['libel']) && trim($valeurBilletArr [$x] ['libel']) != '') {
+          $total_billetArr [] = ( int )($valeurBilletArr [$x]) * ( int )($listTypesBilletArr [$x] ['libel']);
+        }
+      }
+    }
+    $SESSION_VARS['total_billetArr'] = $total_billetArr; // ticket 805
+	
+    //controle d'envoie du formulaire
+    $SESSION_VARS['envoi']++;
+    if( $SESSION_VARS['envoi'] != 1 ) {
+      $html_err = new HTML_erreur(_("Confirmation"));
+        $html_err->setMessage(_("Donnée dèjà envoyée"));
+        $html_err->addButton("BUTTON_OK", 'Gen-8');
+        $html_err->buildHTML();
+        echo $html_err->HTML_code;
+        exit();
+    }
+  }
+	//fin contrôle
+
+  if (isset($SESSION_VARS['ecran_prec']) && $SESSION_VARS['ecran_prec'] == 'Rcp-4'){ //ticket 805 information billetage gerer par sessions
+    if (isset($SESSION_VARS['valeurBilletArr']) && $SESSION_VARS['valeurBilletArr'] != null){
+      $valeurBilletArr = $SESSION_VARS['valeurBilletArr'];
+    }
+    if (isset($SESSION_VARS['total_billetArr']) && $SESSION_VARS['total_billetArr'] != null){
+      $total_billetArr = $SESSION_VARS['total_billetArr'];
+    }
+  }
+	
+  global $global_monnaie_courante, $global_id_guichet;
+  if (isset($SESSION_VARS["change"])) {
+    $CHANGE = $SESSION_VARS['change'];
+    $hasBilletageRecu = false;
+    $hasBilletageChange = true;
+  }
+
+  // récupérer le infos sur le produit associé au compte sélectionné
+  $InfoCpte = getAccountDatas($SESSION_VARS["NumCpte"]);
+  $InfoProduit = getProdEpargne($InfoCpte["id_prod"]);
+  if (isset($SESSION_VARS['Frais'])) $InfoProduit['frais_retrait_cpt']=$SESSION_VARS['Frais'];
+
+  $data_cheque=array();
+  if ($SESSION_VARS['type_retrait']>1) {
+    $data_cheque["num_piece"] 	= $SESSION_VARS["num_chq"];
+    $data_cheque["date_piece"] 	= $SESSION_VARS["date_chq"];
+    $data_cheque["id_ext_benef"]	= $SESSION_VARS["id_ben"];
+    $data_cheque["type_piece"]	= $SESSION_VARS["type_retrait"];
+    if ($SESSION_VARS['type_retrait']==4 || $SESSION_VARS['type_retrait']==5)
+      $data_cheque['date_piece']=date("d/m/Y");
+
+    if ($data_cheque["type_piece"] == 2) // Il faut distinguer leschèques extérieurs et internes. Dans ce cas-ci, il s'agit d'un chèque guichet
+      $data_cheque["type_piece"] = 15;
+    if($SESSION_VARS['type_retrait'] == 8 || $SESSION_VARS['type_retrait'] == 15) {
+    	$dataBef = $SESSION_VARS['tib'];
+    }
+  }
+  
+  $data_cheque["communication"] = $SESSION_VARS["communication"];
+  $data_cheque["remarque"] = $SESSION_VARS["remarque"];
+  $data_cheque["sens"]	= "out";    
+  $data_cheque['id_pers_ext'] = $SESSION_VARS['id_pers_ext'];
+
+  if(isset($CHANGE)) {
+      $SESSION_VARS["mnt"] = recupMontant($SESSION_VARS["mnt"]);
+  }
+  else {
+    if (!isset($SESSION_VARS["mnt"])){ //ajout frais de non respect de la duree minimum entre 2 retraits
+      $SESSION_VARS["mnt"] = recupMontant($mnt_reel);
+    }
+  }
+  
+  
+  //mouvement des comptes avec gestion des frais d'opérations sur compte s'il y lieu
+  $erreur = retrait_cpte($global_id_guichet, $SESSION_VARS["NumCpte"], $InfoProduit, $InfoCpte, $SESSION_VARS["mnt"], $SESSION_VARS['type_retrait'], $SESSION_VARS['id_mandat'], $data_cheque, $CHANGE, $dataBef, $SESSION_VARS['ERR_DUREE_MIN_RETRAIT']);
+
+  //Affichage des reçus.
+  if ($erreur->errCode == NO_ERR) {
+
+      // Mettre à jour le statut d'une demande de retrait à Payé
+      if (isset($SESSION_VARS['id_dem'])) {
+          $erreur2 = updateRetraitAttenteEtat($SESSION_VARS['id_dem'], 3, "Demande autorisation retrait : Payé", $erreur->param['id']);
+
+          if ($erreur2->errCode == NO_ERR) {
+              // Commit
+              $dbHandler->closeConnection(true);
+              unset($SESSION_VARS['id_dem']);
+          }
+      }
+
+    $infos = get_compte_epargne_info($SESSION_VARS['NumCpte']);
+
+    setMonnaieCourante($InfoProduit['devise']); //Pour etre sûr ke ce la devise du Produit
+
+    ($isbilletage == 'f') ? $hasBilletageChange = false : $hasBilletageChange = true;
+
+    switch ($SESSION_VARS['type_retrait']) {
+    case 1:
+     print_recu_retrait($global_id_client, $global_client, $InfoProduit, $infos, $SESSION_VARS['mnt'], $erreur->param['id'], 'REC-REE',$SESSION_VARS['id_mandat'], $SESSION_VARS["remarque"], $SESSION_VARS["communication"], $SESSION_VARS['id_pers_ext'],NULL,$SESSION_VARS['denomination_conj'], $listTypesBilletArr, $valeurBilletArr, $global_langue_rapport, $total_billetArr, $hasBilletageRecu, $isbilletage,$SESSION_VARS['ERR_DUREE_MIN_RETRAIT'],$type_imprimante);
+
+      break;
+    case 15:
+    case 8:
+    case 4:
+      print_recu_retrait_cheque($global_id_client, $global_client,$SESSION_VARS['mnt'],$InfoProduit, $infos, $erreur->param['id'], $data_cheque["num_piece"], $data_cheque['date_piece'] ,$SESSION_VARS['id_mandat'],$dataBef['denomination'],$SESSION_VARS['ERR_DUREE_MIN_RETRAIT']);
+      break;
+    }
+
+    // Imprime le reçu de change s'il y a lieu
+    if (isset($CHANGE)) {
+      $cpteSource = getAccountDatas($SESSION_VARS['NumCpte']);
+
+      $SESSION_VARS["recu_change"]["source_achat"] = $cpteSource["num_complet_cpte"];
+      $SESSION_VARS["recu_change"]["dest_vente"] = $dest_change;
+
+      printRecuChange ($erreur->param['id'], $SESSION_VARS["mnt"], $cpteSource["devise"], $SESSION_VARS["recu_change"]["source_achat"], $SESSION_VARS["change"]["cv"], $SESSION_VARS["change"]["devise"], $SESSION_VARS["change"]["comm_nette"],$SESSION_VARS["change"]["taux"],$SESSION_VARS["change"]["reste"],$SESSION_VARS["recu_change"]["dest_vente"],$SESSION_VARS["change"]["dest_reste"],$SESSION_VARS["envoi_reste"], $listTypesBilletArr, $valeurBilletArr, $global_langue_rapport, $total_billetArr, $hasBilletageChange, "retrait");
+    }
+
+    create_report_tag("epargne",array($report_backup_path => array("num_client" => $global_id_client,"num_transactions" => $erreur->param["id"], "type_recu" => "retrait", "id_ag" => $global_id_agence, 'montant' => $SESSION_VARS['mnt'])));
+
+      // Mise à jour du bénéficiaire
+    if (isset($SESSION_VARS['id_ben']) && ($SESSION_VARS['id_ben']!=NULL))
+      $myError = setBeneficiaire($SESSION_VARS['id_ben']);
+    if ($myError->errCode == NO_ERR)
+      $majBenef = TRUE;
+
+    //Affichage de la confirmation
+    $html_msg =new HTML_message(_("Confirmation du retrait"));
+    setMonnaieCourante($infos['devise']);
+    $fraisDureeMinEntreRetrait = 0; // ticket 805
+    if(isset($SESSION_VARS['ERR_DUREE_MIN_RETRAIT']) && $SESSION_VARS['ERR_DUREE_MIN_RETRAIT'] == 't' && $InfoProduit['frais_duree_min2retrait'] > 0){ // ticket 805 : ajout frais de non respect de la duree minimum entre 2 retraits
+      $fraisDureeMinEntreRetrait = $InfoProduit['frais_duree_min2retrait'];
+    }
+    $mntDebit=$SESSION_VARS['mnt']+$InfoProduit['frais_retrait_cpt']+$fraisDureeMinEntreRetrait; // ticket 805 : ajout frais de non respect de la duree minimum entre 2 retraits
+    $message="
+             <table><tr><td>"._("Montant débité du compte")." : </td>
+             <td>".afficheMontant($mntDebit,true)."</td>
+             </tr>
+             <tr><td>"._("Frais de retrait")." : </td>
+             <td>".afficheMontant($InfoProduit['frais_retrait_cpt'],true)."</td>
+             </tr>
+             <tr><td>"._("Frais de non respect de la duree minimum entre deux retraits")." : </td>
+             <td>".afficheMontant($fraisDureeMinEntreRetrait,true)."</td>
+             </tr>";
+    $mntGuichet=$SESSION_VARS['mnt'];
+    if (isset($CHANGE)) {
+      setMonnaieCourante($CHANGE['devise']);
+      $mntGuichet=$SESSION_VARS['change']['cv'];
+    }
+    $message.="
+              <tr><td>"._("Remis au client")." : </td>
+              <td>".afficheMontant($mntGuichet, true)."</td>
+              </tr>";
+    if ($CHANGE['reste']>0) {
+      setMonnaieCourante($global_monnaie);
+      $message.="
+                <tr><td>"._("Liquidié en devise de référence")."</td>
+                <td>".afficheMontant($CHANGE['reste'], true)."</td>";
+    }
+    $message.="
+              </table>
+              <br />
+              "._("Le reçu a été imprimé")."
+              <br />";
+    if (isset($SESSION_VARS['id_ben'])) {
+      debug($majBenef,"majbenef est ");
+      if ($majBenef== TRUE) $message.="<br />"._("Bénéficiaire mis à jour")." <br />";
+      else $message.="<br />"._("Bénéficiaire non mis à jour")." <br />";
+    }
+
+    $message .= "<br /><br />"._("N° de transaction")." : <B><code>".sprintf("%09d", $erreur->param['id'])."</code></B>";
+
+    $html_msg->setMessage($message);
+
+    $html_msg->addButton("BUTTON_OK", 'Gen-10');
+    $html_msg->buildHTML();
+    echo $html_msg->HTML_code;
+  } else {
+    debug($erreur->param);
+    if ($erreur->errCode == ERR_DUREE_MIN_RETRAIT){ // Ticket 805 : ajout frais de non respect de la duree minimum entre 2 retraits
+      $SESSION_VARS['ecran_prec'] = 'Rcp-4';
+      $SESSION_VARS['ERR_DUREE_MIN_RETRAIT'] = 't';
+      $html_err = new HTML_erreur(_("Retrait sur un compte.")." ");
+      $html_err->setMessage(_("ATTENTION")." : ".$error[$erreur->errCode]."<br />"._("Paramètre Numero Compte Client : ")." : ".$erreur->param." <br /> Mais si vous voulez continuer le retrait, sachez que les frais de non respect de la durée minimum entre deux retraits seront prelevés sur le compte du client; alors veuillez cliquer sur le bouton 'OK' pour continuer sinon le bouton 'annuler'!");
+      $html_err->addButton("BUTTON_CANCEL", 'Rcp-1');
+      $html_err->addButton("BUTTON_OK", 'Rcp-4');
+      $html_err->buildHTML();
+      echo $html_err->HTML_code;
+    }
+    else{
+      unset($SESSION_VARS['ERR_DUREE_MIN_RETRAIT']);
+      unset($SESSION_VARS['ecran_prec']);
+      $html_err = new HTML_erreur(_("Echec du retrait sur un compte.")." ");
+      $html_err->setMessage(_("Erreur")." : ".$error[$erreur->errCode]."<br />"._("Paramètre : ")." : ".$erreur->param);
+      $html_err->addButton("BUTTON_OK", 'Rcp-1');
+      $html_err->buildHTML();
+      echo $html_err->HTML_code;
+    }
+  }
+} else
+  signalErreur(__FILE__,__LINE__,__FUNCTION__); // "L'écran '$global_nom_ecran' n'a pas été trouvé"
+?>

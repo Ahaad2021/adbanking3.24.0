@@ -1,0 +1,21 @@
+<!-- DTD pour le passage d'ecritures libres -->
+
+<!-- Element root -->
+<!ELEMENT recu_passage_ecriture (header, body)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- Corps -->
+<!ELEMENT body (num_cpte_deb, nom_cpte_deb, num_cpte_cre, nom_cpte_cre, montant, num_client,login_initiateur)>
+<!ELEMENT num_cpte_deb (#PCDATA)>
+<!ELEMENT nom_cpte_deb (#PCDATA)>
+<!ELEMENT num_cpte_cre (#PCDATA)>
+<!ELEMENT nom_cpte_cre (#PCDATA)>
+<!ELEMENT montant (#PCDATA)>
+<!ELEMENT libelle (#PCDATA)>
+<!ELEMENT login (#PCDATA)>
+<!ELEMENT num_client (#PCDATA)> 
+<!ELEMENT num_trans (#PCDATA)>
+<!ELEMENT login_initiateur (#PCDATA)>

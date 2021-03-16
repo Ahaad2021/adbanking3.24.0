@@ -1,0 +1,23 @@
+<!-- DTD pour le rapports operations diverses -->
+
+<!-- Element root -->
+<!ELEMENT creation_client (header,header_contextuel, client*)>
+<!-- Un en-tete commun a tous -->
+
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- En-tete contextuel -->
+<!ELEMENT header_contextuel (criteres_recherche)>
+<!-- Criteres de recherche commun -->
+<!ENTITY % mod_criteres SYSTEM "criteres_recherche.dtd">
+%mod_criteres;
+
+<!ELEMENT client (id_trans, id_client, nom_client, statut_juridique, etat, nom_agent, date_creation)>
+<!ELEMENT id_trans (#PCDATA)>
+<!ELEMENT id_client (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT statut_juridique (#PCDATA)>
+<!ELEMENT etat (#PCDATA)>
+<!ELEMENT nom_agent (#PCDATA)>
+<!ELEMENT date_creation (#PCDATA)>

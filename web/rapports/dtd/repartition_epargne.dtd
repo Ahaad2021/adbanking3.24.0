@@ -1,0 +1,64 @@
+<!-- DTD pour le rapport concentration epargne -->
+
+<!-- Element root -->
+<!ELEMENT concentration_epargne (header, header_contextuel, niveau1*)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- En-tete contextuel -->
+<!ELEMENT header_contextuel (critere,nb1,nb2,nbc1,nbc2)>
+<!ELEMENT critere (#PCDATA)>
+<!ELEMENT nb1 (#PCDATA)>
+<!ELEMENT nb2 (#PCDATA)>
+
+<!ELEMENT nbc1 (#PCDATA)>
+<!ELEMENT nbc2 (#PCDATA)>
+
+<!-- Corps -->
+<!ELEMENT niveau1 (lib_niveau1, niveau2*, sous_total, total)>
+<!ELEMENT lib_niveau1 (#PCDATA)>
+
+<!ELEMENT niveau2 (lib_niveau2, nb_compte, nb_prc, solde_compte, solde_prc, nb_client, nb_prc_client, solde_client, solde_prc_client)>
+<!ELEMENT lib_niveau2 (#PCDATA)>
+<!ELEMENT nb_compte (#PCDATA)>
+<!ELEMENT nb_prc (#PCDATA)>
+<!ELEMENT solde_compte (#PCDATA)>
+<!ELEMENT solde_prc (#PCDATA)>
+
+<!ELEMENT nb_client (#PCDATA)>
+<!ELEMENT nb_prc_client (#PCDATA)>
+<!ELEMENT solde_client (#PCDATA)>
+<!ELEMENT solde_prc_client (#PCDATA)>
+
+<!ELEMENT sous_total (nb_tot, nb_prc_tot, mnt_tot, mnt_prc_tot, nb_tot_client, nb_prc_tot_client, mnt_tot_client, tot_solde_prc)>
+<!ELEMENT nb_tot (#PCDATA)>
+<!ELEMENT nb_prc_tot (#PCDATA)>
+<!ELEMENT mnt_tot (#PCDATA)>
+<!ELEMENT mnt_prc_tot (#PCDATA)>
+
+<!ELEMENT nb_tot_client (#PCDATA)>
+<!ELEMENT nb_prc_tot_client (#PCDATA)>
+<!ELEMENT mnt_tot_client (#PCDATA)>
+<!ELEMENT mnt_prc_tot_client (#PCDATA)>
+
+<!ELEMENT total (tot_nb_compte, tot_nb_prc, tot_solde_compte, tot_solde_prc, tot_nb_client, tot_nb_prc_client, tot_solde_client, tot_solde_prc_client)>
+<!ELEMENT tot_nb_compte (#PCDATA)>
+<!ELEMENT tot_nb_prc (#PCDATA)>
+<!ELEMENT tot_solde_compte (#PCDATA)>
+<!ELEMENT tot_solde_prc (#PCDATA)>
+
+<!ELEMENT tot_nb_client (#PCDATA)>
+<!ELEMENT tot_nb_prc_client (#PCDATA)>
+<!ELEMENT tot_solde_client (#PCDATA)>
+<!ELEMENT tot_solde_prc_client (#PCDATA)>
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,31 @@
+<!-- DTD pour la repartition des clients -->
+
+<!-- Element root -->
+<!ELEMENT repartition_client (header, header_contextuel, total, detail_etat*)>
+
+<!-- En-tete contextuel -->
+<!ELEMENT header_contextuel (criteres_recherche)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!ELEMENT total (en_att_valid, nb_cli_actif, cli_deces,cli_transfere, cli_demission, cli_radie, cli_enreg_deces, cli_non_ins, cli_att_sold_gar)>
+
+<!ELEMENT en_att_valid (#PCDATA)>
+<!ELEMENT nb_cli_actif (#PCDATA)>
+<!ELEMENT cli_deces (#PCDATA)>
+<!ELEMENT cli_transfere (#PCDATA)>
+<!ELEMENT cli_demission (#PCDATA)>
+<!ELEMENT cli_radie (#PCDATA)>
+<!ELEMENT cli_enreg_deces (#PCDATA)>
+<!ELEMENT cli_non_ins (#PCDATA)>
+<!ELEMENT cli_att_sold_gar (#PCDATA)>
+
+<!ELEMENT  client (id_client, nom,date_adh,date_etat,statut)>
+
+<!ELEMENT id_client (#PCDATA)>
+<!ELEMENT nom (#PCDATA)>
+<!ELEMENT date_adh (#PCDATA)>
+<!ELEMENT date_etat (#PCDATA)>
+<!ELEMENT statut (#PCDATA)>

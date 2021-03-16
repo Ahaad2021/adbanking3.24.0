@@ -1,0 +1,50 @@
+<!-- DTD pour les rapport mobile lending -->
+
+<!-- Element root -->
+<!ELEMENT mobile_lending (header, analytics)>
+
+
+<!-- Un en-tete commun a tous -->
+<!--<!ENTITY % mod_header SYSTEM "header.dtd">-->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+
+%mod_header;
+<!ELEMENT analytics (infos*)>
+
+<!ELEMENT infos (id_client, id_doss, etat_doss_mob, imf, agence, id_agent, localisation, tranche_localisation, sexe, tranche_sexe, sal_moy, tranche_sal_moy, lg_histo, somm_tot_emprunter, tranche_somm_tot_emprunter, nbre_credit_carac, tranche_nbre_credit, age, tx_irregularite, tranche_tx_irregularite, nbre_credit, mnt_dem, date_deboursement, nbre_ech, retard_ech_1, retard_ech_2, retard_ech_3, mnt_rest_du, penalite, score_retard_credit, score_client, commentaire, tranche_age, tranche_lg_histo)>
+
+
+<!ELEMENT id_client (#PCDATA)>
+<!ELEMENT id_doss (#PCDATA)>
+<!ELEMENT etat_doss_mob (#PCDATA)>
+<!ELEMENT imf (#PCDATA)>
+<!ELEMENT agence (#PCDATA)>
+<!ELEMENT id_agent (#PCDATA)>
+<!ELEMENT localisation (#PCDATA)>
+<!ELEMENT tranche_localisation (#PCDATA)>
+<!ELEMENT sexe (#PCDATA)>
+<!ELEMENT tranche_sexe (#PCDATA)>
+<!ELEMENT sal_moy (#PCDATA)>
+<!ELEMENT tranche_sal_moy (#PCDATA)>
+<!ELEMENT lg_histo (#PCDATA)>
+<!ELEMENT somm_tot_emprunter (#PCDATA)>
+<!ELEMENT tranche_somm_tot_emprunter (#PCDATA)>
+<!ELEMENT nbre_credit_carac (#PCDATA)>
+<!ELEMENT tranche_nbre_credit (#PCDATA)>
+<!ELEMENT age (#PCDATA)>
+<!ELEMENT tx_irregularite (#PCDATA)>
+<!ELEMENT tranche_tx_irregularite (#PCDATA)>
+<!ELEMENT nbre_credit (#PCDATA)>
+<!ELEMENT mnt_dem (#PCDATA)>
+<!ELEMENT date_deboursement (#PCDATA)>
+<!ELEMENT nbre_ech (#PCDATA)>
+<!ELEMENT retard_ech_1 (#PCDATA)>
+<!ELEMENT retard_ech_2 (#PCDATA)>
+<!ELEMENT retard_ech_3 (#PCDATA)>
+<!ELEMENT mnt_rest_du (#PCDATA)>
+<!ELEMENT penalite (#PCDATA)>
+<!ELEMENT score_retard_credit (#PCDATA)>
+<!ELEMENT score_client (#PCDATA)>
+<!ELEMENT commentaire (#PCDATA)>
+<!ELEMENT tranche_age (#PCDATA)>
+<!ELEMENT tranche_lg_histo (#PCDATA)>

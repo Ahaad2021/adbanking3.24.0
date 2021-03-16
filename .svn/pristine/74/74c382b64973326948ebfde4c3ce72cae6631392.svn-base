@@ -1,0 +1,93 @@
+#!/bin/bash
+# vim: set expandtab softtabstop=2 shiftwidth=2:
+
+##########
+# Variables
+TMP_DIR="/tmp/adbanking.pot.dir"
+DEBUG="true"
+
+cd "`dirname $0`/.."
+echo -e "\033[1mGénération des fichiers POT à donner aux traducteurs.\033[0m"
+echo "Le répertoire $TMP_DIR sera détruit durant l'exécution de ce script."
+if [[ $DEBUG ]] ; then
+  echo -e "\033[1mMode DEBUG activé!\033[0m"
+fi
+echo
+
+##########
+# XSLT -> PHP (xgettext ne connaît pas les fichiers XSLT)
+echo -n "Extraction des chaînes des fichiers XSLT..."
+rm -rf $TMP_DIR
+mkdir $TMP_DIR
+# Pour chaque fichier XSLT
+for XSLT_FILE in `/bin/ls web/rapports/xslt/*.xslt` ; do
+  PHP_XSLT_FILE=${XSLT_FILE/*\//}.php
+  multilingue/xslttophp < $XSLT_FILE > $TMP_DIR/$PHP_XSLT_FILE
+  if [[ $DEBUG ]] ; then
+    echo -n "."
+  fi
+done
+echo -e "  ...\033[1mfait !\033[0m"
+
+##########
+# Création du fichier POT à donner au traducteur
+echo -n "Récupération de toutes les chaînes à traduire..."
+POT="web/locale/adbanking.pot"
+PHPFILES=`find web $TMP_DIR -name "*.php"`
+if [[ $DEBUG ]] ; then
+  rm -f $POT
+  touch $POT
+  for PHPFILE in $PHPFILES ; do
+    xgettext --copyright-holder=ADbanking --msgid-bugs-address=devel@adbanking.org -j --no-wrap -s -o $POT -d adbanking -L php --from-code=UTF-8 $PHPFILE
+    if [[ $? > 0 ]] ; then
+      echo
+      echo -e "Il y a un problème avec \033[1m${PHPFILE}\033[0m"
+    fi
+    echo -n "."
+  done
+else
+  xgettext --copyright-holder=ADbanking --msgid-bugs-address=devel@adbanking.org --no-wrap -s -o $POT -d adbanking -L php --from-code=UTF-8 $PHPFILES
+  rm -rf $TMP_DIR
+fi
+echo -e "  ...\033[1mfait !\033[0m"
+echo
+
+##########
+# Mise à jour des fichiers PO avec les chaînes dans la langue originale (non traduite)
+echo "Fusion des nouvelles chaînes, non traduites, dans les fichiers PO déjà existants."
+# La langue de référence, on recopie le fichier original
+langue="fr_BE"
+echo -en "Traitement de \033[1m${langue}\033[0m..."
+echo -n "  regénération du fichier de la langue de référence  "
+PO="web/locale/${langue}/LC_MESSAGES/adbanking.po"
+msgen --no-wrap --no-location $POT | sed '/^msgstr "/,/^$/ s/\[\[[^\[]*\]\]//g' > $PO
+echo -e "  ...\033[1mfait !\033[0m"
+POTS=""
+# Pour chaque langue traduite
+for langue in `/bin/ls web/locale` ; do
+  # La langue originale est fr_BE, on l'évite
+  if [[ -d web/locale/$langue && $langue != 'fr_BE' ]] ; then
+    PO="web/locale/${langue}/LC_MESSAGES/adbanking.po"
+    echo -en "Traitement de \033[1m${langue}\033[0m..."
+    # Fusion des nouvelles chaînes dans l'ancien fichier PO
+    echo -n "  ajout des nouvelles chaînes non traduites  ."
+    msgmerge -U -N -q --no-wrap --no-location $PO $POT
+    # Fusion des nouvelles traductions dans l'ancien fichier PO
+    NEWPO=web/locale/${langue}/LC_MESSAGES/adbanking-translated.po
+    if [ -f $NEWPO ] ; then
+      echo -n "..  ajout des nouvelles traductions  "
+      msgmerge -N -q --no-wrap --no-location $NEWPO $PO > ${PO}.new
+      mv -f ${PO}.new $PO
+    fi
+    echo -e "  ...\033[1mfait !\033[0m"
+    POTS=$POTS"\n"$PO
+  fi
+done 
+echo
+
+##########
+# Fini !
+echo "Le traitement POT/PO avant traduction est terminé."
+echo -e "Les fichiers à donner aux \033[1mtraducteurs\033[0m sont \033[1m$POTS\033[0m"
+echo
+

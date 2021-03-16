@@ -1,0 +1,26 @@
+<!-- DTD pour le recu (remboursement  credit) -->
+
+<!-- Element root -->
+<!ELEMENT recu (header,infos_doss*)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- Corps -->
+<!ELEMENT infos_doss (body)>
+
+<!ELEMENT body (iddossier,num_gs?,nom_gs?,num_client,nom_client, mnt_rbt,encours,interet,garantie,penalite)>
+<!ATTLIST body gs_cat CDATA #REQUIRED>
+<!ELEMENT iddossier (#PCDATA)>
+<!ELEMENT num_gs (#PCDATA)>
+<!ELEMENT nom_gs (#PCDATA)>
+<!ELEMENT num_client (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT mnt_rbt (#PCDATA)>
+<!ELEMENT encours (#PCDATA)>
+<!ELEMENT interet (#PCDATA)>
+<!ELEMENT garantie (#PCDATA)> 
+<!ELEMENT penalite (#PCDATA)>
+
+

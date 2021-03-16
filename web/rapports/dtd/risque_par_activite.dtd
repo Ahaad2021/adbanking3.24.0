@@ -1,0 +1,29 @@
+<!-- DTD pour le rapports des plus grands emprunteurs de l'institution -->
+
+<!-- Element root -->
+<!ELEMENT risque_credit_activite (header, globals, details)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!ELEMENT globals (frequency, devise)>
+<!ELEMENT frequency (#PCDATA)>
+<!ELEMENT devise (#PCDATA)>
+
+<!ELEMENT details (activ*, total)>
+<!ELEMENT total (tot_mnt_cred, tot_ind_deb, tot_grp_deb, tot_grp_benef_pret, tot__benef_pret)>
+<!ELEMENT tot_mnt_cred (#PCDATA)>
+<!ELEMENT tot_ind_deb (#PCDATA)>
+<!ELEMENT tot_grp_deb (#PCDATA)>
+<!ELEMENT tot_grp_benef_pret (#PCDATA)>
+<!ELEMENT tot__benef_pret (#PCDATA)>
+
+<!ELEMENT activ (index, libel_act, mnt_cred, nbr_ind_deb, nbr_grp_deb, nbr_grp_benef_pret, nbr_benef_act)>
+<!ELEMENT index (#PCDATA)>
+<!ELEMENT libel_act (#PCDATA)>
+<!ELEMENT mnt_cred (#PCDATA)>
+<!ELEMENT nbr_ind_deb (#PCDATA)>
+<!ELEMENT nbr_grp_deb (#PCDATA)>
+<!ELEMENT nbr_grp_benef_pret (#PCDATA)>
+<!ELEMENT nbr_benef_act (#PCDATA)>

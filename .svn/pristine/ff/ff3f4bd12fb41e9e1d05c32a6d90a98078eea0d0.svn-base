@@ -1,0 +1,108 @@
+<!-- DTD pour le rapport engrais chimiques sur la liste des beneficiaires payants -->
+
+<!-- Element root -->
+<!--<!ELEMENT engraisChimiques_listbenefpayant (header, list_beneficiaires)>
+
+<!- Un en-tete commun a tous -->
+<!--<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!ELEMENT list_beneficiaires (list_zoneColline*)>
+<!-<!ELEMENT details_beneficiaires (nom_benef, zone, colline, details_produits*, totals)>
+<!ELEMENT nom_benef (#PCDATA)>
+<!ELEMENT zone (#PCDATA)>
+<!ELEMENT colline (#PCDATA)>
+
+<!ELEMENT details_produits (produit, type_produit, qty_produit, montant_total_produit, montant_paye_produit)>
+<!ELEMENT produit (#PCDATA)>
+<!ELEMENT type_produit (#PCDATA)>
+<!ELEMENT qty_produit (#PCDATA)>
+<!ELEMENT montant_total_produit (#PCDATA)>
+<!ELEMENT montant_paye_produit (#PCDATA)>
+
+<!ELEMENT totals (montant_total, montant_paye)>
+<!ELEMENT montant_total (#PCDATA)>
+<!ELEMENT montant_paye (#PCDATA)>-->
+
+<!--<!ELEMENT list_zoneColline (zone, colline, details_beneficiaires*, totals)>
+<!ELEMENT zone (#PCDATA)>
+<!ELEMENT colline (#PCDATA)>
+
+<!ELEMENT details_beneficiaires (id_benef, nom_benef, qty_produit_Engrais, montant_total_Engrais, qty_produit_Amendement, montant_total_Amendement, montant_total)>
+<!ELEMENT id_benef (#PCDATA)>
+<!ELEMENT nom_benef (#PCDATA)>
+<!ELEMENT qty_produit_Engrais (#PCDATA)>
+<!ELEMENT montant_total_Engrais (#PCDATA)>
+<!ELEMENT qty_produit_Amendement (#PCDATA)>
+<!ELEMENT montant_total_Amendement (#PCDATA)>
+<!ELEMENT montant_total (#PCDATA)>
+
+<!ELEMENT totals (qty_engrais, qty_amendement, montant_engrais, montant_amendement, montant)>
+<!ELEMENT qty_engrais (#PCDATA)>
+<!ELEMENT qty_amendement (#PCDATA)>
+<!ELEMENT montant_engrais (#PCDATA)>
+<!ELEMENT montant_amendement (#PCDATA)>
+<!ELEMENT montant (#PCDATA)> -->
+
+<!-- DTD pour le rapport engrais chimiques sur la liste des beneficiaires payants -->
+
+<!-- Element root -->
+<!ELEMENT engraisChimiques_listbenefpayant (header,nbre_colonne, list_beneficiaires)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+<!--
+<!ELEMENT nbre_colonne (colonne*)>
+<!ELEMENT colonne (#PCDATA)>-->
+
+
+<!-- Dtd qui marche
+<!ELEMENT list_beneficiaires (nbre_colonne,details_beneficiaires*)>
+
+<!ELEMENT nbre_colonne (colonne*)>
+<!ELEMENT colonne (#PCDATA)>
+
+<!ELEMENT details_beneficiaires (zone, colline, nom_benef,detail_produit*)>
+<!ELEMENT zone (#PCDATA)>
+<!ELEMENT colline (#PCDATA)>
+<!ELEMENT nom_benef (#PCDATA)>
+
+
+<!ELEMENT detail_produit (id_produit,qty_produit)>
+<!ELEMENT id_produit (#PCDATA)>
+<!ELEMENT qty_produit (#PCDATA)> -->
+
+<!ELEMENT list_beneficiaires (province*,nbre_colonne)>
+<!--
+<!ELEMENT details_beneficiaires (province)>
+-->
+<!ELEMENT province (nom_province, commune*)>
+<!ELEMENT nom_province (#PCDATA)>
+
+<!ELEMENT commune (nom_commune, coopec*)>
+<!ELEMENT nom_commune (#PCDATA)>
+
+<!ELEMENT coopec (nom_coopec, zone*)>
+<!ELEMENT nom_coopec (#PCDATA)>
+
+
+<!ELEMENT zone (nom_zone, colline*)>
+<!ELEMENT nom_zone (#PCDATA)>
+
+<!ELEMENT colline (nom_colline,details_benef*)>
+<!ELEMENT nom_colline (#PCDATA)>
+
+<!ELEMENT nbre_colonne (colonne*)>
+<!ELEMENT colonne (#PCDATA)>
+
+<!ELEMENT details_benef (nom_zone1,nom_colline1,nom_benef,id_card,montant,detail_produit*)>
+<!ELEMENT nom_zone1 (#PCDATA)>
+<!ELEMENT nom_colline1 (#PCDATA)>
+<!ELEMENT nom_benef (#PCDATA)>
+<!ELEMENT id_card (#PCDATA)>
+<!ELEMENT montant (#PCDATA)>
+
+<!ELEMENT detail_produit (id_produit,qty_produit)>
+<!ELEMENT id_produit (#PCDATA)>
+<!ELEMENT qty_produit (#PCDATA)>

@@ -1,0 +1,21 @@
+<!-- DTD pour le recu ouverture d'un nouveau compte -->
+
+<!-- Element root -->
+<!ELEMENT recucpt (header, body)>
+<!ATTLIST recucpt type CDATA #REQUIRED>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- Corps -->
+<!ELEMENT body (nom_client, num_cpte, solde, num_trans,info_cheque?)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT num_cpte (#PCDATA)>
+<!ELEMENT num_trans (#PCDATA)>
+<!ELEMENT solde (#PCDATA)>
+
+<!ELEMENT info_cheque (num_cheque, banque_cheque, date_cheque)>
+<!ELEMENT num_cheque (#PCDATA)>
+<!ELEMENT banque_cheque (#PCDATA)>
+<!ELEMENT date_cheque (#PCDATA)>

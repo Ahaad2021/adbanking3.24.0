@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<talendfile:ContextType xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:talendfile="platform:/resource/org.talend.model/model/TalendFile.xsd" confirmationNeeded="false" name="Default">
+  <contextParameter comment="" name="app_db_host" prompt="app_db_host?" promptNeeded="false" type="id_String" value="192.168.17.33"/>
+  <contextParameter comment="" name="app_db_bdd" prompt="app_db_bdd?" promptNeeded="false" type="id_String" value="mbeni"/>
+  <contextParameter comment="" name="app_db_login" prompt="app_db_login?" promptNeeded="false" type="id_String" value="adbanking"/>
+  <contextParameter comment="" name="app_db_port" prompt="app_db_port?" promptNeeded="false" type="id_String" value="5432"/>
+  <contextParameter comment="" name="app_db_pwd" prompt="app_db_pwd?" promptNeeded="false" type="id_String" value="public"/>
+  <contextParameter comment="" name="app_db_schema" prompt="app_db_schema?" promptNeeded="false" type="id_String" value="public"/>
+</talendfile:ContextType>

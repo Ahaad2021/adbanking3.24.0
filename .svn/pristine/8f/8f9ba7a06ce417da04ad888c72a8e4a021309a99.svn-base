@@ -1,0 +1,53 @@
+<!-- DTD pour la balance agee du portefeuille a risque -->
+
+<!-- Element root -->
+<!ELEMENT balanceportefeuillerisque (header,totalprcentage,recapilatif,detailsretard*)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!ELEMENT recapilatif (entete_recap,detail_recap*)>
+<!ELEMENT entete_recap (#PCDATA)>
+<!ELEMENT detail_recap (lib_etat,nombre_tot,montant_tot,prcentagerisque)>
+<!ELEMENT lib_etat (#PCDATA)>
+<!ELEMENT montant_tot (#PCDATA)>
+<!ELEMENT nombre_tot (#PCDATA)>
+
+
+<!ELEMENT detailsretard (lib_detail,produits*)>
+<!ELEMENT lib_detail (#PCDATA)>
+<!ELEMENT produits (lib_prod,montant_pret_prod,solde_prod,principalretard_prod,interetretard_prod,garantieretard_prod,penaliteretard_prod,prov_mnt_prod,dossiersretard*)>
+<!ELEMENT lib_prod (#PCDATA)>
+<!ELEMENT montant_pret_prod (#PCDATA)>
+<!ELEMENT solde_prod (#PCDATA)>
+<!ELEMENT principalretard_prod (#PCDATA)>
+<!ELEMENT interetretard_prod (#PCDATA)>
+<!ELEMENT garantieretard_prod (#PCDATA)>
+<!ELEMENT penaliteretard_prod (#PCDATA)>
+<!ELEMENT prov_mnt_prod (#PCDATA)>
+
+<!ELEMENT dossiersretard (numpret,nomclient,montantpret,solde,principalretard,interetretard,impayesprcentage,groupe_gs,membre_gs)>
+<!ELEMENT totalprcentage (totalenretard,totalprincipal,totalsain,portefeuilltotal,pourcentagerisque)>
+
+
+<!ELEMENT numpret (#PCDATA)>
+<!ELEMENT nomclient (#PCDATA)>
+<!ELEMENT montantpret (#PCDATA)>
+<!ELEMENT solde (#PCDATA)>
+<!ELEMENT groupe_gs (#PCDATA)>
+<!ELEMENT membre_gs (#PCDATA)>
+<!ELEMENT principalretard (#PCDATA)>
+<!ELEMENT interetretard (#PCDATA)>
+<!ELEMENT impayesprcentage (#PCDATA)>
+<!ELEMENT intervun (#PCDATA)>
+<!ELEMENT intervdeu (#PCDATA)>
+<!ELEMENT intervtroi (#PCDATA)>
+<!ELEMENT intervkat (#PCDATA)>
+<!ELEMENT intervcinq (#PCDATA)>
+<!ELEMENT totalenretard (#PCDATA)>
+<!ELEMENT totalsain (#PCDATA)>
+<!ELEMENT portefeuilltotal (#PCDATA)>
+<!ELEMENT totalprincipal (#PCDATA)>
+<!ELEMENT pourcentagerisque (#PCDATA)>
+

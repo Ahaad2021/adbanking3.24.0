@@ -1,0 +1,67 @@
+<!-- DTD pour le rapport recouvrement de creance BNR -->
+
+<!-- Element root -->
+<!ELEMENT statistique_operationelle (header,infos_rapport)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+<!-- Criteres de recherche commun -->
+<!ENTITY % mod_criteres SYSTEM "criteres_recherche.dtd">
+%mod_criteres;
+
+<!ELEMENT infos_rapport (adhesion,credit,epargne)>
+
+<!-- Corps -->
+<!ELEMENT adhesion (data_ad*,total_adhesion)>
+<!ELEMENT data_ad (employeur, nbre_cible, nombre,actif,prc_nbre,prc_actif)>
+<!ELEMENT employeur (#PCDATA)>
+<!ELEMENT nbre_cible (#PCDATA)>
+<!ELEMENT nombre (#PCDATA)>
+<!ELEMENT actif (#PCDATA)>
+<!ELEMENT prc_nbre (#PCDATA)>
+<!ELEMENT prc_actif (#PCDATA)>
+
+<!ELEMENT total_adhesion (tot_cible, tot_nbre, tot_actif, tot_prc_nbre, total_prc_actif)>
+<!ELEMENT tot_cible (#PCDATA)>
+<!ELEMENT tot_nbre (#PCDATA)>
+<!ELEMENT tot_actif (#PCDATA)>
+<!ELEMENT tot_prc_nbre (#PCDATA)>
+<!ELEMENT total_prc_actif (#PCDATA)>
+
+
+<!ELEMENT credit (data_cr*,total_credit)>
+<!ELEMENT data_cr (employeur_credit, nbre_octroi, mnt_octroi,nbre_remb,mnt_remb,nbre_encours,mnt_encours)>
+<!ELEMENT employeur_credit (#PCDATA)>
+<!ELEMENT nbre_octroi (#PCDATA)>
+<!ELEMENT mnt_octroi (#PCDATA)>
+<!ELEMENT nbre_remb (#PCDATA)>
+<!ELEMENT mnt_remb (#PCDATA)>
+<!ELEMENT nbre_encours (#PCDATA)>
+<!ELEMENT mnt_encours (#PCDATA)>
+
+<!ELEMENT total_credit (tot_nbre_octroi, tot_mnt_octroi, tot_nbre_remb, tot_mnt_remb, tot_nbre_encours, tot_mnt_encours)>
+<!ELEMENT tot_nbre_octroi (#PCDATA)>
+<!ELEMENT tot_mnt_octroi (#PCDATA)>
+<!ELEMENT tot_nbre_remb (#PCDATA)>
+<!ELEMENT tot_mnt_remb (#PCDATA)>
+<!ELEMENT tot_nbre_encours (#PCDATA)>
+<!ELEMENT tot_mnt_encours (#PCDATA)>
+
+<!ELEMENT epargne (data_ep*,total_epargne)>
+<!ELEMENT data_ep (employeur_epargne, nbre_depot, mnt_depot,nbre_retrait,mnt_retrait,nbre_encours_epargne,mnt_encours_epargne)>
+<!ELEMENT employeur_epargne (#PCDATA)>
+<!ELEMENT nbre_depot (#PCDATA)>
+<!ELEMENT mnt_depot (#PCDATA)>
+<!ELEMENT nbre_retrait (#PCDATA)>
+<!ELEMENT mnt_retrait (#PCDATA)>
+<!ELEMENT nbre_encours_epargne (#PCDATA)>
+<!ELEMENT mnt_encours_epargne (#PCDATA)>
+
+<!ELEMENT total_epargne (tot_nbre_depot, tot_mnt_depot, tot_nbre_retrait, tot_mnt_retrait, tot_nbre_encours_epargne, tot_mnt_encours_epargne)>
+<!ELEMENT tot_nbre_depot (#PCDATA)>
+<!ELEMENT tot_mnt_depot (#PCDATA)>
+<!ELEMENT tot_nbre_retrait (#PCDATA)>
+<!ELEMENT tot_mnt_retrait (#PCDATA)>
+<!ELEMENT tot_nbre_encours_epargne (#PCDATA)>
+<!ELEMENT tot_mnt_encours_epargne (#PCDATA)>

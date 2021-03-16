@@ -1,0 +1,54 @@
+<!-- DTD pour le rapport liste des epargnes -->
+
+<!-- Element root -->
+<!ELEMENT liste_epargne (header, header_contextuel, type_epargnes*)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- En-tete contextuel -->
+<!ELEMENT header_contextuel (critere,type_epargne,zone,header_tot_compte,header_tot_solde)>
+<!ELEMENT critere (#PCDATA)>
+<!ELEMENT type_epargne (#PCDATA)>
+<!ELEMENT zone (#PCDATA)>
+<!ELEMENT header_tot_compte (#PCDATA)>
+<!ELEMENT header_tot_solde (#PCDATA)>
+
+<!ELEMENT type_epargnes (lib_type_ep, clients*)>
+<!ELEMENT lib_type_ep (#PCDATA)>
+<!-- Corps -->
+<!ELEMENT clients (lib_prod_ep, zone*, total)>
+<!ELEMENT lib_prod_ep (#PCDATA)>
+
+<!ELEMENT zone (libelle_zone, zone*, comptes*, sous_total)>
+<!ELEMENT libelle_zone (#PCDATA)>
+
+<!ELEMENT comptes (num_client, nom_client, num_compte, solde_compte, compte_numeros*, compte_soldes*, compte_csv*)>
+<!ELEMENT num_client (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+
+<!ELEMENT compte_numeros (num_compte)>
+<!ELEMENT num_compte (#PCDATA)>
+
+<!ELEMENT compte_soldes (solde_compte)>
+<!ELEMENT solde_compte (#PCDATA)>
+
+
+<!ELEMENT compte_csv (num_compte, solde_compte)>
+
+
+
+<!ELEMENT nb_client (#PCDATA)>
+<!ELEMENT solde_client (#PCDATA)>
+
+
+<!ELEMENT sous_total (nb_tot_tit, sous_tot_compte, mnt_tot)>
+<!ELEMENT nb_tot_tit (#PCDATA)>
+<!ELEMENT sous_tot_compte (#PCDATA)>
+<!ELEMENT mnt_tot (#PCDATA)>
+
+<!ELEMENT total (tot_nb_compte, tot_solde_compte)>
+<!ELEMENT tot_nb_compte (#PCDATA)>
+<!ELEMENT tot_solde_compte (#PCDATA)>
+

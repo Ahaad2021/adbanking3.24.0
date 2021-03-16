@@ -1,0 +1,28 @@
+<!-- DTD pour le recu passage operation diverse de caisse -->
+
+<!-- Element root -->
+<!ELEMENT operation_diverse_caisse (header, body)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- Corps -->
+<!ELEMENT body (date_op,libelle_op, compte_debit,montant_debit,devise_debit,montant_tax_debit,montant_ttc_debit,compte_credit,montant_credit,devise_credit,montant_tax_credit,montant_ttc_credit,type_piece,numero_piece,date_piece,communication,remarque)>
+<!ELEMENT date_op (#PCDATA)>
+<!ELEMENT libelle_op (#PCDATA)>
+<!ELEMENT compte_debit (#PCDATA)>
+<!ELEMENT montant_debit (#PCDATA)>
+<!ELEMENT devise_debit (#PCDATA)>
+<!ELEMENT montant_tax_debit (#PCDATA)>
+<!ELEMENT montant_ttc_debit (#PCDATA)>
+<!ELEMENT compte_credit (#PCDATA)>
+<!ELEMENT montant_credit (#PCDATA)>
+<!ELEMENT devise_credit (#PCDATA)>
+<!ELEMENT montant_tax_credit (#PCDATA)>
+<!ELEMENT montant_ttc_credit (#PCDATA)>
+<!ELEMENT type_piece (#PCDATA)>
+<!ELEMENT numero_piece (#PCDATA)>
+<!ELEMENT date_piece (#PCDATA)>
+<!ELEMENT communication (#PCDATA)>
+<!ELEMENT remarque (#PCDATA)>

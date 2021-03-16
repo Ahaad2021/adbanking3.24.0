@@ -1,0 +1,13 @@
+<!-- DTD pour la liste des comptes dont le solde est superieur  montant donne -->
+<!-- Element root -->
+<!ELEMENT listecomptes (header, details*)>
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+<!ELEMENT details (idclient,nom,numcpt,libel,solde)>
+<!ELEMENT idclient (#PCDATA)>
+<!ELEMENT nom (#PCDATA)>
+<!ELEMENT numcpt (#PCDATA)>
+<!ELEMENT libel (#PCDATA)>
+<!ELEMENT solde (#PCDATA)>
+

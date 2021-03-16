@@ -1,0 +1,20 @@
+<!ELEMENT impression_echeancier (header, infos_doss*)>
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!ELEMENT infos_doss (header_contextuel, (ech)*)>
+<!-- En-tete contextuel -->
+<!ELEMENT header_contextuel (criteres_recherche)>
+
+<!-- Criteres de recherche commun -->
+<!ENTITY % mod_criteres SYSTEM "criteres_recherche.dtd">
+%mod_criteres;
+
+<!ELEMENT ech (eid, date_s, montant_capital, montant_interets, montant_garantie, total_echeance, solde_restant)>
+<!ELEMENT eid (#PCDATA)>
+<!ELEMENT date_s (#PCDATA)>
+<!ELEMENT montant_capital (#PCDATA)>
+<!ELEMENT montant_interets (#PCDATA)>
+<!ELEMENT montant_garantie (#PCDATA)>
+<!ELEMENT total_echeance (#PCDATA)>
+<!ELEMENT solde_restant (#PCDATA)>

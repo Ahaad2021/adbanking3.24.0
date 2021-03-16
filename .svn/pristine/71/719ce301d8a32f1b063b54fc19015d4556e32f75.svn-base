@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:TalendProperties="http://www.talend.org/properties">
+  <TalendProperties:Property xmi:id="_DXR-LYXEEeS5EYAru5gZbQ" id="_K74jAKxbEeSVRKY0JR9v2A" label="ALIM_SIEGE" creationDate="2014-12-10T14:03:42.205+0400" modificationDate="2015-12-17T13:07:09.184+0400" version="0.1" statusCode="" item="_DXR-L4XEEeS5EYAru5gZbQ" displayName="ALIM_SIEGE">
+    <author href="../../talend.project#_YmZnQIXEEeSzVJb5fpllOw"/>
+  </TalendProperties:Property>
+  <TalendProperties:ItemState xmi:id="_K8MFAKxbEeSVRKY0JR9v2A" path="MULTI_AGENCE" locked="true" lockDate="2015-12-17T13:01:53.041+0400">
+    <locker href="../../talend.project#_YmZnQIXEEeSzVJb5fpllOw"/>
+  </TalendProperties:ItemState>
+  <TalendProperties:ProcessItem xmi:id="_DXR-L4XEEeS5EYAru5gZbQ" property="_DXR-LYXEEeS5EYAru5gZbQ" state="_K8MFAKxbEeSVRKY0JR9v2A">
+    <process href="ALIM_SIEGE_0.1.item#/"/>
+  </TalendProperties:ProcessItem>
+</xmi:XMI>

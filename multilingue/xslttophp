@@ -1,0 +1,53 @@
+#!/usr/bin/perl
+#
+# Utilisation: xslttophp < fichier.xslt
+#######################################
+
+#Lecture de stdin
+#TODO: Il faudrait créer l'output au fur et à mesure qu'on lit l'entrée, ligne par ligne
+#      cela éviterait de placer tout le contenu du fichier en mémoire, ce qui peut être limitatif si nous avons de gros fichiers XSLT
+#      cela rendrait aussi la recherche des chaînes à extraire plus aisée
+#      cela permettrait aussi de créer un output plus lisible, avec la même mise en page que l'input et pas tout sur une seule ligne
+open (XSLT,'-'); 
+@stdin = <XSLT>;
+close(XSLT);
+
+#Suppression des sauts de lignes
+$input = join ("" , @stdin);
+$input =~ s/\n//g;		#supression des sauts de ligne
+$input =~ s/\t/ /g;		#supression des tabulations
+$input =~ s/<!--.*?-->//g;	#suppression des commentaires
+
+#ETAPE 1
+#On crée une liste dont chaque elt est un string, séparé par des balises "<qqchose>"
+#On évite aussi d'avoir un string qui se termine par ":" (on préfère traduire "solde" que "solde :")
+@strings = split(/ *:{0,1} *<.*?> */, $input);
+
+print "<?php\n";
+foreach $string (@strings)
+{	
+	#On n'affiche ni les strings vides, ni les strings du type &#x1234; (caractères UNICODE)	
+        # Ni les chaînes ne contenant pas de caractères alphabétiques
+        # Ni les chaînes de type '0">' (really bad patch, sorry! - antoine)
+        # Ni les chaines contenant une variable FOP (another bad patch! - antoine)
+	if (($string ne "") && ($string !~ / *&#.+; */) && ($string ne "0\">") && ($string !~ "&lt;(fo|/fo):.*>") && ($string =~ m/[[:alpha:]]+/))
+	{
+		print ("echo _(\"",$string,"\");\n");
+	};
+};
+
+#ETAPE 2
+#On cherche les titres qui se trouvent dans des balises <xsl:with-param name="titre" select="'Titre à traduire'"/>
+#On isole d'abord toutes les balises (marche mal pour la première et la dernière balise, mais on s'en fout ici car elles ne contient jamais de titres à traduire)
+@balises = split(/>.*?</, $input);
+foreach $balise (@balises)
+{
+        # On ne traite que les balises qui ont la forme <xsl:with-param name="titre" select="'Titre à traduire'"/>
+        if ($balise =~ / *xsl *: *with-param *name *= *"titre" *select *= *".*?'.*?'.*?" *\//i)
+        {
+                # On extrait le string à traduire
+                $balise =~ s/ *xsl *: *with-param *name *= *"titre" *select *= *".*?'(.*?)'.*?" *\//\1/i;
+                print ("echo _(\"",$balise,"\");\n");
+        }
+};
+print "?>\n";

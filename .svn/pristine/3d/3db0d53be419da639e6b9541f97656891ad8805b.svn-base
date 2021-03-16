@@ -1,0 +1,27 @@
+<!-- DTD pour le rapport des transactions -->
+
+<!-- Element root -->
+<!ELEMENT detail_transaction_engraischimiques (header,transactions)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!ELEMENT transactions (his_data*)>
+<!ELEMENT his_data (num_trans, date, fonction, login, num_beneficiaire, ligne_ecritures*)>
+<!ELEMENT num_trans (#PCDATA)>
+<!ELEMENT date (#PCDATA)>
+<!ELEMENT fonction (#PCDATA)>
+<!ELEMENT login (#PCDATA)>
+<!ELEMENT num_beneficiaire (#PCDATA)>
+
+<!ELEMENT ligne_ecritures (num_ecriture, libel_ecriture, ligne_mouvements* )>
+<!ELEMENT num_ecriture (#PCDATA)>
+<!ELEMENT libel_ecriture (#PCDATA)>
+
+
+<!ELEMENT ligne_mouvements (compte, compte_client, montant_debit, montant_credit)>
+<!ELEMENT compte (#PCDATA)>
+<!ELEMENT compte_client (#PCDATA)>
+<!ELEMENT montant_debit (#PCDATA)>
+<!ELEMENT montant_credit (#PCDATA)>

@@ -1,0 +1,40 @@
+<!-- DTD pour le rapport generaliste sur la situation des clients -->
+
+<!-- Element root -->
+<!ELEMENT situation_clients (header, header_contextuel, situation_epargne*, situation_credit*)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- En-tete contextuel -->
+<!ELEMENT header_contextuel (num_client, nom_client, etat_client, date_adhesion, gestionnaire)>
+<!ELEMENT num_client (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT etat_client (#PCDATA)>
+<!ELEMENT date_adhesion (#PCDATA)>
+<!ELEMENT gestionnaire (#PCDATA)>
+
+<!-- Corps -->
+<!ELEMENT situation_epargne (num_cpte, date_ouvert, prod_epargne, solde_cpte, date_dernier_mvt)>
+<!ELEMENT num_cpte (#PCDATA)>
+<!ELEMENT date_ouvert (#PCDATA)>
+<!ELEMENT prod_epargne (#PCDATA)>
+<!ELEMENT solde_cpte (#PCDATA)>
+<!ELEMENT date_dernier_mvt (#PCDATA)>
+
+<!ELEMENT situation_credit (num_credit, prod_credit, date_dem, date_approb?, date_debourse?, mnt_dem, mnt_octr?, etat_credit, nbre_ech, nbre_ech_remb)>
+<!ELEMENT num_credit (#PCDATA)>
+<!ELEMENT prod_credit (#PCDATA)>
+<!ELEMENT date_dem (#PCDATA)>
+<!ELEMENT date_approb (#PCDATA)>
+<!ELEMENT date_debourse (#PCDATA)>
+<!ELEMENT mnt_dem (#PCDATA)>
+<!ELEMENT mnt_octr (#PCDATA)>
+<!ELEMENT etat_credit (#PCDATA)>
+<!ELEMENT nbre_ech (#PCDATA)>
+<!ELEMENT nbre_ech_remb (#PCDATA)>
+<!ATTLIST situation_credit exist_date_approb  CDATA #REQUIRED
+                           exist_date_debourse  CDATA #REQUIRED
+                           exist_mnt_octr     CDATA #REQUIRED>
+             

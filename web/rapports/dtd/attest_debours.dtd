@@ -1,0 +1,34 @@
+<!-- DTD pour les attestations de deboursement -->
+
+<!-- Element root -->
+<!ELEMENT attest_debours (header,infos_doss*)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- Corps -->
+<!ELEMENT infos_doss (body)>
+
+<!ELEMENT body (num_gs?,nom_gs?,num_client, nom_client, id_doss, num_cheque, mnt_debours, gar_tot_a_bloquer, gar_num, gar_mat, gar_tot_mob, gar_num_mob, gar_mat_mob, mnt_com, mnt_tax_com, mnt_ass, mnt_frais, mnt_tax_frais, solde, num_trans)>
+<!ATTLIST body gs_cat CDATA #REQUIRED>
+<!ELEMENT num_gs (#PCDATA)>
+<!ELEMENT nom_gs (#PCDATA)>
+<!ELEMENT num_client (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT id_doss (#PCDATA)>
+<!ELEMENT num_cheque (#PCDATA)>
+<!ELEMENT mnt_debours (#PCDATA)>
+<!ELEMENT gar_tot_a_bloquer (#PCDATA)>
+<!ELEMENT gar_tot_mob (#PCDATA)>
+<!ELEMENT gar_num (#PCDATA)>
+<!ELEMENT gar_mat (#PCDATA)>
+<!ELEMENT gar_num_mob (#PCDATA)>
+<!ELEMENT gar_mat_mob (#PCDATA)>
+<!ELEMENT mnt_com (#PCDATA)>
+<!ELEMENT mnt_tax_com (#PCDATA)>
+<!ELEMENT mnt_ass (#PCDATA)>
+<!ELEMENT mnt_frais (#PCDATA)>
+<!ELEMENT mnt_tax_frais (#PCDATA)>
+<!ELEMENT solde (#PCDATA)>
+<!ELEMENT num_trans (#PCDATA)>

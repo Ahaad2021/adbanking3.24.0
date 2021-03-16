@@ -1,0 +1,43 @@
+<!-- DTD pour la fiche d'un client personne morale -->
+
+<!-- Element root -->
+<!ELEMENT fiche_personne_morale (header, header_contextuel?, fiche_pm)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- Corps -->
+<!ELEMENT fiche_pm (num_pm,etat_pm,stat_jur_pm,qualite_pm,anc_num_pm,date_adh_pm,date_cre_pm,gest_pm,lang_corres_pm,raison_soc_pm,abreviation_pm,nature_jur_pm,categorie_pm,date_notaire_pm,date_greffe_pm,lieu_greffe_pm,num_registre_pm,patrimoine_pm,adresse_pm,loc1_pm,loc2_pm,code_postal_pm,ville_pm,pays_pm,num_tel_pm,fax_pm,email_pm,sect_act_pm,activ_prof_pm,nbre_hommes_grp,nbre_femmes_grp, zone)>
+<!ELEMENT num_pm (#PCDATA)>
+<!ELEMENT etat_pm (#PCDATA)>
+<!ELEMENT stat_jur_pm (#PCDATA)>
+<!ELEMENT qualite_pm (#PCDATA)>
+<!ELEMENT anc_num_pm (#PCDATA)>
+<!ELEMENT date_adh_pm (#PCDATA)>
+<!ELEMENT date_cre_pm (#PCDATA)>
+<!ELEMENT gest_pm (#PCDATA)>
+<!ELEMENT lang_corres_pm (#PCDATA)>
+<!ELEMENT raison_soc_pm (#PCDATA)>
+<!ELEMENT abreviation_pm (#PCDATA)>
+<!ELEMENT nature_juridique_pm (#PCDATA)>
+<!ELEMENT nbre_hommes_grp (#PCDATA)>
+<!ELEMENT nbre_femmes_grp (#PCDATA)>
+<!ELEMENT categorie_pm (#PCDATA)>
+<!ELEMENT date_notaire_pm (#PCDATA)>
+<!ELEMENT date_greffe_pm (#PCDATA)>
+<!ELEMENT lieu_greffe_pm (#PCDATA)>
+<!ELEMENT num_registre_pm (#PCDATA)>
+<!ELEMENT patrimoine_pm (#PCDATA)>
+<!ELEMENT adresse_pm (#PCDATA)>
+<!ELEMENT loc1_pm (#PCDATA)>
+<!ELEMENT loc2_pm (#PCDATA)>
+<!ELEMENT code_postal_pm (#PCDATA)>
+<!ELEMENT ville_pm (#PCDATA)>
+<!ELEMENT pays_pm (#PCDATA)>
+<!ELEMENT num_tel_pm (#PCDATA)>
+<!ELEMENT fax_pm (#PCDATA)>
+<!ELEMENT email_pm (#PCDATA)>
+<!ELEMENT sect_act_pm (#PCDATA)>
+<!ELEMENT activ_prof_pm (#PCDATA)>
+<!ELEMENT zone (#PCDATA)>

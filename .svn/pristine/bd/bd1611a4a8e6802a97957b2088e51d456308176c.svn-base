@@ -1,0 +1,1200 @@
+<?php
+/* vim: set expandtab softtabstop=2 shiftwidth=2 foldmethod=marker: */
+
+/**
+ * [310] Rapports clients.
+ * Ces fonctions appellent les écrans suivants :
+ * - Cra-1 : Sélection du rapport à imprimer
+ * - Cra-2 : Critères de recherche pour le rapport généraliste
+ * - Cra-3 et Cra-8 : Impression ou export CSV du rapport généraliste
+ * - Cra-7 et Cra-9  : Impression ou export liste sociétaires
+ * - Cra-10: Rapport liste sociétaires
+ * - Cra-11: Rapport répartition clients par état
+ * - Cra-12 et Cra-13 : Impression ou export répartition clients par état
+ * - Cra-16 : Rapport concentration clients
+ * - Cra-17 et Cra-18 : Impression ou export CSV du rapport concentration clients
+ * @package Rapports
+ **/
+
+require_once 'lib/html/HTML_GEN2.php';
+require_once 'lib/dbProcedures/rapports.php';
+require_once 'lib/dbProcedures/client.php';
+require_once 'modules/rapports/xml_clients.php';
+require_once 'modules/rapports/xslt.php';
+require_once 'lib/misc/tableSys.php';
+require_once 'lib/misc/divers.php';
+require_once 'lib/misc/csv.php';
+require_once 'lib/misc/excel.php';
+
+$id_agence = getNumAgence();
+
+$liste_agences = getAllIdNomAgence();
+/*{{{ Cra-1 : Sélection du rapport à imprimer */
+if ($global_nom_ecran == "Cra-1") {
+  $global_id_client="";
+  $global_client="";
+  unset($SESSION_VARS['sequence']);
+  unset($SESSION_VARS['DATA_SAUV']);
+  // Recherche de tous les rapports à afficher
+  foreach ($adsys["adsys_rapport"] as $key => $name) {
+    if (substr($key, 0, 3) == 'CLI' && substr($key, 0, 7) != 'CLI-SIT')
+      $rapports[$key] = _($name);
+  }
+  $MyPage = new HTML_GEN2(_("Sélection type rapport client"));
+  $MyPage->addField("type", _("Type de rapport client"), TYPC_LSB);
+  $MyPage->setFieldProperties("type", FIELDP_IS_REQUIRED, true);
+  $MyPage->setFieldProperties("type", FIELDP_ADD_CHOICES, $rapports);
+
+  //Boutons
+  $MyPage->addFormButton(1,1,"valider", _("Sélectionner"), TYPB_SUBMIT);
+  $MyPage->setFormButtonProperties("valider", BUTP_PROCHAIN_ECRAN, "Gen-13");
+  $MyPage->addFormButton(1,2,"annuler", _("Annuler"), TYPB_SUBMIT);
+  $MyPage->setFormButtonProperties("annuler", BUTP_PROCHAIN_ECRAN, "Gen-13");
+  $MyPage->setFormButtonProperties("annuler", BUTP_CHECK_FORM, false);
+
+  //JS pour bouton
+  $js = "if (document.ADForm.HTML_GEN_LSB_type.value == 'CLI-GEN') assign('Cra-2');";
+  $js.= "if (document.ADForm.HTML_GEN_LSB_type.value == 'CLI-SIT') assign('Cra-5');";
+  $js.= "if (document.ADForm.HTML_GEN_LSB_type.value == 'CLI-SIT-EXP') assign('Cra-5');";
+  $js.= "if (document.ADForm.HTML_GEN_LSB_type.value == 'CLI-ETA') assign('Cra-11');";
+  $js.= "if (document.ADForm.HTML_GEN_LSB_type.value == 'CLI-SOC') assign('Cra-10');";
+  $js .= "if (document.ADForm.HTML_GEN_LSB_type.value == 'CLI-PSR') assign('Cra-19');";
+  $js.= "if (document.ADForm.HTML_GEN_LSB_type.value == 'CLI-CON') assign('Cra-16');";
+  $js.= "if (document.ADForm.HTML_GEN_LSB_type.value == 'CLI-EXP') assign('Cra-14');";
+  $MyPage->addJS(JSP_BEGIN_CHECK, "js1", $js);
+
+  //HTML
+  $MyPage->buildHTML();
+  echo $MyPage->getHTML();
+} /*}}}*/
+
+/*{{{ Cra-2 : Critères de recherche pour le rapport généraliste */
+else if ($global_nom_ecran == "Cra-2") {
+  if ($global_nom_ecran_prec == "Cra-1") {
+    $MyPage = new HTML_GEN2(_("Critères de sélection"));
+    resetGlobalIdAgence();
+    if (isSiege()) {
+      $MyPage->addField("agence", _("Agence"), TYPC_LSB);
+      $MyPage->setFieldProperties("agence", FIELDP_IS_REQUIRED, true);
+      unset($liste_agences[$global_id_agence]);
+      $MyPage->setFieldProperties("agence", FIELDP_ADD_CHOICES, $liste_agences);
+    }
+    //Statut juridique
+    $MyPage->addTableRefField("statut_jur", _("Statut juridique"), "adsys_stat_jur");
+    $MyPage->setFieldProperties("statut_jur", FIELDP_HAS_CHOICE_AUCUN, false);
+    $MyPage->setFieldProperties("statut_jur", FIELDP_HAS_CHOICE_TOUS, true);
+    //Qualité du client
+    $MyPage->addTableRefField("qualite", _("Qualité"), "adsys_qualite_client");
+    $MyPage->setFieldProperties("qualite", FIELDP_HAS_CHOICE_AUCUN, false);
+    $MyPage->setFieldProperties("qualite", FIELDP_HAS_CHOICE_TOUS, true);
+    //Date adhésion
+    $MyPage->addField("date_adh_min", _("Date d'adhésion min"), TYPC_DTE);
+    $MyPage->addField("date_adh_max", _("Date d'adhésion max"), TYPC_DTE);
+    //Date rupture
+    $MyPage->addField("date_rupt_min", _("Date de rupture min"), TYPC_DTE);
+    $MyPage->addField("date_rupt_max", _("Date de rupture max"), TYPC_DTE);
+    //Secteur d'activité
+    $MyPage->addTableRefField("sect_act", _("Secteur d'activité"), "adsys_sect_activite");
+    $MyPage->setFieldProperties("sect_act", FIELDP_HAS_CHOICE_AUCUN, false);
+    $MyPage->setFieldProperties("sect_act", FIELDP_HAS_CHOICE_TOUS, true);
+    //Gestionnaire
+
+    $array_uti = getLibelUtilisateur();
+    $MyPage->addField("gest",_("Gestionnaire"),TYPC_LSB);
+    $MyPage->setFieldProperties("gest", FIELDP_HAS_CHOICE_AUCUN, false);
+    $MyPage->setFieldProperties("gest", FIELDP_HAS_CHOICE_TOUS, true);
+    $MyPage->setFieldProperties("gest",FIELDP_ADD_CHOICES, $array_uti);
+
+    //Etat
+    $MyPage->addTableRefField("etat", _("Etat"), "adsys_etat_client");
+    $MyPage->setFieldProperties("etat", FIELDP_HAS_CHOICE_AUCUN, false);
+    $MyPage->setFieldProperties("etat", FIELDP_HAS_CHOICE_TOUS, true);
+    //Limite
+    $MyPage->addField("limite", _("Limite "), TYPC_INT);
+    $MyPage->setFieldProperties("limite", FIELDP_DEFAULT,20000);
+
+    //niveau Agence et Guichet
+      $nivArrayFenacobu = getNivFenacobuArray("type_niveau > 1");
+      // --> Sélection des champs à afficher dans id_loc
+      reset($nivArrayFenacobu);
+      $includeChoicesFenacobu = array();
+      while (list (, $value_fenacobu) = each($nivArrayFenacobu)) {
+          if ($value_fenacobu['type_niveau'] == 2)
+              //array_push($includeChoicesFenacobu, $value_fenacobu['id'] =>$value_fenacobu['libelle_localisation']);
+              $arrayDisplay[$value_fenacobu['id'] ] =$value_fenacobu['libelle_niveau'];
+
+      }
+
+      //$array_test = array(1=> 'test1', 2=> 'test2');print_rn($array_test);
+      $MyPage->addField("n_agence", _("Niveau agence"), TYPC_LSB);
+      $MyPage->addField("n_guichet", _("Niveau guichet"), TYPC_LSB);
+      $MyPage->setFieldProperties("n_agence", FIELDP_ADD_CHOICES, $arrayDisplay);
+      $MyPage->setFieldProperties("n_agence", FIELDP_HAS_CHOICE_TOUS, true);
+      $MyPage->setFieldProperties("n_agence", FIELDP_HAS_CHOICE_AUCUN, false);
+      //$MyPage->setFieldProperties("n_agence", FIELDP_IS_REQUIRED, true);
+
+      $jsCodeNivFenacobu = "function displayNivFenacobu() {\n";
+      $jsCodeNivFenacobu .= "for (i=0; i < document.ADForm.HTML_GEN_LSB_n_guichet.length; ++i) document.ADForm.HTML_GEN_LSB_n_guichet.options[i] = null;\n"; //Vide les choix
+      $jsCodeNivFenacobu .= "document.ADForm.HTML_GEN_LSB_n_guichet.length = 0;";
+      $jsCodeNivFenacobu .= "document.ADForm.HTML_GEN_LSB_n_guichet.options[document.ADForm.HTML_GEN_LSB_n_guichet.length] = new Option('[Tous]', 0, true, true);\n"; //[Aucun]
+      $jsCodeNivFenacobu .= "document.ADForm.HTML_GEN_LSB_n_guichet.selectedIndex = 0; document.ADForm.HTML_GEN_LSB_n_guichet.length = 1; \n";
+      reset($nivArrayFenacobu);
+      while (list (, $value_fenacobu) = each($nivArrayFenacobu)) {
+          if ($value_fenacobu['parent'] != '') {
+              $jsCodeNivFenacobu .= "\tif (document.ADForm.HTML_GEN_LSB_n_agence.value == " . $value_fenacobu['parent'] . ")\n";
+              $jsCodeNivFenacobu .= "\t\tdocument.ADForm.HTML_GEN_LSB_n_guichet.options[document.ADForm.HTML_GEN_LSB_n_guichet.length] = new Option('" . $value_fenacobu['libelle_niveau'] . "', '" . $value_fenacobu['id'] . "', false, false);\n";
+          }
+      }
+      $jsCodeNivFenacobu .= "\n}";
+      // --> Ajout de la fonction dans le formulaire
+      $MyPage->addJS(JSP_FORM, "jsCodeNivFenacobu", $jsCodeNivFenacobu);
+      // --> ajout des champs
+
+      //AT-150
+      // --> Page reloaded Constrution des choix disponibles pour le district
+      if (isset($n_agence) && isset($n_guichet)){
+          $choices = array();
+          reset($nivArrayFenacobu);
+          while (list(, $value) = each($nivArrayFenacobu)) {
+              if ($value['parent'] == $n_agence)
+                  $choices[$value['id']] = $value['libelle_niveau'];
+          }
+          $MyPage->setFieldProperties("n_guichet", FIELDP_ADD_CHOICES, $choices);
+          $MyPage->setFieldProperties("n_guichet", FIELDP_DEFAULT, $n_guichet);
+      }
+      else{
+//        $MyPage->setFieldProperties("n_guichet", FIELDP_INCLUDE_CHOICES, array(
+//            "0" => "[Tous]"
+//        ));
+          $MyPage->setFieldProperties("n_guichet", FIELDP_HAS_CHOICE_TOUS, true);
+          $MyPage->setFieldProperties("n_guichet", FIELDP_HAS_CHOICE_AUCUN, false);
+      }
+      //$MyPage->setFieldProperties("n_guichet", FIELDP_IS_REQUIRED, true);
+      $MyPage->setFieldProperties("n_agence", FIELDP_JS_EVENT, array("onchange" => "displayNivFenacobu()"));
+
+
+    //Boutons
+    $MyPage->addFormButton(1,1,"valider", _("Rapport PDF"), TYPB_SUBMIT);
+    $MyPage->setFormButtonProperties("valider", BUTP_PROCHAIN_ECRAN, "Cra-3");
+    $MyPage->addFormButton(1,2,"excel", _("Export EXCEL"), TYPB_SUBMIT);
+    $MyPage->setFormButtonProperties("excel", BUTP_PROCHAIN_ECRAN, "Cra-8");
+    $MyPage->addFormButton(1,3,"csv", _("Export CSV"), TYPB_SUBMIT);
+    $MyPage->setFormButtonProperties("csv", BUTP_PROCHAIN_ECRAN, "Cra-8");
+    $MyPage->addFormButton(1,4,"annuler", _("Annuler"), TYPB_SUBMIT);
+    $MyPage->setFormButtonProperties("annuler", BUTP_PROCHAIN_ECRAN, "Gen-13");
+    $MyPage->setFormButtonProperties("annuler", BUTP_CHECK_FORM, false);
+
+    //HTML
+    $MyPage->buildHTML();
+    echo $MyPage->getHTML();
+  } else {
+    if ($global_nom_ecran_prec == "Cra-3" ||$global_nom_ecran_prec == "Cra-8" )
+      $MyPage = new HTML_GEN2(_("Rapport suivant"));
+    //Statut juridique
+    $MyPage->addTableRefField("statut_jur", _("Statut juridique"), "adsys_stat_jur");
+    $MyPage->setFieldProperties("statut_jur", FIELDP_HAS_CHOICE_AUCUN, false);
+    $MyPage->setFieldProperties("statut_jur", FIELDP_DEFAULT, $SESSION_VARS['DATA_SAUV']['statut_jur']);
+    $MyPage->setFieldProperties("statut_jur", FIELDP_HAS_CHOICE_TOUS, true);
+    $MyPage->setFieldProperties("statut_jur", FIELDP_IS_LABEL, false);
+    //Qualité du client
+    $MyPage->addTableRefField("qualite", _("Qualité"), "adsys_qualite_client");
+    $MyPage->setFieldProperties("qualite", FIELDP_HAS_CHOICE_AUCUN, false);
+    $MyPage->setFieldProperties("qualite", FIELDP_DEFAULT, $SESSION_VARS['DATA_SAUV']['qualite']);
+    $MyPage->setFieldProperties("qualite", FIELDP_HAS_CHOICE_TOUS, true);
+    $MyPage->setFieldProperties("qualite", FIELDP_IS_LABEL, false);
+    //Date adhésion
+    $MyPage->addField("date_adh_min", _("Date d'adhésion min"), TYPC_DTE);
+    $MyPage->setFieldProperties("date_adh_min", FIELDP_DEFAULT, $SESSION_VARS['DATA_SAUV']['date_adh_min']);
+    $MyPage->setFieldProperties("date_adh_min", FIELDP_IS_LABEL, false);
+    $MyPage->addField("date_adh_max", _("Date d'adhésion max"), TYPC_DTE);
+    $MyPage->setFieldProperties("date_adh_max", FIELDP_DEFAULT, $SESSION_VARS['DATA_SAUV']['date_adh_max']);
+    $MyPage->setFieldProperties("date_adh_max", FIELDP_IS_LABEL, false);
+    //Date rupture
+    $MyPage->addField("date_rupt_min", _("Date de rupture min"), TYPC_DTE);
+    $MyPage->setFieldProperties("date_rupt_min", FIELDP_DEFAULT, $SESSION_VARS['DATA_SAUV']['date_min_rupt']);
+    $MyPage->setFieldProperties("date_rupt_min", FIELDP_IS_LABEL, false);
+    $MyPage->addField("date_rupt_max", _("Date de rupture max"), TYPC_DTE);
+    $MyPage->setFieldProperties("date_rupt_max", FIELDP_DEFAULT, $SESSION_VARS['DATA_SAUV']['date_max_rupt']);
+    $MyPage->setFieldProperties("date_rupt_max", FIELDP_IS_LABEL, false);
+    //Secteur d'activité
+    $MyPage->addTableRefField("sect_act", _("Secteur d'activité"), "adsys_sect_activite");
+    $MyPage->setFieldProperties("sect_act", FIELDP_HAS_CHOICE_AUCUN, false);
+    $MyPage->setFieldProperties("sect_act", FIELDP_DEFAULT, $SESSION_VARS['DATA_SAUV']['sect_act']);
+    $MyPage->setFieldProperties("sect_act", FIELDP_HAS_CHOICE_TOUS, true);
+    $MyPage->setFieldProperties("sect_act", FIELDP_IS_LABEL, false);
+    //Gestionnaire
+    $MyPage->addTableRefField("gest", _("Gestionnaire"), "ad_uti");
+    $MyPage->setFieldProperties("gest", FIELDP_HAS_CHOICE_AUCUN, false);
+    $MyPage->setFieldProperties("gest", FIELDP_DEFAULT, $SESSION_VARS['DATA_SAUV']['gest']);
+    $MyPage->setFieldProperties("gest", FIELDP_HAS_CHOICE_TOUS, true);
+    $MyPage->setFieldProperties("gest", FIELDP_IS_LABEL, false);
+    //Etat
+    $MyPage->addTableRefField("etat", _("Etat"), "adsys_etat_client");
+    $MyPage->setFieldProperties("etat", FIELDP_HAS_CHOICE_AUCUN, false);
+    $MyPage->setFieldProperties("etat", FIELDP_DEFAULT, $SESSION_VARS['DATA_SAUV']['etat']);
+    $MyPage->setFieldProperties("etat", FIELDP_HAS_CHOICE_TOUS, true);
+    $MyPage->setFieldProperties("etat", FIELDP_IS_LABEL, false);
+    //Limite
+    $MyPage->addField("limite", _("Limite "), TYPC_INT);
+    $MyPage->setFieldProperties("limite", FIELDP_DEFAULT,20000);
+
+      //niveau Agence et Guichet
+      $nivArrayFenacobu = getNivFenacobuArray("type_niveau > 1");
+      // --> Sélection des champs à afficher dans id_loc
+      reset($nivArrayFenacobu);
+      $includeChoicesFenacobu = array();
+      while (list (, $value_fenacobu) = each($nivArrayFenacobu)) {
+          if ($value_fenacobu['type_niveau'] == 2)
+              //array_push($includeChoicesFenacobu, $value_fenacobu['id'] =>$value_fenacobu['libelle_localisation']);
+              $arrayDisplay[$value_fenacobu['id'] ] =$value_fenacobu['libelle_niveau'];
+
+      }
+
+      //$array_test = array(1=> 'test1', 2=> 'test2');print_rn($array_test);
+      $MyPage->addField("n_agence", _("Niveau agence"), TYPC_LSB);
+      $MyPage->addField("n_guichet", _("Niveau guichet"), TYPC_LSB);
+      $MyPage->setFieldProperties("n_agence", FIELDP_ADD_CHOICES, $arrayDisplay);
+      $MyPage->setFieldProperties("n_agence", FIELDP_HAS_CHOICE_TOUS, true);
+      $MyPage->setFieldProperties("n_agence", FIELDP_HAS_CHOICE_AUCUN, false);
+      $MyPage->setFieldProperties("n_agence", FIELDP_DEFAULT, $SESSION_VARS['DATA_SAUV']['n_agence']);
+      //$MyPage->setFieldProperties("n_agence", FIELDP_IS_REQUIRED, true);
+
+      $jsCodeNivFenacobu = "function displayNivFenacobu() {\n";
+      $jsCodeNivFenacobu .= "for (i=0; i < document.ADForm.HTML_GEN_LSB_n_guichet.length; ++i) document.ADForm.HTML_GEN_LSB_n_guichet.options[i] = null;\n"; //Vide les choix
+      $jsCodeNivFenacobu .= "document.ADForm.HTML_GEN_LSB_n_guichet.length = 0;";
+      $jsCodeNivFenacobu .= "document.ADForm.HTML_GEN_LSB_n_guichet.options[document.ADForm.HTML_GEN_LSB_n_guichet.length] = new Option('[Tous]', 0, true, true);\n"; //[Aucun]
+      $jsCodeNivFenacobu .= "document.ADForm.HTML_GEN_LSB_n_guichet.selectedIndex = 0; document.ADForm.HTML_GEN_LSB_n_guichet.length = 1; \n";
+      reset($nivArrayFenacobu);
+      while (list (, $value_fenacobu) = each($nivArrayFenacobu)) {
+          if ($value_fenacobu['parent'] != '') {
+              $jsCodeNivFenacobu .= "\tif (document.ADForm.HTML_GEN_LSB_n_agence.value == " . $value_fenacobu['parent'] . ")\n";
+              $jsCodeNivFenacobu .= "\t\tdocument.ADForm.HTML_GEN_LSB_n_guichet.options[document.ADForm.HTML_GEN_LSB_n_guichet.length] = new Option('" . $value_fenacobu['libelle_niveau'] . "', '" . $value_fenacobu['id'] . "', false, false);\n";
+          }
+      }
+      $jsCodeNivFenacobu .= "\n}";
+      // --> Ajout de la fonction dans le formulaire
+      $MyPage->addJS(JSP_FORM, "jsCodeNivFenacobu", $jsCodeNivFenacobu);
+      // --> ajout des champs
+
+      //AT-150
+      // --> Page reloaded Constrution des choix disponibles pour le district
+      if (isset($SESSION_VARS['DATA_SAUV']['n_agence']) && isset($SESSION_VARS['DATA_SAUV']['n_guichet'])){
+          $choices = array();
+          reset($nivArrayFenacobu);
+          while (list(, $value) = each($nivArrayFenacobu)) {
+              if ($value['parent'] == $SESSION_VARS['DATA_SAUV']['n_agence'])
+                  $choices[$value['id']] = $value['libelle_niveau'];
+          }
+          $MyPage->setFieldProperties("n_guichet", FIELDP_ADD_CHOICES, $choices);
+          $MyPage->setFieldProperties("n_guichet", FIELDP_DEFAULT, $SESSION_VARS['DATA_SAUV']['n_guichet']);
+      }
+      else{
+//        $MyPage->setFieldProperties("n_guichet", FIELDP_INCLUDE_CHOICES, array(
+//            "0" => "[Tous]"
+//        ));
+          $MyPage->setFieldProperties("n_guichet", FIELDP_HAS_CHOICE_TOUS, true);
+          $MyPage->setFieldProperties("n_guichet", FIELDP_HAS_CHOICE_AUCUN, false);
+      }
+      //$MyPage->setFieldProperties("n_guichet", FIELDP_IS_REQUIRED, true);
+      $MyPage->setFieldProperties("n_agence", FIELDP_JS_EVENT, array("onchange" => "displayNivFenacobu()"));
+
+      //Boutons
+    $MyPage->addFormButton(1, 1, "valider", _("PDF Suivant"), TYPB_SUBMIT);
+    $MyPage->setFormButtonProperties("valider", BUTP_PROCHAIN_ECRAN, "Cra-3");
+    $MyPage->addFormButton(1, 2, "excel", _("EXCEL suivant"), TYPB_SUBMIT);
+    $MyPage->setFormButtonProperties("excel", BUTP_PROCHAIN_ECRAN, "Cra-8");
+    $MyPage->addFormButton(1, 3, "csv", _("CSV suivant"), TYPB_SUBMIT);
+    $MyPage->setFormButtonProperties("csv", BUTP_PROCHAIN_ECRAN, "Cra-8");
+    $MyPage->addFormButton(1, 4, "annuler", _("Annuler"), TYPB_SUBMIT);
+    $MyPage->setFormButtonProperties("annuler", BUTP_PROCHAIN_ECRAN, "Gen-13");
+    $MyPage->setFormButtonProperties("annuler", BUTP_CHECK_FORM, false);
+    //HTML
+    $MyPage->buildHTML();
+    echo $MyPage->getHTML();
+  }
+} /*}}}*/
+
+/*{{{ Cra-3 et Cra-8 : Impression ou export du rapport généraliste */
+else if ($global_nom_ecran == "Cra-3" || $global_nom_ecran == "Cra-8") {
+  setGlobalIdAgence($agence);
+  $DATA['statut_jur'] = $statut_jur;
+  $DATA['qualite'] = $qualite;
+  $DATA['id_loc1'] = $id_loc1;
+  $DATA['id_loc2'] = $id_loc2;
+  $DATA['date_adh_min'] = $date_adh_min;
+  $DATA['date_adh_max'] = $date_adh_max;
+  $DATA['date_rupt_min'] = $date_rupt_min;
+  $DATA['date_rupt_max'] = $date_rupt_max;
+  $DATA['sect_act'] = $sect_act;
+  $DATA['gest'] = $gest;
+  $DATA['lang'] = $lang;
+  $DATA['etat'] = $etat;
+  $DATA['n_agence'] = $n_agence;
+  $DATA['n_guichet'] = $n_guichet;
+
+  $SESSION_VARS['DATA'] = $DATA;
+
+  $Where = array();
+  $nombre = countMatchedClients ($Where, "*");
+  if (!isset($SESSION_VARS['sequence'])) {
+    $SESSION_VARS['DATA_SAUV'] = $DATA;
+    $SESSION_VARS['sequence']=0;
+  }
+  $i = $SESSION_VARS['sequence'];
+  $myErr = recherche_clients($DATA, $i,$limite);
+  // le dernier id_client de la liste
+  $dernier_id_client=$myErr->param[sizeof($myErr->param)-1];
+  $count=sizeof($myErr->param);
+  $SESSION_VARS['result'] = $myErr->param;
+  //Construction de la liste des critères de recherche
+  $list_criteres = array();
+  if ($SESSION_VARS['DATA']['statut_jur'] > 0) //Statut juridique
+    $list_criteres = array_merge($list_criteres, array(_("Statut juridique")=>adb_gettext($adsys["adsys_stat_jur"][$SESSION_VARS['DATA']['statut_jur']])));
+  if ($SESSION_VARS['DATA']['qualite'] > 0) //Qualité
+    $list_criteres = array_merge($list_criteres, array(_("Qualité")=>adb_gettext($adsys["adsys_qualite_client"][$SESSION_VARS['DATA']['qualite']])));
+  if ($SESSION_VARS['DATA']['date_adh_min'] != "") //Date adhésion min
+    $list_criteres = array_merge($list_criteres, array(_("Date d'adhésion minimum")=>$SESSION_VARS['DATA']['date_adh_min']));
+  if ($SESSION_VARS['DATA']['date_adh_max'] != "") //Date adhésion max
+    $list_criteres = array_merge($list_criteres, array(_("Date d'adhésion maximum")=>$SESSION_VARS['DATA']['date_adh_max']));
+  if ($SESSION_VARS['DATA']['date_rupt_min'] != "") //Date rupture min
+    $list_criteres = array_merge($list_criteres, array(_("Date de rupture minimum")=>$SESSION_VARS['DATA']['date_rupt_min']));
+  if ($SESSION_VARS['DATA']['date_rupt_max'] != "") //Date rupture max
+    $list_criteres = array_merge($list_criteres, array(_("Date de rupture maximum")=>$SESSION_VARS['DATA']['date_rupt_max']));
+  if ($SESSION_VARS['DATA']['sect_act'] > 0) //Secteur activité
+    $list_criteres = array_merge($list_criteres, array(_("Secteur d'activité")=>getLibel("adsys_sect_activite", $SESSION_VARS['DATA']['sect_act'])));
+  if ($SESSION_VARS['DATA']['etat'] > 0) //Etat
+    $list_criteres = array_merge($list_criteres, array(_("Etat")=>adb_gettext($adsys["adsys_etat_client"][$SESSION_VARS['DATA']['etat']])));
+  if ($SESSION_VARS['DATA']['gest'] > 0) //Etat
+    $list_criteres = array_merge($list_criteres, array(_("Gestionnaire")=>getLibel("ad_uti",$SESSION_VARS['DATA']['gest'])));
+
+  //Génération du code XML
+  if ($count > 0)
+  $xml = xml_clients($SESSION_VARS['result'],($SESSION_VARS['DATA']['statut_jur'] != ''),($SESSION_VARS['DATA']['sect_act'] != ''),($SESSION_VARS['DATA']['gest'] != ''),$list_criteres);
+
+  if ($global_nom_ecran == "Cra-3") {
+    //Génération du XSL-FO (grâce au XSLT) et du PDF (grâce à FOP)
+    $fichier_pdf = xml_2_xslfo_2_pdf($xml, 'clients.xslt');
+
+    //Message de confirmation + affichage du rapport dans une nouvelle fenêtre
+    $i = $i + $limite; // nombre de clients à imprimer
+    if ($i > $nombre)
+      $i = $nombre;
+    $SESSION_VARS['sequence']=$i;
+    if ($i!=$dernier_id_client) {
+      $i = $dernier_id_client;
+      $SESSION_VARS['sequence'] = $i;
+    }
+
+    //echo get_show_pdf_html("Gen-13", $fichier_pdf);
+
+    if (($count < $limite || $nombre == $limite)&&($count>0))
+      echo get_show_pdf_html("Gen-13", $fichier_pdf);
+    else
+      echo get_show_pdf_html("Cra-2", $fichier_pdf);
+  }
+  elseif ($global_nom_ecran == "Cra-8") {
+    //Génération du fichier CSV
+    $csv_file = xml_2_csv($xml, 'clients.xslt');
+
+    //Message de confirmation + affichage du rapport dans une nouvelle fenêtre
+    $i = $i + $limite;
+    if ($i > $nombre)
+      $i = $nombre;
+    $SESSION_VARS['sequence']=$i;
+    if ($i!=$dernier_id_client) {
+      $i = $dernier_id_client;
+      $SESSION_VARS['sequence'] = $i;
+    }
+    //echo getShowCSVHTML("Gen-13", $csv_file);
+    if ($count < $limite || $nombre == $limite){
+      if (isset($excel) && ($excel == 'Export EXCEL'||$excel == 'EXCEL suivant')){
+        echo getShowEXCELHTML("Gen-13", $csv_file);
+      }
+      else{
+        echo getShowCSVHTML("Gen-13", $csv_file);
+      }
+    }
+    else{
+      if (isset($excel) && ($excel == 'Export EXCEL'||$excel == 'EXCEL suivant')){
+        echo getShowEXCELHTML("Cra-2", $csv_file);
+      }
+      else{
+        echo getShowCSVHTML("Cra-2", $csv_file);
+      }
+    }
+  }
+} /*}}}*/
+
+/*{{{ Cra-12 et Cra-13 : Impression répartition clients */
+else if ($global_nom_ecran == 'Cra-12' || $global_nom_ecran == 'Cra-13') {
+  setGlobalIdAgence($agence);
+
+  //génération par tranche
+  $Where = array();
+  $nombre = countMatchedClients($Where, "*");
+  if (!isset($SESSION_VARS['sequence'])) {
+    $SESSION_VARS['sequence'] = 0;
+  }
+  $i = $SESSION_VARS['sequence'];
+  $DATA = getClientEtat($i);
+  // le dernier id_client de la liste
+  $count = sizeof($DATA);
+	//recupération du dernier client
+	$tab = end($DATA);
+	$dernier_id_client = $tab['id_client'];
+	$liste_criteres = array();
+	$liste_criteres["Du Client N° "] = $i;
+	$liste_criteres["Au Client N° "] = $dernier_id_client;
+	//Génération du fichier XML
+	$xml = xml_repartition_client($DATA, $nombre, $liste_criteres);
+
+  if ($global_nom_ecran == "Cra-12") {
+    //Génération du XSL-FO (grâce au XSLT) et du PDF (grâce à FOP)
+    $fichier_pdf = xml_2_xslfo_2_pdf($xml, 'repartition_client.xslt');
+
+    //Message de confirmation + affichage du rapport dans une nouvelle fenêtre
+    $i = $i + 4000; // nombre de clients à imprimer
+    if ($i > $nombre){
+    	$i = $nombre;
+    }
+    $SESSION_VARS['sequence'] = $i;
+    if ($i != $dernier_id_client) {
+      $i = $dernier_id_client;
+      $SESSION_VARS['sequence'] = $i;
+    }
+    if (($count < 4000 || $nombre == 4000) && ($count >= 0)){
+    	echo get_show_pdf_html("Gen-13", $fichier_pdf);
+    } else {
+    	echo get_show_pdf_html("Cra-11", $fichier_pdf);
+    }
+  } elseif ($global_nom_ecran == "Cra-13") {
+    //Génération du fichier CSV
+    $csv_file = xml_2_csv($xml, 'repartition_client.xslt');
+
+    //Message de confirmation + affichage du rapport dans une nouvelle fenêtre
+    $i = $i + 4000; // nombre de clients à imprimer
+    if ($i > $nombre){
+    	$i = $nombre;
+    }
+    $SESSION_VARS['sequence'] = $i;
+    if ($i != $dernier_id_client) {
+      $i = $dernier_id_client;
+      $SESSION_VARS['sequence'] = $i;
+    }
+    if (($count < 4000 || $nombre == 4000) && ($count > 0)){
+      if (isset($excel) && ($excel == 'Export EXCEL'||$excel == 'Export EXCEL Suivant')){
+        echo getShowEXCELHTML("Gen-13", $csv_file);
+      }
+      else{
+    	  echo getShowCSVHTML("Gen-13", $csv_file);
+      }
+    } else {
+      if (isset($excel) && ($excel == 'Export EXCEL'||$excel == 'Export EXCEL Suivant')){
+        echo getShowEXCELHTML("Cra-11", $csv_file);
+      }
+      else{
+    	  echo getShowCSVHTML("Cra-11", $csv_file);
+      }
+    }
+  }
+} /*}}}*/
+
+/*{{{ Cra-11 : Type rapport répartition clients par état */
+else if ($global_nom_ecran == "Cra-11") {
+  if($global_nom_ecran_prec == 'Cra-1'){
+  	resetGlobalIdAgence();
+	  $MyPage = new HTML_GEN2(_("Répartition clients par état"));
+
+	  if (isSiege()) {
+	    //Agence- Tri par agence
+	    $MyPage->addField("agence", _("Agence"), TYPC_LSB);
+	    $MyPage->setFieldProperties("agence", FIELDP_IS_REQUIRED, true);
+	    unset($liste_agences[$global_id_agence]);
+	    $MyPage->setFieldProperties("agence", FIELDP_ADD_CHOICES, $liste_agences);
+	  }
+	  //Boutons
+	  $MyPage->addFormButton(1,1,"pdf", _("Rapport PDF"), TYPB_SUBMIT);
+	  $MyPage->setFormButtonProperties("pdf", BUTP_PROCHAIN_ECRAN, "Cra-12");
+    $MyPage->addFormButton(1,2,"excel", _("Export EXCEL"), TYPB_SUBMIT);
+    $MyPage->setFormButtonProperties("excel", BUTP_PROCHAIN_ECRAN, "Cra-13");
+	  $MyPage->addFormButton(1,3,"csv", _("Export CSV"), TYPB_SUBMIT);
+	  $MyPage->setFormButtonProperties("csv", BUTP_PROCHAIN_ECRAN, "Cra-13");
+	  $MyPage->addFormButton(1,4,"annuler", _("Annuler"), TYPB_SUBMIT);
+	  $MyPage->setFormButtonProperties("annuler", BUTP_PROCHAIN_ECRAN, "Gen-13");
+	  $MyPage->setFormButtonProperties("annuler", BUTP_CHECK_FORM, false);
+	  //HTML
+	  $MyPage->buildHTML();
+	  echo $MyPage->getHTML();
+  } else {
+  	resetGlobalIdAgence();
+	  $MyPage = new HTML_GEN2(_("Rapport suivant : Repatition clients par état"));
+
+	  //Boutons
+	  $MyPage->addFormButton(1,1,"pdf", _("Rapport PDF Suivant"), TYPB_SUBMIT);
+	  $MyPage->setFormButtonProperties("pdf", BUTP_PROCHAIN_ECRAN, "Cra-12");
+    $MyPage->addFormButton(1,2,"excel", _("Export EXCEL Suivant"), TYPB_SUBMIT);
+    $MyPage->setFormButtonProperties("excel", BUTP_PROCHAIN_ECRAN, "Cra-13");
+	  $MyPage->addFormButton(1,3,"csv", _("Export CSV Suivant"), TYPB_SUBMIT);
+	  $MyPage->setFormButtonProperties("csv", BUTP_PROCHAIN_ECRAN, "Cra-13");
+	  $MyPage->addFormButton(1,4,"annuler", _("Annuler"), TYPB_SUBMIT);
+	  $MyPage->setFormButtonProperties("annuler", BUTP_PROCHAIN_ECRAN, "Gen-13");
+	  $MyPage->setFormButtonProperties("annuler", BUTP_CHECK_FORM, false);
+	  //HTML
+	  $MyPage->buildHTML();
+	  echo $MyPage->getHTML();
+  }
+
+
+} /*}}}*/
+
+/*{{{ Cra-7 et Cra-9 : Impression ou export liste sociétaires */
+else
+  if ($global_nom_ecran == 'Cra-7' || $global_nom_ecran == 'Cra-9') {
+    setGlobalIdAgence($agence);
+    global $adsys;
+    
+    if ($statut_jur == "")
+      $statut_jur = 0;
+    
+    //get data for rapport liste de societaires de l'insitution
+    $DATA = getListeSocietaires( $statut_jur, $export_date);
+    
+    //get data for rapport complement de liste de societaires de l'institution
+    $DATA_comp = getListeSocietaires_tranche( $statut_jur, $export_date);
+    
+//listing des criteres 
+    if ($statut_jur == 0) {
+    	$list_criteres = array(_("Statut juridique") => _("Tous"),_("Date") => date($export_date));
+    } else if($statut_jur == 1) {
+    	$list_criteres = array(_("Statut juridique") => _("Personne Physique"),_("Date") => date($export_date));
+    } else if($statut_jur == 2) {
+    	$list_criteres = array(_("Statut juridique") => _("Personne Morale"),_("Date") => date($export_date));
+    } else if($statut_jur == 3) {
+    	$list_criteres = array(_("Statut juridique") => _("Groupe Informel"),_("Date") => date($export_date));
+    } else if($statut_jur == 4) {
+    	$list_criteres = array(_("Statut juridique") => _("Groupe Solidaire"),_("Date") => date($export_date));
+    }
+
+    if ($global_nom_ecran == "Cra-7") {
+      //Génération du XSL-FO (grâce au XSLT) et du PDF (grâce à FOP)
+       $xml = xml_liste_societaires( $DATA , $DATA_comp, $list_criteres);
+      $fichier_pdf = xml_2_xslfo_2_pdf($xml, 'liste_societaires.xslt');
+      //Message de confirmation + affichage du rapport dans une nouvelle fenêtre
+      echo get_show_pdf_html("Gen-13", $fichier_pdf); 
+      
+      } 
+   if ($global_nom_ecran == "Cra-9") {
+      //Génération du fichier CSV
+       $xml = xml_liste_societaires($DATA, $DATA_comp, $list_criteres, true);
+      $csv_file = xml_2_csv($xml, 'liste_societaires.xslt');
+      //Message de confirmation + affichage du rapport dans une nouvelle fenêtre
+     if (isset($excel) && $excel == 'Export EXCEL'){
+       echo getShowEXCELHTML("Gen-13", $csv_file);
+     }
+     else{
+       echo getShowCSVHTML("Gen-13", $csv_file);
+     }
+    } 
+  } /*}}}*/
+
+/*{{{ Cra-10 : Type rapport liste sociétaires */
+elseif ($global_nom_ecran == "Cra-10") {
+  $MyPage = new HTML_GEN2(_("Sélection type rapport Liste sociétaires"));
+  resetGlobalIdAgence();
+  if (isSiege()) {
+//Agence- Tri par agence
+    $MyPage->addField("agence", _("Agence"), TYPC_LSB);
+    $MyPage->setFieldProperties("agence", FIELDP_IS_REQUIRED, true);
+    unset($liste_agences[$global_id_agence]);
+    $MyPage->setFieldProperties("agence", FIELDP_ADD_CHOICES, $liste_agences);
+  }
+  //Statut juridique
+  $MyPage->addTableRefField("statut_jur", _("Statut juridique"), "adsys_stat_jur", "sortNumeric");
+  $MyPage->setFieldProperties("statut_jur", FIELDP_HAS_CHOICE_AUCUN, false);
+  $MyPage->setFieldProperties("statut_jur", FIELDP_HAS_CHOICE_TOUS, true); 
+  
+  //date de l'export
+  $MyPage->addField("export_date", _("Date"), TYPC_DTE);
+  $MyPage->setFieldProperties("export_date", FIELDP_DEFAULT, date("d/m/Y", mktime(0, 0, 0, date("m"), date("d"), date("Y"))));
+  $MyPage->setFieldProperties("export_date", FIELDP_IS_REQUIRED, true);
+  
+  //Boutons
+  $MyPage->addFormButton(1,1,"pdf", _("Rapport PDF"), TYPB_SUBMIT);
+  $MyPage->setFormButtonProperties("pdf", BUTP_PROCHAIN_ECRAN, "Cra-7");
+  $MyPage->addFormButton(1,2,"excel", _("Export EXCEL"), TYPB_SUBMIT);
+  $MyPage->setFormButtonProperties("excel", BUTP_PROCHAIN_ECRAN, "Cra-9");
+  $MyPage->addFormButton(1,3,"csv", _("Export CSV"), TYPB_SUBMIT);
+  $MyPage->setFormButtonProperties("csv", BUTP_PROCHAIN_ECRAN, "Cra-9");
+  $MyPage->addFormButton(1,4,"annuler", _("Annuler"), TYPB_SUBMIT);
+  $MyPage->setFormButtonProperties("annuler", BUTP_PROCHAIN_ECRAN, "Gen-13");
+  $MyPage->setFormButtonProperties("annuler", BUTP_CHECK_FORM, false);
+  //HTML
+  $MyPage->buildHTML();
+  echo $MyPage->getHTML();
+} /*}}}*/
+
+/*{{{ Cra-16 : Type rapport concentration sur les clients */
+elseif ($global_nom_ecran == "Cra-16") {
+  $MyPage = new HTML_GEN2(_("Sélection critères de concentration"));
+  resetGlobalIdAgence();
+  $agence_data = getAgenceDatas($global_id_agence);
+  if (isSiege()) {
+		//Agence- Tri par agence
+    $MyPage->addField("agence", _("Agence"), TYPC_LSB);
+    $MyPage->setFieldProperties("agence", FIELDP_IS_REQUIRED, true);
+    unset($liste_agences[$global_id_agence]);
+    $MyPage->setFieldProperties("agence", FIELDP_ADD_CHOICES, $liste_agences);
+    //$myForm->setFieldProperties("agence", FIELDP_HAS_CHOICE_TOUS, true);
+  }
+	$loc = get_localisation(1);
+	foreach($loc as $key => $value) {
+		if($value['libel'] != "Non renseigné") $localisation_niveau1[$value['id']]= $value['libel'];
+	}
+  if ($agence_data['identification_client'] == 2 ){
+    $array_localisation_rwanda = array(
+      1 => "Province",
+      2 => "District",
+      3 => "Secteur",
+      4 => "Cellule",
+      5 => "Village"
+    );
+
+  }
+	$Myjs2 = "function gereControle(){
+				document.ADForm.HTML_GEN_date_date_debut.disabled=(document.ADForm.HTML_GEN_BOL_taux.checked==true)?false:true;
+				document.ADForm.HTML_GEN_date_date_fin.disabled=(document.ADForm.HTML_GEN_BOL_taux.checked==true)?false:true;
+				";
+        if ($agence_data['identification_client'] == 2){
+          $Myjs2 .=" document.ADForm.HTML_GEN_LSB_localisation_main.disabled=(document.ADForm.HTML_GEN_BOL_local.checked==true)?false:true;";
+          $Myjs2 .=" document.ADForm.HTML_GEN_LSB_crit_loc.disabled=(document.ADForm.HTML_GEN_BOL_local.checked==true)?false:true;";
+        }else{
+          $Myjs2 .="document.ADForm.HTML_GEN_LSB_localisation.disabled=(document.ADForm.HTML_GEN_BOL_local.checked==true)?false:true;";
+        }
+        $Myjs2 .="return true;
+				}";
+	
+//gestion des coche criteres
+	 $Myjs4 = "function removeA(arr) {
+				    var what, a = arguments, L = a.length, ax;
+				    while (L > 1 && arr.length) {
+				        what = a[--L];
+				        while ((ax= arr.indexOf(what)) !== -1) {
+				            arr.splice(ax, 1);
+				        }
+				    }
+				    return arr;
+				}
+
+	 function KeepCount(field_name) {
+	
+		var NewCount = 0
+		var ArrayObj = new Array();
+	 		
+	    var el = eval('document.ADForm.' + field_name);
+	 		
+	    var hdd_items = document.ADForm.hidden_check.value;
+	 	var hdd_arr = hdd_items.toString().split(',');
+	 		
+	    if (el.checked) {	
+	 		hdd_arr.push(field_name);
+	    } else {
+	 		removeA(hdd_arr, field_name);
+	 	}
+
+	 	document.ADForm.hidden_check.value = hdd_arr.join();	 		
+        
+		if (document.ADForm.HTML_GEN_BOL_tranche_age.checked==true)
+		   {
+	 		NewCount++;
+           }
+	
+		if (document.ADForm.HTML_GEN_BOL_statjuridik.checked==true)
+		   {
+	 		NewCount++;
+           }
+	
+		if (document.ADForm.HTML_GEN_BOL_local.checked==true)
+		   {
+	 		NewCount++;
+           }
+	
+		if (document.ADForm.HTML_GEN_BOL_secteur.checked==true)
+		   {
+	 		NewCount++;
+           }
+	
+		if (document.ADForm.HTML_GEN_BOL_taux.checked==true)
+		   {
+	 		NewCount++;
+           }
+	
+		if (NewCount > 3)
+		{
+	    	alert('Veuillez cocher une combinaison de 3 critères seulement ');
+	 		
+	 		var hdd_el = document.ADForm.hidden_check.value;
+	 		
+	 		var chk_arr = hdd_el.toString().split(',');
+	 		
+	 		for(var x=1; x < chk_arr.length; x++) {
+	 			var el = eval('document.ADForm.' + chk_arr[x]);
+	 		
+	 			if (x > 3){
+	 				el.checked = false;
+	 				removeA(chk_arr, chk_arr[x]);
+	 				
+	 		    }
+            }
+	 		document.ADForm.hidden_check.value = chk_arr.join();
+	 		
+	 		if (document.ADForm.HTML_GEN_BOL_taux.checked==true)
+		   {
+	 		document.ADForm.HTML_GEN_date_date_debut.disabled=false;
+	 		document.ADForm.HTML_GEN_date_date_fin.disabled =flase;
+	 		}else{
+	 		document.ADForm.HTML_GEN_date_date_debut.disabled=true;
+	 		document.ADForm.HTML_GEN_date_date_fin.disabled =true;
+	 		}
+	 		
+		}
+	 
+	 return false;
+	}"; 
+
+	
+   	//Type de répartition
+	$MyPage->addField("tranche_age", _("Tranche d'âge"), TYPC_BOL);
+	$MyPage->addField("statjuridik", _("Statut Juridique"), TYPC_BOL);
+	
+	$MyPage->addField("local", _("Localisation"), TYPC_BOL);
+
+  // AT-76 : Evolution rapport Concentration sur les clients après AT-33
+  if ($agence_data['identification_client'] == 2) {
+    $MyPage->addField("localisation_main", _("Niveau de Localisation"), TYPC_LSB);
+    $MyPage->setFieldProperties("localisation_main", FIELDP_ADD_CHOICES, $array_localisation_rwanda);
+    $MyPage->setFieldProperties("localisation_main", FIELDP_HAS_CHOICE_AUCUN, true);
+    $MyPage->setFieldProperties("localisation_main", FIELDP_HAS_CHOICE_TOUS, false);
+    $MyPage->setFieldProperties("localisation_main", FIELDP_JS_EVENT, array("onChange"=>"assign('Cra-16'); this.form.submit();"));
+    /***********************************************************************************/
+    //tableau des écritures diverses
+    $ExtraHtml = "<link rel=\"stylesheet\" href=\"/lib/misc/js/chosen/css/chosen.css\">";
+    $ExtraHtml .= "<script src=\"/lib/misc/js/lib/jquery.min.js\" type=\"text/javascript\"></script>";
+    $ExtraHtml .= "<script src=\"/lib/misc/js/chosen/chosen.jquery.js\" type=\"text/javascript\"></script>";
+
+    $ExtraHtml .= "<TABLE align=\"left\" >\n";
+
+    //En-tête du tableau
+    $ExtraHtml .= "<TR bgcolor=$color>\n";
+
+    // Comptes comptables qui peuvent être mouvementés dans le brouillard
+
+    $ExtraHtml .= "<TD>\n";
+    $ExtraHtml .= "<label>Critère de localisation  </label>";
+    $ExtraHtml .= "</TD>\n";
+    $ExtraHtml .= "<TD>\n";
+    $ExtraHtml .= "<select required class=\"chosen-select\" NAME=\"crit_loc\" ID=\"localisation_crit\"  style=\"width:160px\" "  ;
+    $ExtraHtml .= "\">\n";
+    $ExtraHtml .= "<option value=\" \">["._("Tous")."]</option>\n";
+    if (isset($localisation_main) && isset($local)){//Page Reloaded
+      $locArrayRwanda = getLocRwandaSelectedArray();
+      reset($locArrayRwanda);
+      while (list (, $value_rwanda) = each($locArrayRwanda)) {
+        if ($value_rwanda['type_localisation'] == $localisation_main){
+          $ExtraHtml .= "<option value=".$value_rwanda['id'].">".$value_rwanda['libelle_localisation']."</option>\n";
+        }
+      }
+    }
+    $ExtraHtml .= "</select>\n";
+    $ExtraHtml .= "</TD>";
+
+
+    $ExtraHtml .= "</TR>";
+    $ExtraHtml .= "</TABLE>\n";
+
+
+    $ExtraHtml .= "<script type=\"text/javascript\">\n";
+    $ExtraHtml .= "var config = { '.chosen-select' : {} }\n";
+    $ExtraHtml .= "for (var selector in config) {\n";
+    $ExtraHtml .= "$(selector).chosen(config[selector]); }\n";
+
+    $ExtraHtml .= "</script>\n";
+
+    $MyPage->addHTMLExtraCode("html2",$ExtraHtml);
+    $MyPage->setHTMLExtraCodeProperties("html2", HTMP_IN_TABLE, true);
+    /***********************************************************************************/
+  }
+  else{
+    $MyPage->addField("localisation", _("Critère de Localisation"), TYPC_LSB);
+    $MyPage->setFieldProperties("localisation", FIELDP_ADD_CHOICES, $localisation_niveau1);
+    $MyPage->setFieldProperties("localisation", FIELDP_HAS_CHOICE_AUCUN, false);
+    $MyPage->setFieldProperties("localisation", FIELDP_HAS_CHOICE_TOUS, true);
+
+  }
+  //AT-33/AT-76 - Localisation Rwanda
+  if ($agence_data['identification_client'] == 2) {
+    //AT-76 : Evolution rapport Concentration sur les clients après AT-33
+    $locArrayRwanda = getLocRwandaSelectedArray();
+    // --> Sélection des champs à afficher dans id_loc
+    reset($locArrayRwanda);
+    $includeChoicesRwanda = array();
+    while (list (, $value_rwanda) = each($locArrayRwanda)) {
+      if ($value_rwanda['parent'] == 0)
+        array_push($includeChoicesRwanda, $value_rwanda['id']);
+      //$arrayDisplay[$value_rwanda['id'] ] =$value_rwanda['libelle_localisation'];
+
+    }
+    //$MyPage->addField("crit_loc", _("Critere de localisation"), TYPC_LSB);
+
+    $jsCodeLocRwanda = "function displayLocsRwanda() {\n";
+    $jsCodeLocRwanda .= "\t for (i=0; i < document.getElementById('localisation_crit').options.length; i++) {\n\t\t document.getElementById('localisation_crit').options[i] = null;}\n"; //Vide les choixdocument.getElementById('localisation_crit').options[i] = null;
+    $jsCodeLocRwanda .= "\t document.getElementById('localisation_crit').length = 0;\n";
+    $jsCodeLocRwanda .= "\t document.getElementById('localisation_crit').options[document.getElementById('localisation_crit').options.length] = new Option('[Tous]', 0, true, true);\n"; //[Aucun]
+    $jsCodeLocRwanda .= "\t document.getElementById('localisation_crit').selectedIndex = 0; document.getElementById('localisation_crit').length = 1; \n";
+    reset($locArrayRwanda);
+    while (list (, $value_rwanda) = each($locArrayRwanda)) {
+      if ($value_rwanda['type_localisation'] != '') {
+        $jsCodeLocRwanda .= "\t if (document.ADForm.HTML_GEN_LSB_localisation_main.value == " . $value_rwanda['type_localisation'] . "){\n";
+        $jsCodeLocRwanda .= "\t\t document.getElementById('localisation_crit').options[document.getElementById('localisation_crit').options.length] = new Option('" . $value_rwanda['libelle_localisation'] . "', " . $value_rwanda['id'] . ", false, true);}\n";
+	/*$jsCodeLocRwanda .= "\t\t var x = document.getElementById('localisation_crit');\n";
+	$jsCodeLocRwanda .= "\t\t var opt = document.createElement('option');\n";
+	$jsCodeLocRwanda .= "\t\t opt.text = '".$value_rwanda['libelle_localisation']."';\n";
+	$jsCodeLocRwanda .= "\t\t opt.value = '".$value_rwanda['id']."';\n";
+	$jsCodeLocRwanda .= "\t\t x.options.add(opt,document.getElementById('localisation_crit').length);}\n";*/
+	//$jsCodeLocRwanda .= "\t\t document.getElementById('localisation_crit').options.add('".$value_rwanda['libelle_localisation']."',".$value_rwanda['id'].");}";
+      }
+    }
+    $jsCodeLocRwanda .= "\n}";
+    // --> Ajout de la fonction dans le formulaire
+    //$MyPage->addJS(JSP_FORM, "jsCodeLocRwanda", $jsCodeLocRwanda);
+    //$MyPage->setFieldProperties("crit_loc", FIELDP_HAS_CHOICE_AUCUN, false);
+    /*$MyPage->setFieldProperties("crit_loc", FIELDP_ADD_CHOICES, array(
+      "0" => "[Tous]"
+    ));*/
+    //$MyPage->setFieldProperties("localisation_main", FIELDP_JS_EVENT, array("onchange" => "displayLocsRwanda()"));
+  }
+
+	$MyPage->addField("secteur", _("Secteur d'activité"), TYPC_BOL);
+	//Periode
+    $MyPage->addField("taux", _("Savoir le taux ?"), TYPC_BOL);
+	$MyPage->addField("date_debut", _("Date de debut"), TYPC_DTE);
+    $MyPage->addField("date_fin", _("Date de fin"), TYPC_DTE);
+	$MyPage->addHiddenType("hidden_check");
+
+	$Myjs = "	if (document.ADForm.HTML_GEN_BOL_taux.checked==false) {
+					document.ADForm.HTML_GEN_date_date_debut.disabled=true;
+					document.ADForm.HTML_GEN_date_date_fin.disabled=true;
+					}
+				if (document.ADForm.HTML_GEN_BOL_local.checked== false) {";
+          if ($agence_data['identification_client'] == 2){
+            $Myjs .=" document.ADForm.HTML_GEN_LSB_localisation_main.disabled=true;";
+            $Myjs .=" document.getElementById('localisation_crit').disabled=true;";
+          }else{
+            $Myjs .="document.ADForm.HTML_GEN_LSB_localisation.disabled=true;";
+          }
+
+        $Myjs .= "}
+			";
+
+	$Myjs2 = "function gereControle(){
+				document.ADForm.HTML_GEN_date_date_debut.disabled=(document.ADForm.HTML_GEN_BOL_taux.checked==true)?false:true;
+				document.ADForm.HTML_GEN_date_date_fin.disabled=(document.ADForm.HTML_GEN_BOL_taux.checked==true)?false:true;";
+        if ($agence_data['identification_client'] == 2){
+          $Myjs2 .=" document.ADForm.HTML_GEN_LSB_localisation_main.disabled=(document.ADForm.HTML_GEN_BOL_local.checked==true)?false:true;";
+          $Myjs2 .=" document.getElementById('localisation_crit').disabled=(document.ADForm.HTML_GEN_BOL_local.checked==true)?false:true;";
+        }else{
+          $Myjs2 .="document.ADForm.HTML_GEN_LSB_localisation.disabled=(document.ADForm.HTML_GEN_BOL_local.checked==true)?false:true;";
+        }
+  $Myjs2 .="return true;
+				}";
+
+	
+	//si le taux est coché les dates doivent être renseignées
+	$js_taux = "if (document.ADForm.HTML_GEN_BOL_taux.checked == true) {";
+	$js_taux .= "if((document.ADForm.HTML_GEN_date_date_debut.value == '') || (document.ADForm.HTML_GEN_date_date_fin.value == '')){";
+	$js_taux .= "msg += '- "._("Les dates de début et de fin doivent être renseignées.")."\\n';ADFormValid = false;\n}";
+	$js_taux .= "\n }";
+	$MyPage->addJS(JSP_BEGIN_CHECK, "js3", $js_taux);
+	$MyPage->addJS(JSP_FORM, "js", $Myjs);
+	$MyPage->addJS(JSP_FORM, "js2", $Myjs2);
+	$MyPage->addJS(JSP_FORM, "js4", $Myjs4);
+
+	
+	
+	$MyPage->setFieldProperties("tranche_age", FIELDP_JS_EVENT, array ("onchange" => " return KeepCount('HTML_GEN_BOL_tranche_age');"));
+	$MyPage->setFieldProperties("statjuridik", FIELDP_JS_EVENT, array ("onchange" => " return KeepCount('HTML_GEN_BOL_statjuridik');")); 
+	$MyPage->setFieldProperties("secteur", FIELDP_JS_EVENT, array ("onchange" => " return KeepCount('HTML_GEN_BOL_secteur');"));
+	$MyPage->setFieldProperties("local", FIELDP_JS_EVENT, array ("onchange" => " gereControle();return KeepCount('HTML_GEN_BOL_local');"));
+	$MyPage->setFieldProperties("taux", FIELDP_JS_EVENT, array ("onchange" => "gereControle();return KeepCount('HTML_GEN_BOL_taux');"));
+	//$MyPage->setFieldProperties("local", FIELDP_JS_EVENT, array ("onchange" => "gereControle();"));
+  //AT-33/AT-76 - Reload page with pre-selected data
+  if ($agence_data['identification_client'] == 2 && isset($localisation_main) && isset($local)) {
+    $MyPage->setFieldProperties("local", FIELDP_DEFAULT, $local);
+    $MyPage->setFieldProperties("localisation_main", FIELDP_DEFAULT, $localisation_main);
+    if (isset($tranche_age)){
+      $MyPage->setFieldProperties("tranche_age", FIELDP_DEFAULT, $tranche_age);
+    }
+    if (isset($statjuridik)){
+      $MyPage->setFieldProperties("statjuridik", FIELDP_DEFAULT, $statjuridik);
+    }
+    if (isset($secteur)){
+      $MyPage->setFieldProperties("secteur", FIELDP_DEFAULT, $secteur);
+    }
+    if (isset($taux)){
+      $MyPage->setFieldProperties("taux", FIELDP_DEFAULT, $taux);
+    }
+    if (isset($date_debut) && $date_debut != null){
+      $MyPage->setFieldProperties("date_debut", FIELDP_DEFAULT, $date_debut);
+    }
+    if (isset($date_fin) && $date_fin != null){
+      $MyPage->setFieldProperties("date_fin", FIELDP_DEFAULT, $date_fin);
+    }
+  }
+
+    //niveau Agence et Guichet
+    $nivArrayFenacobu = getNivFenacobuArray("type_niveau > 1");
+    // --> Sélection des champs à afficher dans id_loc
+    reset($nivArrayFenacobu);
+    $includeChoicesFenacobu = array();
+    while (list (, $value_fenacobu) = each($nivArrayFenacobu)) {
+        if ($value_fenacobu['type_niveau'] == 2)
+            //array_push($includeChoicesFenacobu, $value_fenacobu['id'] =>$value_fenacobu['libelle_localisation']);
+            $arrayDisplay[$value_fenacobu['id'] ] =$value_fenacobu['libelle_niveau'];
+
+    }
+
+    //$array_test = array(1=> 'test1', 2=> 'test2');print_rn($array_test);
+    $MyPage->addField("n_agence", _("Niveau agence"), TYPC_LSB);
+    $MyPage->addField("n_guichet", _("Niveau guichet"), TYPC_LSB);
+    $MyPage->setFieldProperties("n_agence", FIELDP_ADD_CHOICES, $arrayDisplay);
+    $MyPage->setFieldProperties("n_agence", FIELDP_HAS_CHOICE_TOUS, true);
+    $MyPage->setFieldProperties("n_agence", FIELDP_HAS_CHOICE_AUCUN, false);
+    //$MyPage->setFieldProperties("n_agence", FIELDP_IS_REQUIRED, true);
+
+    $jsCodeNivFenacobu = "function displayNivFenacobu() {\n";
+    $jsCodeNivFenacobu .= "for (i=0; i < document.ADForm.HTML_GEN_LSB_n_guichet.length; ++i) document.ADForm.HTML_GEN_LSB_n_guichet.options[i] = null;\n"; //Vide les choix
+    $jsCodeNivFenacobu .= "document.ADForm.HTML_GEN_LSB_n_guichet.length = 0;";
+    $jsCodeNivFenacobu .= "document.ADForm.HTML_GEN_LSB_n_guichet.options[document.ADForm.HTML_GEN_LSB_n_guichet.length] = new Option('[Tous]', 0, true, true);\n"; //[Aucun]
+    $jsCodeNivFenacobu .= "document.ADForm.HTML_GEN_LSB_n_guichet.selectedIndex = 0; document.ADForm.HTML_GEN_LSB_n_guichet.length = 1; \n";
+    reset($nivArrayFenacobu);
+    while (list (, $value_fenacobu) = each($nivArrayFenacobu)) {
+        if ($value_fenacobu['parent'] != '') {
+            $jsCodeNivFenacobu .= "\tif (document.ADForm.HTML_GEN_LSB_n_agence.value == " . $value_fenacobu['parent'] . ")\n";
+            $jsCodeNivFenacobu .= "\t\tdocument.ADForm.HTML_GEN_LSB_n_guichet.options[document.ADForm.HTML_GEN_LSB_n_guichet.length] = new Option('" . $value_fenacobu['libelle_niveau'] . "', '" . $value_fenacobu['id'] . "', false, false);\n";
+        }
+    }
+    $jsCodeNivFenacobu .= "\n}";
+    // --> Ajout de la fonction dans le formulaire
+    $MyPage->addJS(JSP_FORM, "jsCodeNivFenacobu", $jsCodeNivFenacobu);
+    // --> ajout des champs
+
+    //AT-150
+    // --> Page reloaded Constrution des choix disponibles pour le district
+    if (isset($n_agence) && isset($n_guichet)){
+        $choices = array();
+        reset($nivArrayFenacobu);
+        while (list(, $value) = each($nivArrayFenacobu)) {
+            if ($value['parent'] == $n_agence)
+                $choices[$value['id']] = $value['libelle_niveau'];
+        }
+        $MyPage->setFieldProperties("n_guichet", FIELDP_ADD_CHOICES, $choices);
+        $MyPage->setFieldProperties("n_guichet", FIELDP_DEFAULT, $n_guichet);
+    }
+    else{
+//        $MyPage->setFieldProperties("n_guichet", FIELDP_INCLUDE_CHOICES, array(
+//            "0" => "[Tous]"
+//        ));
+        $MyPage->setFieldProperties("n_guichet", FIELDP_HAS_CHOICE_TOUS, true);
+        $MyPage->setFieldProperties("n_guichet", FIELDP_HAS_CHOICE_AUCUN, false);
+    }
+    //$MyPage->setFieldProperties("n_guichet", FIELDP_IS_REQUIRED, true);
+    $MyPage->setFieldProperties("n_agence", FIELDP_JS_EVENT, array("onchange" => "displayNivFenacobu()"));
+
+
+
+    //Boutons
+  	$MyPage->addFormButton(1,1,"pdf", _("Rapport PDF"), TYPB_SUBMIT);
+  	$MyPage->setFormButtonProperties("pdf", BUTP_PROCHAIN_ECRAN, "Cra-17");
+    $MyPage->addFormButton(1,2,"excel", _("Export EXCEL"), TYPB_SUBMIT);
+    $MyPage->setFormButtonProperties("excel", BUTP_PROCHAIN_ECRAN, "Cra-18");
+  	$MyPage->addFormButton(1,3,"csv", _("Export CSV"), TYPB_SUBMIT);
+  	$MyPage->setFormButtonProperties("csv", BUTP_PROCHAIN_ECRAN, "Cra-18");
+  	$MyPage->addFormButton(1,4,"annuler", _("Annuler"), TYPB_SUBMIT);
+  	$MyPage->setFormButtonProperties("annuler", BUTP_PROCHAIN_ECRAN, "Gen-13");
+  	$MyPage->setFormButtonProperties("annuler", BUTP_CHECK_FORM, false);
+  	//HTML
+  	$MyPage->buildHTML();
+  	echo $MyPage->getHTML();
+} /*}}}*/
+
+/*{{{ Cra-17 et Cra-18 : Impression concentration clients */
+else if ($global_nom_ecran == 'Cra-17' || $global_nom_ecran == 'Cra-18') {
+	$list_criteres = array();
+	$critere = array();
+
+	setGlobalIdAgence($agence);
+
+  	if($tranche_age) $critere[] = _("Tranches d'âge");
+  	if($statjuridik) $critere[] = _("Statut Juridique");
+  	
+	if($local) 		 $critere[] = _("Localisations");
+	if($secteur) 	 $critere[] = _("Secteurs d'activité");
+
+	$list_criteres = array_merge($list_criteres, array (_("Répartition par ") => implode(", ", $critere)));
+	//if taux is set libere les date debut et fin 
+	//enregistrer le taux avec la date debut et fin
+  	if ($taux) {
+  		$debut = php2pg($date_debut);
+  		$fin = php2pg($date_fin);
+  		$tauxCroissance = calculTauxCroissance($debut, $fin);
+  		$list_criteres 	= array_merge($list_criteres, array(_("Le taux de croissance est de") => $tauxCroissance." ".sprintf(_("entre le %s et le %s"),$date_debut,$date_fin)));
+  }
+
+  if (isset($localisation_main) && $localisation_main > 0){
+    $concentre_data = getConcentrationClients($tranche_age, $statjuridik, $local, $secteur, null, $localisation_main, $crit_loc);
+  }else {
+    $concentre_data = getConcentrationClients($tranche_age, $statjuridik, $local, $secteur, $localisation);
+  }
+
+  if ($global_nom_ecran == 'Cra-18') {
+		$xml = xmlConcentrationClients($concentre_data, $list_criteres, true);
+        //Génération du CSV grâce à XALAN
+        $csv_file = xml_2_csv($xml, 'concentration_client.xslt');
+
+        //Message de confirmation + affichage du rapport dans une nouvelle fenêtre
+        if (isset($excel) && $excel == 'Export EXCEL'){
+            echo getShowEXCELHTML("Gen-13", $csv_file);
+        }
+        else{
+            echo getShowCSVHTML("Gen-13", $csv_file);
+        }
+	} elseif ($global_nom_ecran == 'Cra-17') {
+	
+		$xml = xmlConcentrationClients($concentre_data, $list_criteres);
+		
+		//Génération du XSL-FO (grâce au XSLT) et du PDF (grâce à FOP)
+		$fichier_pdf = xml_2_xslfo_2_pdf($xml, 'concentration_client.xslt');
+		//Message de confirmation + affichage du rapport dans une nouvelle fenêtre
+		echo get_show_pdf_html("Gen-13", $fichier_pdf);
+}
+
+} /*}}}*/
+
+elseif($global_nom_ecran == "Cra-14") {
+  $MyPage = new HTML_GEN2(_("Exportation des Clients/Comptes sous format EXCEL/CSV"));
+  $liste_agences = getAllIdNomAgence();
+  resetGlobalIdAgence();
+  if (isSiege()) {
+     //Agence- Tri par agence
+     unset($liste_agences[$global_id_agence]);
+     $MyPage->addField("agence", _("Agence"), TYPC_LSB);
+     $MyPage->setFieldProperties("agence", FIELDP_ADD_CHOICES, $liste_agences);
+     //$myForm->setFieldProperties("agence", FIELDP_HAS_CHOICE_TOUS, true);
+  }
+  //Boutons
+  $MyPage->addFormButton(1,1,"excel", _("Export EXCEL"), TYPB_SUBMIT);
+  $MyPage->setFormButtonProperties("excel", BUTP_PROCHAIN_ECRAN, "Cra-15");
+  $MyPage->addFormButton(1,2,"csv", _("Export CSV"), TYPB_SUBMIT);
+  $MyPage->setFormButtonProperties("csv", BUTP_PROCHAIN_ECRAN, "Cra-15");
+  $MyPage->addFormButton(1,3,"annuler", _("Annuler"), TYPB_SUBMIT);
+  $MyPage->setFormButtonProperties("annuler", BUTP_PROCHAIN_ECRAN, "Gen-13");
+  $MyPage->setFormButtonProperties("annuler", BUTP_CHECK_FORM, false);
+  //HTML
+  $MyPage->buildHTML();
+  echo $MyPage->getHTML();
+}
+elseif($global_nom_ecran == "Cra-15") {
+  //***********************
+  setGlobalIdAgence($agence);
+  set_time_limit(0);
+  $DATA = getListeClientComptes();
+  //echo "taille =".sizeof($DATA->param);
+  //Génération du fichier CSV
+  $xml = xml_liste_clients_comptes($DATA);
+  $csv_file = xml_2_csv($xml, 'liste_clients_comptes.xslt');
+  //Message de confirmation + affichage du rapport dans une nouvelle fenêtre
+  if (isset($excel) && $excel == 'Export EXCEL'){
+    echo getShowEXCELHTML("Gen-13", $csv_file);
+  }
+  else{
+    echo getShowCSVHTML("Gen-13", $csv_file);
+  }
+
+  //***********************
+}
+
+/*{{{ Cra-19 : PSR - Personnalisation rapport parts sociales  reprises */
+else
+	if ($global_nom_ecran == 'Cra-19' ) {
+		$html = new HTML_GEN2(_("Personnalisation du rapport"));
+
+
+    //Remettre $global_id_agence à l'identifiant de l'agence courante
+		resetGlobalIdAgence();
+		//Agence- Tri par agence
+		 $list_agence = getAllIdNomAgence();
+		 if (isSiege()) {
+		      unset ($list_agence[$global_id_agence]);
+		      $html->addField("agence", _("Agence"), TYPC_LSB);
+		      $html->setFieldProperties("agence", FIELDP_ADD_CHOICES, $list_agence);
+		      $html->setFieldProperties("agence", FIELDP_HAS_CHOICE_AUCUN, true);
+		      $html->setFieldProperties("agence", FIELDP_IS_REQUIRED, true);
+		  }
+
+		$html->addField("date_deb", _("Date de début"), TYPC_DTE);
+		$html->setFieldProperties("date_deb", FIELDP_DEFAULT, date("01/01/Y"));
+		$html->setFieldProperties("date_deb", FIELDP_IS_REQUIRED, true);
+
+		$html->addField("date_fin", _("Date de fin"), TYPC_DTE);
+		$html->setFieldProperties("date_fin", FIELDP_DEFAULT, date("d/m/Y"));
+		$html->setFieldProperties("date_fin", FIELDP_IS_REQUIRED, true);
+
+		$html->addFormButton(1, 1, "valider", _("Rapport PDF"), TYPB_SUBMIT);
+		$html->setFormButtonProperties("valider", BUTP_PROCHAIN_ECRAN, "Cra-20");
+    $html->addFormButton(1, 2, "excel", _("Export EXCEL"), TYPB_SUBMIT);
+    $html->setFormButtonProperties("excel", BUTP_PROCHAIN_ECRAN, "Cra-21");
+		$html->addFormButton(1, 3, "csv", _("Export CSV"), TYPB_SUBMIT);
+		$html->setFormButtonProperties("csv", BUTP_PROCHAIN_ECRAN, "Cra-21");
+
+		$html->addFormButton(1, 4, "annuler", _("Annuler"), TYPB_SUBMIT);
+		$html->setFormButtonProperties("annuler", BUTP_PROCHAIN_ECRAN, "Gen-13");
+		$html->setFormButtonProperties("annuler", BUTP_CHECK_FORM, false);
+		$html->buildHTML();
+		echo $html->getHTML();
+
+	}
+/*{{{ Cra-20 : PSR- Impression ou export csv parts sociales reprises' */
+else
+	if ($global_nom_ecran == 'Cra-20' || $global_nom_ecran == 'Cra-21' ) {
+    $list_criteres = array ("Date du  "=>$date_deb,"Au       "=>$date_fin);
+    if (isSiege()) {
+     	setGlobalIdAgence($agence);
+
+     }
+		$myErr=getPartSocialesReprises($date_deb,$date_fin);
+		if($global_nom_ecran == 'Cra-20') { //PDF
+			$xml=xml_ps_reprise($myErr->param,$list_criteres);
+			$fichier_pdf = xml_2_xslfo_2_pdf($xml, 'ps_reprises.xslt');
+
+			//Message de confirmation + affichage du rapport dans une nouvelle fenêtre
+			echo get_show_pdf_html("Gen-13", $fichier_pdf);
+
+		}elseif ($global_nom_ecran == "Cra-21") {//CSV
+			//Génération du fichier CSV
+			$xml =xml_ps_reprise($myErr->param,$list_criteres,true);
+			$csv_file = xml_2_csv($xml, 'ps_reprises.xslt');
+
+			//Message de confirmation + affichage du rapport dans une nouvelle fenêtre
+      if (isset($excel) && $excel == 'Export EXCEL'){
+        echo getShowEXCELHTML("Gen-13", $csv_file);
+      }
+      else{
+			  echo getShowCSVHTML("Gen-13", $csv_file);
+      }
+		}
+
+
+	}
+
+
+else signalErreur(__FILE__,__LINE__,__FUNCTION__, sprintf(_("L'écran %s n'a pas pu être trouvé"), $global_nom_ecran));
+?>

@@ -1,0 +1,42 @@
+<!-- DTD pour le rapports operations diverses -->
+
+<!-- Element root -->
+<!ELEMENT commission_agent (header,header_contextuel, infos_syn, agent*)>
+<!-- Un en-tete commun a tous -->
+
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- En-tete contextuel -->
+<!ELEMENT header_contextuel (criteres_recherche)>
+<!-- Criteres de recherche commun -->
+<!ENTITY % mod_criteres SYSTEM "criteres_recherche.dtd">
+%mod_criteres;
+
+<!ELEMENT infos_syn (devise, tot_depot, tot_retrait, tot_comm_agent, tot_comm_inst, tot_commission, tot_client)>
+<!ELEMENT devise (#PCDATA)>
+<!ELEMENT tot_depot (#PCDATA)>
+<!ELEMENT tot_retrait (#PCDATA)>
+<!ELEMENT tot_comm_agent (#PCDATA)>
+<!ELEMENT tot_comm_inst (#PCDATA)>
+<!ELEMENT tot_commission (#PCDATA)>
+<!ELEMENT tot_client (#PCDATA)>
+
+<!ELEMENT agent (nom_agent, depot*, retrait*, client*)>
+<!ELEMENT nom_agent (#PCDATA)>
+
+<!ELEMENT depot (his*)>
+<!ELEMENT retrait (his*)>
+<!ELEMENT client (his*)>
+
+<!ELEMENT his (date_mod, mnt_transac, num_complet_cpte, nom_client, mnt_comm_inst, mnt_comm_agent, mnt_comm_agent_inst, num_transac, mnt_comm_client)>
+<!ELEMENT mnt_comm_agent (#PCDATA)>
+<!ELEMENT mnt_comm_client (#PCDATA)>
+<!ELEMENT mnt_comm_inst (#PCDATA)>
+<!ELEMENT mnt_comm_agent_inst (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT num_complet_cpte (#PCDATA)>
+<!ELEMENT mnt_transac (#PCDATA)>
+<!ELEMENT date_mod (#PCDATA)>
+<!ELEMENT num_transac (#PCDATA)>
+

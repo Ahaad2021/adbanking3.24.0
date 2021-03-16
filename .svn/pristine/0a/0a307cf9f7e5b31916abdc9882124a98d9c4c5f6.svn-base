@@ -1,0 +1,3114 @@
+<?php
+
+
+/* vim: set expandtab softtabstop=2 shiftwidth=2: */
+/**
+ * Génère le code XML pour les rapports épargne
+ * @package Rapports
+ */
+
+require_once 'lib/misc/xml_lib.php';
+require_once 'modules/rapports/xslt.php';
+require_once 'lib/misc/divers.php';
+require_once 'lib/dbProcedures/client.php';
+
+
+function xml_epargne($DATA, $list_criteres, $export_csv = false) {
+
+  //Génération de code XML pour les rapports sur les mouvements de ccmptes d'épargne
+  //DATA contient la liste des mouvements de comptes sélectionés suivant les critères
+  //la liste des critères est un tableau associatif : champs=>valeur
+
+  basculer_langue_rpt();
+
+
+  setMonnaieCourante($DATA["devise"]);
+  global $adsys, $global_id_profil, $global_id_client;
+
+  $document = create_xml_doc("compte_epargne", "compte_epargne.dtd");
+
+  //définition de la racine
+  $root = $document->root();
+
+  //En-tête généraliste
+  gen_header($root, 'EPA-EXT');
+  $AGC = getAgenceDatas($global_id_agence);
+  $prodPS = $AGC["id_prod_cpte_parts_sociales"];
+  //control table column & header in xslt
+  if($DATA["id_produit"] == $prodPS ){
+        $root->new_child("isset_ps", $prodPS);
+  }
+
+  //En-tête contextuel
+  $header_contextuel = $root->new_child("header_contextuel", "");
+  //control csv
+  if($DATA["id_produit"] == $prodPS ){
+  $header_contextuel->new_child("isset_ps_csv", $prodPS);
+  }
+  gen_criteres_recherche($header_contextuel, $list_criteres);
+
+  $infos_synthetiques = $header_contextuel->new_child("infos_synthetiques", "");
+  //Contôle sur l'affichage des soldes
+  $access_solde = get_profil_acces_solde($global_id_profil, $DATA['id_produit']);
+  $access_solde_vip = get_profil_acces_solde_vip($global_id_profil, $global_id_client);
+  if(manage_display_solde_access($access_solde, $access_solde_vip))
+  	$infos_synthetiques->new_child("solde", afficheMontant($DATA["solde"], true));
+  $infos_synthetiques->new_child("mnt_bloq", afficheMontant($DATA["mnt_bloq"], true));
+  $infos_synthetiques->new_child("date_ouverture", localiser_date_rpt($DATA["date_ouverture"]));
+  $infos_synthetiques->new_child("produit", $DATA["produit"]);
+  $infos_synthetiques->new_child("solde_min", $DATA["taux_int"] > 0 ? afficheMontant($DATA["solde_min"], true) : _("Compte non rémunéré"));
+  $infos_synthetiques->new_child("mnt_min", afficheMontant($DATA["mnt_min"], true));
+  if(manage_display_solde_access($access_solde, $access_solde_vip))
+  	$infos_synthetiques->new_child("solde_disp", afficheMontant($DATA["solde_disp"], true));
+  $infos_synthetiques->new_child("taux_int", $DATA["taux_int"] == 0 ? _("Non rémunéré") : affichePourcentage($DATA["taux_int"], 2, true));
+//xml pour les champs PS
+  if($DATA["id_produit"] == $prodPS ){//info a afficher dans le pdf/csv pour ps
+  	$infos_synthetiques->new_child("ps_souscrites", $DATA["souscrites"]);
+  	$infos_synthetiques->new_child("ps_lib", $DATA["lib"]);
+
+  }
+
+  $infos_synthetiques->new_child("devise", $DATA["devise"]);
+	if ($DATA ["id_produit"] == $prodPS) {
+		//body pour le cas PS
+		if (is_array ( $DATA ["InfoMvts"] )) {
+			foreach ( $DATA ["InfoMvts"] as $value ) {
+				$mouvement = $root->new_child ( "mouvement", "" );
+				$tmp_dte1 = pg2phpDatebis ( $value ["date"] );
+				// On ne doit localiser que la partie date et laisser la partie :hhmm
+				$tmp_dte2 = localiser_date_rpt ( $tmp_dte1 [1] . "/" . $tmp_dte1 [0] . "/" . $tmp_dte1 [2] ) . " " . $tmp_dte1 [3] . ":" . $tmp_dte1 [4];
+				$mouvement->new_child ( "date_mouv", $tmp_dte2 );
+				$mouvement->new_child ( "num_trans", $value ["id_his"] );
+				// FIXME il y a actuellement un pb avec le support XML pour l'encodage des caractères spéciaux
+				$libel_ecriture = new Trad ( $value ["libel_ecriture"] );
+				$libel_ecriture = $libel_ecriture->traduction ();
+				$operation = ereg_replace ( "é|è|ê", "e", $libel_ecriture );
+				$operation = ereg_replace ( "ô", "o", $operation );
+				$operation = ereg_replace ( "à", "a", $operation );
+				$operation = ereg_replace ( "ù", "u", $operation );
+
+				$mouvement->new_child ( "libel_ope", $operation );
+				if ($value ["sens"] == "d")
+					$mouvement->new_child ( "mnt_retrait", afficheMontant ( $value ["montant"], false, $export_csv ) );
+				else if ($value ["sens"] == "c")
+					$mouvement->new_child ( "mnt_depot", afficheMontant ( $value ["montant"], false, $export_csv ) );
+				$mouvement->new_child ( "nbre_jour_inactivite", $value ["nbre_jours_inactivite"] );
+				if (manage_display_solde_access ( $access_solde, $access_solde_vip ))
+					$mouvement->new_child ( "solde", afficheMontant ( $value ["solde"], false, $export_csv ) );
+
+					// gestion de nombre ps mouvementer pour le cas de produit ps en se basant sur les fonctions qui concerne
+				$fonction_ps = array (
+						28,
+						20,
+						23
+				);
+				if (in_array ( $value ["type_fonction"], $fonction_ps )) {
+					if (isset ( $value ["infos"] )) {
+						$mouvement->new_child ( "nbre_ps_mouvementer", $value ["infos"] );
+					}
+				}
+
+
+			}
+		}
+	} else {
+
+		// body pour le cas autre compte
+		if (is_array ( $DATA ["InfoMvts"] )) {
+			foreach ( $DATA ["InfoMvts"] as $value ) {
+				$mouvement = $root->new_child ( "mouvement", "" );
+				$tmp_dte1 = pg2phpDatebis ( $value ["date"] );
+				// On ne doit localiser que la partie date et laisser la partie :hhmm
+				$tmp_dte2 = localiser_date_rpt ( $tmp_dte1 [1] . "/" . $tmp_dte1 [0] . "/" . $tmp_dte1 [2] ) . " " . $tmp_dte1 [3] . ":" . $tmp_dte1 [4];
+				$mouvement->new_child ( "date_mouv", $tmp_dte2 );
+				$mouvement->new_child ( "num_trans", $value ["id_his"] );
+				// FIXME il y a actuellement un pb avec le support XML pour l'encodage des caractères spéciaux
+				$libel_ecriture = new Trad ( $value ["libel_ecriture"] );
+				$libel_ecriture = $libel_ecriture->traduction ();
+				$operation = ereg_replace ( "é|è|ê", "e", $libel_ecriture );
+				$operation = ereg_replace ( "ô", "o", $operation );
+				$operation = ereg_replace ( "à", "a", $operation );
+				$operation = ereg_replace ( "ù", "u", $operation );
+
+                if ($value["type_fonction"] == '76' && $value["type_operation"] == '120') {
+
+                    if (isset($value["info_ecriture"])) {
+                        $numcpts = explode('|', $value["info_ecriture"]);
+
+                        if (count($numcpts) == 2) {
+
+                            $operation .= ":\n";
+                            $operation .= "Compte source: " . $numcpts[0];
+                            $operation .= "\nCompte destination: " . $numcpts[1];
+                        }
+                    }
+                }
+
+                // Vérifier liste opération à modifier.
+                if (in_array($value['type_operation'], $adsys["adsys_operation_cheque_infos"])) {
+                    $operation = getChequeno($value['id_his'], $operation, $value['info_ecriture']);
+                }
+
+				$mouvement->new_child ( "libel_ope", $operation );
+				if ($value ["sens"] == "d")
+					$mouvement->new_child ( "mnt_retrait", afficheMontant ( $value ["montant"], false, $export_csv ) );
+				else if ($value ["sens"] == "c")
+					$mouvement->new_child ( "mnt_depot", afficheMontant ( $value ["montant"], false, $export_csv ) );
+				$mouvement->new_child ( "nbre_jour_inactivite", $value ["nbre_jours_inactivite"] );
+				if (manage_display_solde_access ( $access_solde, $access_solde_vip ))
+					$mouvement->new_child ( "solde", afficheMontant ( $value ["solde"], false, $export_csv ) );
+
+			}
+		}
+	}
+  reset_langue();
+
+  return $document->dump_mem(true);
+
+}
+
+function xml_comptes_inactifs($DATA, $nbre_jours, $produit, $export_csv = false) {
+  /*
+  Génère le code XML du rapport des comptes inactifs
+  */
+
+  global $global_monnaie;
+
+  $id_prod = $produit == null ? 0 : $produit["id"];
+  $produitLibel = $produit == null ? _("Tous") : $produit['libel'];
+  // le nombre total de comptes d'épargne financiers
+  $total_comptes = getComptesFinanciers(array("id_prod" => $id_prod, "nb_jours" => 0));
+
+  // nombre total de comptes créés il y a moins de $nbre_jour
+  $comptes_existant = getComptesFinanciers(array("id_prod" => $id_prod, "nb_jours" => $nbre_jours));
+
+  $document = create_xml_doc("comptes_inactifs", "comptes_inactifs.dtd");
+
+  //définition de la racine
+  $root = $document->root();
+
+  //En-tête généraliste
+  gen_header($root, 'EPA-INA');
+
+  //En-tête contextuel
+  $header_contextuel = $root->new_child("header_contextuel", "");
+
+
+  //body
+  if (is_array($DATA)) {
+    $total_general_cptes = 0;
+    $total_general_montant = 0;
+
+    foreach ($DATA as $key =>$value) {
+      setMonnaieCourante($value["devise"]);
+      $clients[$key] = $root->new_child("groupe_comptes", "");
+      $clients[$key]->new_child("lib_prod_ep", $value["libel_prod_ep"]);
+      $comptes = $value["comptes"];
+      //$sous_tot_compte = 0;
+      $sous_tot_solde = 0;
+      if(sizeof($comptes)!=0){
+        foreach($comptes as $key2 => $value2 ){
+          setMonnaieCourante($global_monnaie);
+          $ligne_compte = $clients[$key]->new_child("ligne_compte", "");
+          $ligne_compte->new_child("num_compte", $value2["num_complet_cpte"]);
+          $ligne_compte->new_child("num_client", $value2["id_titulaire"]);
+          $ligne_compte->new_child("solde_compte", afficheMontant($value2["solde"], false, $export_csv));
+          $ligne_compte->new_child("cv", afficheMontant($value2["cv"], false, $export_csv));
+          $ligne_compte->new_child("date_derniere_operation", pg2phpDate($value2["last_date"]));
+          $date_dern_op = pg2phpDate($value2["last_date"]);
+          $nbre_jours_inactifs = nbreDiffJours($date_dern_op, date("d/m/Y"));
+          $ligne_compte->new_child("nbre_jours_inactifs", $nbre_jours_inactifs);
+          $ligne_compte->new_child("nom_client", $value2["nom_client"]);
+          //$sous_tot_compte++;
+          $sous_tot_solde += $value2["solde"];
+        }
+      }
+
+      // sous totaux
+      $st = $clients[$key]->new_child("sous_total", "");
+      $sous_tot_compte = sizeof($comptes);
+      $st->new_child("sous_tot_compte", $sous_tot_compte);
+      $st->new_child("sous_tot_solde", afficheMontant($sous_tot_solde, true));
+      $total_general_cptes += $sous_tot_compte;
+      $total_general_montant  += $sous_tot_solde;
+    }
+
+    $list_criteres = array ();
+    $list_criteres[_("Date du rapport")] = $DATA['date_rapport'];
+    $gest = (getLibel("ad_uti", $_POST["gest"]) =="")?_("Tous"):getLibel("ad_uti", $_POST["gest"]);
+    $list_criteres[_("Gestionnaire")] = $gest;
+    $list_criteres[_("Produit d'épargne")] = $produitLibel;
+    gen_criteres_recherche($header_contextuel, $list_criteres);
+
+    $infos_synthetiques = $header_contextuel->new_child("infos_synthetiques", "");
+    $infos_synthetiques->new_child("etat_compte_definition", ($DATA['etat'] == 1)?"Comptes inactifs / dormants":(($DATA['etat'] == 2)?"Comptes inactifs":"Comptes dormants"));
+    $infos_synthetiques->new_child("nbre_jours", $nbre_jours);
+    $infos_synthetiques->new_child("total_general_cptes", $total_general_cptes);
+    $infos_synthetiques->new_child("comptes_existant", $comptes_existant);
+    $infos_synthetiques->new_child("total_comptes", $total_comptes);
+    $pc = $total_general_cptes / $comptes_existant;
+    $infos_synthetiques->new_child("total_prc_comptes", affichePourcentage($pc));
+    $pc = $total_general_cptes / $total_comptes;
+    $infos_synthetiques->new_child("total_nbre_comptes", affichePourcentage($pc));
+
+    $total_general = $clients[$key]->new_child("total_general", "");
+    $total_general->new_child("total_nombre", $total_general_cptes);
+    $total_general->new_child("total_montant", afficheMontant($total_general_montant, true));
+  }
+
+  return $document->dump_mem(true);
+}
+
+function xml_DAT_echeance($DATA, $list_criteres, $export_csv = false) {
+  /*
+  fonction qui génère le code XML pour le rapport des DAT arrivant à échéance
+  */
+  global $global_monnaie;
+  global $global_multidevise;
+  $document = create_xml_doc("DAT_echeance", "DAT_echeance.dtd");
+  //  $global_multidevise=false;
+  //définition de la racine
+  $root = $document->root();
+
+  //En-tête généraliste
+  gen_header($root, 'EPA-DAT');
+
+  //En-tête contextuel
+  $header_contextuel = $root->new_child("header_contextuel", "");
+  gen_criteres_recherche($header_contextuel, $list_criteres);
+
+  //body
+  if (is_array($DATA)) {
+    $total_general_cptes = 0;
+    $total_general_montant = 0;
+
+    foreach ($DATA as $value) {
+      if ($value["total"]["nombre"] > 0) {
+        $ligne_DAT = $root->new_child("ligne_DAT", "");
+        $groupe = $ligne_DAT->new_child("groupe", "");
+        $groupe->new_child("echeance", $value["libelle_echeance"]);
+        if (is_array($value["details"])) {
+          $solde_sous_total = 0;
+          foreach ($value["details"] as $v1) {
+            $ligne = $ligne_DAT->new_child("ligne", "");
+            $ligne->new_child("num_compte", $v1["num_complet_cpte"]);
+            switch ($v1["statut_juridique"]) {
+            case 1 :
+              $ligne->new_child("nom_client", $v1["pp_nom"] . " " . $v1["pp_prenom"]);
+              break;
+            case 2 :
+              $ligne->new_child("nom_client", $v1["pm_raison_sociale"]);
+              break;
+            case 3 :
+              $ligne->new_child("nom_client", $v1["gi_nom"]);
+            }
+            setMonnaieCourante($v1["devise"]);
+            $ligne->new_child("num_client", makeNumClient($v1["id_titulaire"]));
+            $ligne->new_child("solde_compte", afficheMontant($v1["solde"], false, $export_csv));
+            $contre_valeur = calculeCV($v1["devise"], $global_monnaie, $v1["solde"]);
+            $solde_sous_total += $contre_valeur;
+            setMonnaieCourante($global_monnaie);
+            if ($global_multidevise) {
+              $ligne->new_child("solde_contre_valeur", afficheMontant($contre_valeur, false, $export_csv));
+            }
+            $ligne->new_child("date_echeance", pg2phpDate($v1["date_echeance"]));
+            $ligne->new_child("taux_interet", affichePourcentage($v1["tx_interet"]));
+            if ($v1["dat_prolongeable"] == 'f')
+              $ligne->new_child("proroge", "Non");
+            else
+              if ($v1["dat_prolongeable"] == 't') {
+                $temp_date = pg2phpDate($v1["date_ouverture"]);
+                $temp_date = explode("/", $temp_date);
+                $date_echeance_initiale = mktime(0, 0, 0, $temp_date[1] + $v1["terme"], $temp_date[0], $temp_date[2]);
+                $temp_date = pg2phpDate($v1["date_echeance"]);
+                $temp_date = explode("/", $temp_date);
+                $date_echeance_actuelle = mktime(0, 0, 0, $temp_date[1], $temp_date[0], $temp_date[2]);
+
+                if ($date_echeance_actuelle == $date_echeance_initiale) {
+                  $ligne->new_child("proroge", _("Non"));
+                } else
+                  if ($date_echeance_actuelle > $date_echeance_initiale)
+                    $ligne->new_child("proroge", _("Oui"));
+              }
+            // Ajouté par TF - 04/09/2002 : dcision du client
+            if ($v1["dat_decision_client"] == 'f')
+              $ligne->new_child("decision", _("Pas de décision"));
+            else {
+              if ($v1["dat_prolongation"] == 't')
+                $ligne->new_child("decision", _("Prolonge"));
+              else
+                $ligne->new_child("decision", _("Ne prolonge pas"));
+            }
+          }
+        }
+        $sous_total = $ligne_DAT->new_child("sous_total", "");
+        // $solde_sous_total
+        //$sous_total->new_child("nombre",$solde_sous_total);
+        $sous_total->new_child("nombre", $value["total"]["nombre"]);
+        $total_general_cptes += $value["total"]["nombre"];
+        setMonnaieCourante($global_monnaie);
+        //	      $sous_total->new_child("montant_total",afficheMontant($value["total"]["montant_total"]));//
+        $sous_total->new_child("montant_total", afficheMontant($solde_sous_total, true));
+        $total_general_montant += $solde_sous_total;
+      }
+    }
+    setMonnaieCourante($global_monnaie);
+    $total_general = $root->new_child("total_general", "");
+    $total_general->new_child("total_nombre", $total_general_cptes);
+    $total_general->new_child("total_montant", afficheMontant($total_general_montant, true));
+  }
+
+  return $document->dump_mem(true);
+
+}
+function xml_CpteEpargneCloture($DATA, $list_criteres, $export_csv = false) {
+  /*
+  fonction qui génère le code XML pour le rapport des DAT arrivant à échéance
+  */
+  global $global_monnaie;
+  global $global_multidevise;
+  global $adsys;
+  $document = create_xml_doc("cptes_epargne_cloture", "cptes_epargne_cloture.dtd");
+  //  $global_multidevise=false;
+  //définition de la racine
+  $root = $document->root();
+
+  //En-tête généraliste
+  gen_header($root, 'EPA-CEC');
+
+  //En-tête contextuel
+  $header_contextuel = $root->new_child("header_contextuel", "");
+  gen_criteres_recherche($header_contextuel, $list_criteres);
+
+  //body
+  if (is_array($DATA)) {
+    $total_general_cptes = 0;
+    $total_general_montant = 0;
+
+    foreach ($DATA as $value) {
+    	 $ligne= $root->new_child("ligne_cpte", "");
+       $ligne->new_child("num_cpte", $value['num_complet_cpte']);
+       $ligne->new_child("num_client", $value["id_client"]);
+       $ligne->new_child("nom_client", getClientNameByArray($value));
+
+       setMonnaieCourante($value["devise"]);
+       $ligne->new_child("solde_clot",  afficheMontant($value["solde_clot"],true,false) );
+
+       $ligne->new_child("solde_clot_cv", afficheMontant($value["solde_clot_cv"],false,$export_csv) );
+       $ligne->new_child("date_clot",  pg2phpDate($value["date_clot"])) ;
+       $ligne->new_child("raison_clot", adb_gettext($adsys["adsys_raison_cloture"][$value["raison_clot"]]));
+       $ligne->new_child("classe_comptable", adb_gettext($adsys["adsys_type_cpte_comptable"][$value["classe_comptable"]]));
+       $ligne->new_child("produit", $value["libel"]);
+       $ligne->new_child("devise", $value["devise"]);
+       $total_general_cptes += 1;
+       $total_general_montant += $value["solde_clot_cv"];
+
+    }
+    setMonnaieCourante($global_monnaie);
+    $total_general = $root->new_child("total", "");
+    $total_general->new_child("total_nombre", $total_general_cptes);
+    $total_general->new_child("total_montant", afficheMontant($total_general_montant, false,$export_csv));
+    $total_general->new_child("devise",$global_monnaie );
+  }
+
+  return $document->dump_mem(true);
+
+}
+function xml_etat_general_comptes_clients($DATA, $CRIT, $export_csv = false,$date_deb=null)
+// Fonction qui génère le code XML pour le rapport "Etat général des comptes des clients"
+// ou le rapport "Solde des comptes de base mouvementés dans la journée"
+{
+  global $global_monnaie;
+
+  reset($DATA);
+  // Création racine
+  $document = create_xml_doc("etat_general_comptes_clients", "etat_general_comptes_clients.dtd");
+
+  //Element root
+  $root = $document->root();
+
+  //En-tête généraliste
+  if($date_deb==null)
+  {
+    $date = date("d/m/Y");
+  }
+  else
+  {
+    $date = $date_deb;
+  }
+  if (isset ($CRIT[_("Date")])) // C'est le rapport 25
+    gen_header($root, 'EPA-BAJ', " : " . $CRIT[_("Date")] . " ");
+  else // C'est le rapport 23
+    gen_header($root, 'EPA-BAS', " : " . $date . " ");
+
+  //En-tête contextuel
+  $header_contextuel = $root->new_child("header_contextuel", "");
+  gen_criteres_recherche($header_contextuel, $CRIT);
+
+  $continue = true;
+  $nbr_tot = 0;
+  $solde_tot = 0;
+  reset($DATA);
+  while ($continue) {
+    $ligne = $root->new_child("ligne", "");
+    $numColonne = 1;
+    while ($numColonne <= 2 && $continue) {
+      $element = each($DATA);
+      if ($element == NULL)
+        $continue = false;
+      else {
+        $info = $element[1];
+        $client = $ligne->new_child("client", "");
+        $client->new_child("id", $info["id_client"]);
+        $client->new_child("num_cpte", $info["num_complet_cpte"]);
+        $client->new_child("nom", $info["nom"]);
+        $client->new_child("solde", afficheMontant(recupMontant($info["solde"]), false, $export_csv));
+        $nbr_tot++;
+        $solde_tot += $info["solde"];
+      }
+      $numColonne++;
+    }
+  }
+  $infos_synth = $header_contextuel->new_child("infos_synthetiques", "");
+  $infos_synth->new_child("nbr_tot", $nbr_tot);
+  $infos_synth->new_child("solde_tot", afficheMontant(recupMontant($solde_tot), false, $export_csv));
+  return $document->dump_mem(true);
+}
+
+function xml_echeances_CAT($DATA, $list_criteres, $nbre_mois) {
+  /*
+  Fonction qui génère le code XML du rapport sur les DAT en fonction de leur arrivée à échéance
+  */
+
+  global $global_monnaie;
+
+  $document = create_xml_doc("echeances_CAT", "echeances_CAT.dtd");
+
+  //définition de la racine
+  $root = $document->root();
+
+  //En-tête généraliste
+  gen_header($root, 'EPA-CAT', " ($global_monnaie)");
+
+  //En-tête contextuel
+  $header_contextuel = $root->new_child("header_contextuel", "");
+  gen_criteres_recherche($header_contextuel, $list_criteres);
+
+  //En tête de la table
+  $table_header = $root->new_child("table_header", "");
+  $table_header->set_attribute("colonnes", $nbre_mois +1); // +1 car il y a la colonne TOTAL
+  $now = time();
+  for ($i = 0; $i < $nbre_mois; $i++) {
+    $colonne = $table_header->new_child("colonne", "");
+    $colonne->set_attribute("id", $i);
+    $timestamp = mktime(0, 0, 0, date("m") + $i, 1, date("Y"));
+    $nom_mois = strftime("%b %y", $timestamp);
+    $colonne->set_attribute("libel", $nom_mois);
+  }
+  $colonne = $table_header->new_child("colonne", "");
+  $colonne->set_attribute("id", $i);
+  $colonne->set_attribute("libel", _("Total"));
+
+  // Lignes
+  if (is_array($DATA)) {
+    foreach ($DATA as $key => $value) {
+      $ligne = $root->new_child("ligne", "");
+
+      $ligne->set_attribute("type_compte", $key);
+
+      for ($i = 0; $i < $nbre_mois; $i++) {
+        $cellule = $ligne->new_child("cellule", "");
+        $cellule->set_attribute("id", $i);
+        $current_mois_an = date("n", mktime(0, 0, 0, date("n") + $i, 1, date("Y"))) . date("Y");
+        if ($value["details"]["$current_mois_an"]["montant"] != '0')
+          $montant = $cellule->new_child("montant", afficheMontant($value["details"]["$current_mois_an"]["montant"]));
+        else
+          $montant = $cellule->new_child("montant", "");
+        if ($value["details"]["$current_mois_an"]["nbre"] != '0')
+          $nombre = $cellule->new_child("nombre", $value["details"]["$current_mois_an"]["nbre"]);
+        else
+          $nombre = $cellule->new_child("nombre", "");
+      }
+      $cellule = $ligne->new_child("cellule", "");
+      $cellule->set_attribute("id", $i);
+      if ($value["total"]["montant"] == '0')
+        $value["total"]["montant"] = '';
+      if ($value["total"]["nbre"] == '0')
+        $value["total"]["nbre"] = '';
+      $montant = $cellule->new_child("montant", afficheMontant($value["total"]["montant"]));
+      $nbre = $cellule->new_child("nombre", $value["total"]["nbre"]);
+    }
+  }
+
+  return $document->dump_mem(true);
+
+}
+
+/**
+ * Renvoie les statistiques nécessaires pour le rapport concentration de l'épargne.
+ *
+ * Cette fonction compte le nombre et la somme des soldes des comptes d'épargne satisfaisant de 1 à 3 critères.
+ * @param array $data Tableau de tableaux contenant les données des comptes d'épargne à traiter.
+ * @param array $total Le nombre total et la somme des soldes de l'entièreté des comtpes d'épargne considérés.
+ * @param int $key1 L'index, dans le tableau contenant les informations d'un compte, du 1e critère.
+ * @param unknown $val1 La valeur du 1e critère.
+ * @param int $key2 L'index, dans le tableau contenant les informations d'un compte, du 2e critère.
+ * @param unknown $val2 La valeur du 2e critère.
+ * @param int $key3 L'index, dans le tableau contenant les informations d'un compte, du 3e critère.
+ * @param unknown $val3 La valeur du 3e critère.
+ * @param string $operator L'opérateur de comparaison à passer à la fonction PHP key_match6
+ * @return array Tableau contenant les statistiques calculées
+ */
+function get_tranche($data, $total, $key1, $val1, $key2, $val2, $key3, $val3, $operator) {
+
+  global $global_multidevise;
+  $retour = array();
+  $retour['nbre'] = 0;
+  $retour['nbre_prc'] = 0;
+  $retour['mnt'] = 0;
+  $retour['mnt_prc'] = 0;
+
+  $retour['nbre_client'] = 0;
+  $retour['nbre_prc_client'] = 0;
+  $retour['mnt_client'] = 0;
+  $retour['mnt_prc_client'] = 0;
+  $clientliste = array();
+
+  foreach ($data as $infosCpte) {
+    // Pour chaque compte
+    if (key_match6($infosCpte[$key1], $val1, $infosCpte[$key2], $val2, $infosCpte[$key3], $val3, $operator)) {
+      // Si le compte appartient à la tranche
+      $retour['nbre']++;
+      $retour['mnt'] += $infosCpte['solde'];
+      if (!in_array($infosCpte['id_client'], $clientliste)) {
+        // Le tableau $data doit être trié par id_client !!!
+        // Ce postulat permet de réduire le tps d'exécution de cette fonction get_tranche, voir #1201.
+        array_push($clientliste, $infosCpte['id_client']);
+        $retour['nbre_client']++;
+      }
+    }
+  }
+  $retour['mnt_client'] = $retour['mnt'];
+  $retour['nbre_prc'] = $retour['nbre'] / max($total['nbre'], 1);
+  $retour['mnt_prc'] = $retour['mnt'] / max($total['mnt'], 1);
+  $retour['nbre_prc_client'] = $retour['nbre_client'] / max($total['nbreclient'], 1);
+  $retour['mnt_prc_client'] = $retour['mnt_client'] / max($total['mntclient'], 1);
+
+  return $retour;
+}
+
+/**
+ * Fonction qui effectue une comparaison entre deux valeurs selon l'opérateur fourni en paramètre
+ *
+ * La règle est la suivante
+ * $operateur = '=' => TRUE si ($val1 = $val2)
+ *               '<' => TRUE si ($val1 < $val2)
+ *               '>' => TRUE si ($val1 > $val2)
+ *               '><' => TRUE si ($val1 >= $val2) et ($val1 <= $val4)
+ *               '==' => TRUE si ($val1 = $val2) et ($val3 = $val4)
+ * 							 '===' => TRUE si ($val1 = $val2) et ($val3 = $val4) et ($val5 = $val6))
+ * @return BOOLEEN
+ */
+function key_match6($val1, $val2, $val3, $val4, $val5, $val6, $operator) {
+  if (($operator == '=') && ($val1 == $val2))
+    return true;
+  if (($operator == '<') && ($val1 < $val2))
+    return true;
+  if (($operator == '>') && ($val1 > $val2))
+    return true;
+  if (($operator == '><') && ($val1 >= $val2) && ($val1 <= $val4))
+    return true;
+  if (($operator == '==') && ($val1 == $val2) && ($val3 == $val4))
+    return true;
+  if (($operator == '===') && ($val1 == $val2) && ($val3 == $val4) && ($val5 == $val6))
+    return true;
+  return false;
+}
+
+/**
+ * Génération du XML pour le rapport Concentration de l'épargne
+ *
+ * @param unknown_type $val
+ * 			 1 : produit d'épargne et statut juridique;
+ * 	     2 : statut juridique;
+ * 	     3 : qualité;
+ * 	     4 : secteur d'activité et produit d'épargne;
+ * 	     5 : localisation;
+ * 	     6 : solde (b1 précise le premier palier et b2 le second;
+ * @param int $b1 : si $val == 6, valeur du 1er palier
+ * @param int $b2 : si $val == 6, valeur du 2ème palier
+ * @param boolean $export_csv: flag pour savoir si l'etat a produire est un export CSV
+ * @return str Une chaîne contenant le code XML demandé
+ */
+
+function xml_repartition_epargne($DATA, $export_csv = false,$date_rapport,$date_debut,$date_fin) {
+  global $adsys;
+  // XML
+  $document = create_xml_doc("concentration_epargne", "repartition_epargne.dtd");
+  $root = $document->root();
+  //ticket 659
+  $v_date = "  du ".$date_debut." au ".$date_fin;
+  if(is_null($date_debut) && is_null($date_fin)){
+    $v_date = "  ".$date_rapport;
+  }
+  gen_header($root, 'EPA-CON',$v_date);
+  $header_contextuel = $root->new_child("header_contextuel", "");
+  $header_contextuel->new_child("nb1", $DATA['nbre']);
+  $header_contextuel->new_child("nb2", afficheMontant($DATA['mnt'], true));
+  $header_contextuel->new_child("nbc1", $DATA['nbreclient']);
+  $header_contextuel->new_child("nbc2", afficheMontant($DATA['mntclient'], true));
+  if (is_array($DATA['devises']) && sizeof($DATA['devises'])>0)
+    foreach($DATA['devises'] as $devise=>$value) {
+    if ($value["taux"] != 1) {
+      $total_devise = afficheMontant($DATA['mnt']*$value['taux'], false);
+      $totaux_devises = $root->new_child("totaux_devises", "");
+      $totaux_devises->set_attribute("nb", $total_devise.$value["libel"]);
+      $totaux_devises->set_attribute("nbc", $total_devise.$value["libel"]);
+    }
+  }
+
+  if ($DATA['val'] == 1) {// le critère c'est produit d'épargne
+    $header_contextuel->new_child("critere", $DATA['critere']);
+    foreach($DATA['produit'] as $key =>$value) {
+      $niveau1[$key] = $root->new_child("niveau1", "");
+      $niveau1[$key]->new_child("lib_niveau1", $value['libel']);
+
+      for ($key2 = 0; $key2 < 5; $key2++) {
+        $niveau2 = $niveau1[$key]->new_child("niveau2", "");
+        $niveau2->new_child("lib_niveau2", $DATA['lib_niveau2'][$key2]);
+        $niveau2->new_child("nb_compte", $DATA['lib_niveau2']['nbre'][$key][$key2]);
+        $niveau2->new_child("nb_prc", affichePourcentage($DATA['lib_niveau2']['nbre_prc'][$key][$key2], 2));
+        $niveau2->new_child("solde_compte", afficheMontant($DATA['lib_niveau2']['mnt'][$key][$key2], false, $export_csv));
+        $niveau2->new_child("solde_prc", affichePourcentage($DATA['lib_niveau2']['mnt_prc'][$key][$key2], 2));
+      }
+
+
+      // sous totaux
+      $st = $niveau1[$key]->new_child("sous_total", "");
+      $st->new_child("nb_tot", $DATA['nb_tot'][$key]);
+      $st->new_child("nb_prc_tot", affichePourcentage($DATA['nb_prc_tot'][$key], 2));
+      $st->new_child("mnt_tot", afficheMontant($DATA['mnt_tot'][$key], true));
+      $st->new_child("mnt_prc_tot", affichePourcentage($DATA['mnt_prc_tot'][$key], 2));
+
+    }
+
+    //total général
+    $niveau1[$DATA['taille']] = $root->new_child("niveau1", "");
+    $total = $niveau1[$DATA['taille']]->new_child("total", "");
+    $total->new_child("tot_nb_compte", $DATA['nbre']);
+    $total->new_child("tot_nb_prc", "100%");
+    $total->new_child("tot_solde_compte", afficheMontant($DATA['mnt'], true));
+    $total->new_child("tot_solde_prc", "100%");
+
+    //Liste des agences consolidées
+	  if (isSiege() && $_POST["agence"] == NULL) {
+	   $list_agence=getListAgenceConsolide();
+	   foreach($list_agence as $id_ag =>$data_agence) {
+	     $enreg_agence=$root->new_child("enreg_agence","");
+	     $enreg_agence->new_child("is_siege", "true");
+	     $enreg_agence->new_child("id_ag", $data_agence['id']);
+	     $enreg_agence->new_child("libel_ag", $data_agence['libel']);
+	     $enreg_agence->new_child("date_max", $data_agence['date_dernier_mouv']);
+	   }
+	  }else{
+	  	 $enreg_agence=$root->new_child("enreg_agence","");
+	  	 $enreg_agence->new_child("is_siege", "false");
+	  }
+
+    return $document->dump_mem(true);
+
+  } else
+    if ($DATA['val'] == 2) { // le critère c'est statu juridique
+      $critere = _("Statut juridique");
+      $header_contextuel->new_child("critere", $critere);
+
+      for ($i = 0; $i < 5; $i++) {
+        $niveau1[$i] = $root->new_child("niveau1", "");
+
+        $niveau1[$i]->new_child("lib_niveau1", $DATA['lib_niveau1'][$i]);
+
+        $niveau2 = $niveau1[$i]->new_child("niveau2", "");
+        $niveau2->new_child("lib_niveau2", $DATA['lib_niveau2'][$i]);
+        $niveau2->new_child("nb_compte", $DATA['lib_niveau2']['nbre'][$i]);
+        $niveau2->new_child("nb_prc", affichePourcentage($DATA['lib_niveau2']['nbre_prc'][$i], 2));
+        $niveau2->new_child("solde_compte", afficheMontant($DATA['lib_niveau2']['mnt'][$i], false, $export_csv));
+        $niveau2->new_child("solde_prc", affichePourcentage($DATA['lib_niveau2']['mnt_prc'][$i], 2));
+
+        $niveau2->new_child("nb_client", $DATA['lib_niveau2']['nbre_client'][$i]);
+        $niveau2->new_child("nb_prc_client", affichePourcentage($DATA['lib_niveau2']['nbre_prc_client'][$i], 2));
+        $niveau2->new_child("solde_client", afficheMontant($DATA['lib_niveau2']['mnt_client'][$i], false, $export_csv));
+        $niveau2->new_child("solde_prc_client", affichePourcentage($DATA['lib_niveau2']['mnt_prc_client'][$i], 2));
+      }
+
+      $niveau1[4] = $root->new_child("niveau1", "");
+      $total = $niveau1[4]->new_child("total", "");
+      $total->new_child("tot_nb_compte", $DATA['nbre']);
+      $total->new_child("tot_nb_prc", "100%");
+      $total->new_child("tot_solde_compte", afficheMontant($DATA['mnt'], true));
+      $total->new_child("tot_solde_prc", "100%");
+
+      $total->new_child("tot_nb_client", $DATA['nbreclient']);
+      $total->new_child("tot_nb_prc_client", "100%");
+      $total->new_child("tot_solde_client", afficheMontant($DATA['mntclient'], true));
+      $total->new_child("tot_solde_prc_client", "100%");
+
+      //Liste des agences consolidées
+	  if (isSiege() && $_POST["agence"] == NULL) {
+	   $list_agence=getListAgenceConsolide();
+	   foreach($list_agence as $id_ag =>$data_agence) {
+	     $enreg_agence=$root->new_child("enreg_agence","");
+	     $enreg_agence->new_child("is_siege", "true");
+	     $enreg_agence->new_child("id_ag", $data_agence['id']);
+	     $enreg_agence->new_child("libel_ag", $data_agence['libel']);
+	     $enreg_agence->new_child("date_max", $data_agence['date_dernier_mouv']);
+	   }
+	  }else{
+	  	 $enreg_agence=$root->new_child("enreg_agence","");
+	  	 $enreg_agence->new_child("is_siege", "false");
+	  }
+
+      return $document->dump_mem(true);
+
+    } else
+      if ($DATA['val'] == 3) { // le critère est "Qualité"
+        $header_contextuel->new_child("critere", "Qualité");
+
+        // pour chaque qualité
+        for ($i = 1; $i < 5; $i++) {
+          $niveau1[$i] = $root->new_child("niveau1", "");
+          $niveau1[$i]->new_child("lib_niveau1", $DATA['lib_niveau1'][$i]);
+
+          $niveau2 = $niveau1[$i]->new_child("niveau2", "");
+          $niveau2->new_child("lib_niveau2", $DATA['lib_niveau2'][$i]);
+          $niveau2->new_child("nb_compte", $DATA['lib_niveau2']['nbre'][$i]);
+          $niveau2->new_child("nb_prc", affichePourcentage($DATA['lib_niveau2']['nbre_prc'][$i], 2));
+          $niveau2->new_child("solde_compte", afficheMontant($DATA['lib_niveau2']['mnt'][$i], false, $export_csv));
+          $niveau2->new_child("solde_prc", affichePourcentage($DATA['lib_niveau2']['mnt_prc'][$i], 2));
+
+          $niveau2->new_child("nb_client", $DATA['lib_niveau2']['nbre_client'][$i]);
+          $niveau2->new_child("nb_prc_client", affichePourcentage($DATA['lib_niveau2']['nbre_prc_client'][$i], 2));
+          $niveau2->new_child("solde_client", afficheMontant($DATA['lib_niveau2']['mnt_client'][$i], false, $export_csv));
+          $niveau2->new_child("solde_prc_client", affichePourcentage($DATA['lib_niveau2']['mnt_prc_client'][$i], 2));
+        }
+
+        $niveau1[5] = $root->new_child("niveau1", "");
+        $total = $niveau1[5]->new_child("total", "");
+        $total->new_child("tot_nb_compte", $DATA['nbre']);
+        $total->new_child("tot_nb_prc", "100%");
+        $total->new_child("tot_solde_compte", afficheMontant($DATA['mnt'], true));
+        $total->new_child("tot_solde_prc", "100%");
+
+        $total->new_child("tot_nb_client", $DATA['nbreclient']);
+        $total->new_child("tot_nb_prc_client", "100%");
+        $total->new_child("tot_solde_client", afficheMontant($DATA['mntclient'], true));
+        $total->new_child("tot_solde_prc_client", "100%");
+
+        //Liste des agences consolidées
+		  if (isSiege() && $_POST["agence"] == NULL) {
+		   $list_agence=getListAgenceConsolide();
+		   foreach($list_agence as $id_ag =>$data_agence) {
+		     $enreg_agence=$root->new_child("enreg_agence","");
+		     $enreg_agence->new_child("is_siege", "true");
+		     $enreg_agence->new_child("id_ag", $data_agence['id']);
+		     $enreg_agence->new_child("libel_ag", $data_agence['libel']);
+		     $enreg_agence->new_child("date_max", $data_agence['date_dernier_mouv']);
+		   }
+		  }else{
+		  	 $enreg_agence=$root->new_child("enreg_agence","");
+		  	 $enreg_agence->new_child("is_siege", "false");
+		  }
+
+        return $document->dump_mem(true);
+
+      } else
+        if ($DATA['val'] == 4) { // secteurs d'activité couplés aux produits d'éparne
+          //$secteurs_activite = get_secteurs_activite();
+          //$prod_ep = get_produits_epargne();
+
+          $critere = _("Secteur d'activité et produit d'épargne");
+          $header_contextuel->new_child("critere", $critere);
+
+          reset($DATA['secteurs_activite']);
+          //Pour chaque secteur d'activé
+          while (list ($key, $sect) = each($DATA['secteurs_activite'])) {
+            // sous totaux
+
+
+            $niveau1[$sect["id"]] = $root->new_child("niveau1", "");
+            $niveau1[$sect["id"]]->new_child("lib_niveau1", $sect['libel']);
+
+            // Pour chaque produit d'épargne
+            reset($DATA['produit']);
+            while (list ($k, $prod) = each($DATA['produit'])) {
+
+              $niveau2 = $niveau1[$sect["id"]]->new_child("niveau2", "");
+              $niveau2->new_child("lib_niveau2", $DATA['lib_niveau2'][$k]);
+              $niveau2->new_child("nb_compte", $DATA['lib_niveau2']['nbre'][$key][$k]);
+              $niveau2->new_child("nb_prc", affichePourcentage($DATA['lib_niveau2']['nbre_prc'][$key][$k], 2));
+              $niveau2->new_child("solde_compte", afficheMontant($DATA['lib_niveau2']['mnt'][$key][$k], false, $export_csv));
+              $niveau2->new_child("solde_prc", affichePourcentage($DATA['lib_niveau2']['mnt_prc'][$key][$k], 2));
+
+              $niveau2->new_child("nb_client", $DATA['lib_niveau2']['nbre_client'][$key][$k]);
+              $niveau2->new_child("nb_prc_client", affichePourcentage($DATA['lib_niveau2']['nbre_prc_client'][$key][$k], 2));
+              $niveau2->new_child("solde_client", afficheMontant($DATA['lib_niveau2']['mnt_client'][$key][$k], false, $export_csv));
+              $niveau2->new_child("solde_prc_client", affichePourcentage($DATA['lib_niveau2']['mnt_prc_client'][$key][$k], 2));
+
+
+            }
+
+            // sous totaux
+            $st = $niveau1[$sect["id"]]->new_child("sous_total", "");
+            $st->new_child("nb_tot", $DATA['nb_tot'][$key]);
+            $st->new_child("nb_prc_tot", affichePourcentage($DATA['nb_prc_tot'][$key], 2));
+            $st->new_child("mnt_tot", afficheMontant($DATA['mnt_tot'][$key], true));
+            $st->new_child("mnt_prc_tot", affichePourcentage($DATA['mnt_prc_tot'][$key], 2));
+
+            $st->new_child("nb_tot_client", $DATA['nb_tot_client'][$key]);
+            $st->new_child("nb_prc_tot_client", affichePourcentage($DATA['nb_prc_tot_client'][$key], 2));
+            $st->new_child("mnt_tot_client", afficheMontant($DATA['mnt_tot_client'][$key], true));
+            $st->new_child("mnt_prc_tot_client", affichePourcentage($DATA['mnt_prc_tot_client'][$key], 2));
+
+          }
+
+          // total général
+          $niveau1[sizeof($DATA['secteurs_activite'])] = $root->new_child("niveau1", "");
+          $total = $niveau1[sizeof($DATA['secteurs_activite'])]->new_child("total", "");
+          $total->new_child("tot_nb_compte", $DATA['nbre']);
+          $total->new_child("tot_nb_prc", "100%");
+          $total->new_child("tot_solde_compte", afficheMontant($DATA['mnt'], true));
+          $total->new_child("tot_solde_prc", "100%");
+
+          $total->new_child("tot_nb_client", $DATA['nbreclient']);
+          $total->new_child("tot_nb_prc_client", "100%");
+          $total->new_child("tot_solde_client", afficheMontant($DATA['mntclient'], true));
+          $total->new_child("tot_solde_prc_client", "100%");
+
+          return $document->dump_mem(true);
+        } else
+          if ($DATA['val'] == 5) { // le critère est "Localisation"
+            $header_contextuel->new_child("critere", _("Localisation"));
+
+            // localisation1
+
+            $niveau1[0] = $root->new_child("niveau1", "");
+            $niveau1[0]->new_child("lib_niveau1", _("Localisation 1"));
+
+            for ($i = 0; $i < sizeof($DATA['loc']); $i++) {
+
+              $niveau2 = $niveau1[0]->new_child("niveau2", "");
+              $niveau2->new_child("lib_niveau2", $DATA['lib_niveau1'][$i]);
+              $niveau2->new_child("nb_compte", $DATA['lib_niveau1']['nbre'][$i]);
+              $niveau2->new_child("nb_prc", affichePourcentage($DATA['lib_niveau1']['nbre_prc'][$i], 2));
+              $niveau2->new_child("solde_compte", afficheMontant($DATA['lib_niveau1']['mnt'][$i], false, $export_csv));
+              $niveau2->new_child("solde_prc", affichePourcentage($DATA['lib_niveau1']['mnt_prc'][$i], 2));
+
+              $niveau2->new_child("nb_client", $DATA['lib_niveau1']['nbre_client'][$i]);
+              $niveau2->new_child("nb_prc_client", affichePourcentage($DATA['lib_niveau1']['nbre_prc_client'][$i], 2));
+              $niveau2->new_child("solde_client", afficheMontant($DATA['lib_niveau1']['mnt_client'][$i], false, $export_csv));
+              $niveau2->new_child("solde_prc_client", affichePourcentage($DATA['lib_niveau1']['mnt_prc_client'][$i], 2));
+
+            }
+
+            $total = $niveau1[0]->new_child("total", "");
+            $total->new_child("tot_nb_compte", $DATA['nb_tot'][1]);
+            $total->new_child("tot_nb_prc", "100%");
+            $total->new_child("tot_solde_compte", afficheMontant($DATA['mnt_tot'][1], true));
+            $total->new_child("tot_solde_prc", "100%");
+
+            $total->new_child("tot_nb_client", $DATA['nb_tot_client'][1]);
+            $total->new_child("tot_nb_prc_client", "100%");
+            $total->new_child("tot_solde_client", afficheMontant($DATA['mnt_tot_client'][1], true));
+            $total->new_child("tot_solde_prc_client", "100%");
+            // localisation 2
+
+            $niveau1[1] = $root->new_child("niveau1", "");
+            $niveau1[1]->new_child("lib_niveau1", _("Localisation 2"));
+            for ($i = 0; $i < sizeof($DATA['loc2']); $i++) {
+
+              $niveau2 = $niveau1[1]->new_child("niveau2", "");
+              $niveau2->new_child("lib_niveau2", $DATA['lib_niveau2'][$i]);
+              $niveau2->new_child("nb_compte", $DATA['lib_niveau2']['nbre'][$i]);
+              $niveau2->new_child("nb_prc", affichePourcentage($DATA['lib_niveau2']['nbre_prc'][$i], 2));
+              $niveau2->new_child("solde_compte", afficheMontant($DATA['lib_niveau2']['mnt'][$i], false, $export_csv));
+              $niveau2->new_child("solde_prc", affichePourcentage($DATA['lib_niveau2']['mnt_prc'][$i], 2));
+
+              $niveau2->new_child("nb_client", $DATA['lib_niveau2']['nbre_client'][$i]);
+              $niveau2->new_child("nb_prc_client", affichePourcentage($DATA['lib_niveau2']['nbre_prc_client'][$i], 2));
+              $niveau2->new_child("solde_client", afficheMontant($DATA['lib_niveau2']['mnt_client'][$i], false, $export_csv));
+              $niveau2->new_child("solde_prc_client", affichePourcentage($DATA['lib_niveau2']['mnt_prc_client'][$i], 2));
+
+            }
+            $total = $niveau1[1]->new_child("total", "");
+            $total->new_child("tot_nb_compte", $DATA['nb_tot'][2]);
+            $total->new_child("tot_nb_prc", "100%");
+            $total->new_child("tot_solde_compte", afficheMontant($DATA['mnt_tot'][2], true));
+            $total->new_child("tot_solde_prc", "100%");
+
+            $total->new_child("tot_nb_client", $DATA['nb_tot_client'][2]);
+            $total->new_child("tot_nb_prc_client", "100%");
+            $total->new_child("tot_solde_client", afficheMontant($DATA['mnt_tot_client'][2], true));
+            $total->new_child("tot_solde_prc_client", "100%");
+
+            return $document->dump_mem(true);
+
+          } else
+            if ($DATA['val'] == 6) { //le critère est solde montant
+              $header_contextuel->new_child("critere", _("Solde compte épargne"));
+
+              for ($i = 0; $i < 3; $i++) {
+                $niveau1[$i] = $root->new_child("niveau1", "");
+
+                $niveau1[$i]->new_child("lib_niveau1", $DATA['lib_niveau1'][$i], true);
+
+
+                $niveau2 = $niveau1[$i]->new_child("niveau2", "");
+                $niveau2->new_child("lib_niveau2", $DATA['lib_niveau2'][$i]);
+                $niveau2->new_child("nb_compte", $DATA['lib_niveau2']['nbre'][$i]);
+                $niveau2->new_child("nb_prc", affichePourcentage($DATA['lib_niveau2']['nbre_prc'][$i], 2));
+                $niveau2->new_child("solde_compte", afficheMontant($DATA['lib_niveau2']['mnt'][$i], false, $export_csv));
+                $niveau2->new_child("solde_prc", affichePourcentage($DATA['lib_niveau2']['mnt_prc'][$i], 2));
+              }
+
+              // total général
+              $niveau1[3] = $root->new_child("niveau1", "");
+              $total = $niveau1[3]->new_child("total", "");
+              $total->new_child("tot_nb_compte", $DATA['nbre']);
+              $total->new_child("tot_nb_prc", "100%");
+              $total->new_child("tot_solde_compte", afficheMontant($DATA['mnt'], true));
+              $total->new_child("tot_solde_prc", "100%");
+
+              //Liste des agences consolidées
+			  if (isSiege() && $_POST["agence"] == NULL) {
+			   $list_agence=getListAgenceConsolide();
+			   foreach($list_agence as $id_ag =>$data_agence) {
+			     $enreg_agence=$root->new_child("enreg_agence","");
+			     $enreg_agence->new_child("is_siege", "true");
+			     $enreg_agence->new_child("id_ag", $data_agence['id']);
+			     $enreg_agence->new_child("libel_ag", $data_agence['libel']);
+			     $enreg_agence->new_child("date_max", $data_agence['date_dernier_mouv']);
+			   }
+			  }else{
+			  	 $enreg_agence=$root->new_child("enreg_agence","");
+			  	 $enreg_agence->new_child("is_siege", "false");
+			  }
+
+
+              return $document->dump_mem(true);
+            } else
+              if ($DATA['val'] == 7) { // le critère est type de produit : DAV , DAT , CAT
+                $header_contextuel->new_child("critere", _("Type de produit d'épargne"));
+
+                for ($i = 0; $i < 5; $i++) {
+                  $niveau1[$i] = $root->new_child("niveau1", "");
+set_time_limit(0);
+                  if ($i == 0)
+                    $j = 1; // DAV
+                  else
+                    if ($i == 1)
+                      $j = 2; // DAT
+                    else
+                      if ($i == 2)
+                        $j = 5; // CAT
+					else
+                      if ($i == 3)
+                        $j = 3; // Autres dépôts (garanties au crédit, etc)
+                    else
+                      if ($i == 4)
+                        $j = 8; // Comptes chèques certifiés
+                  $niveau1[$i]->new_child("lib_niveau1", $DATA['lib_niveau1'][$i]);
+                  // XXX
+                  $niveau2 = $niveau1[$i]->new_child("niveau2", "");
+                  $niveau2->new_child("lib_niveau2", $DATA['lib_niveau2'][$i]);
+                  $niveau2->new_child("nb_compte", $DATA['lib_niveau2']['nbre'][$i]);
+                  $niveau2->new_child("nb_prc", affichePourcentage($DATA['lib_niveau2']['nbre_prc'][$i], 2));
+                  //$niveau2->new_child("solde_compte", afficheMontant($tranche_data['mnt'], true));
+                  $niveau2->new_child("solde_compte", afficheMontant($DATA['lib_niveau2']['mnt'][$i], false, $export_csv));
+                  $niveau2->new_child("solde_prc", affichePourcentage($DATA['lib_niveau2']['mnt_prc'][$i], 2));
+                }
+
+                $niveau1[3] = $root->new_child("niveau1", "");
+                $total = $niveau1[3]->new_child("total", "");
+                $total->new_child("tot_nb_compte", $DATA['nbre']);
+                $total->new_child("tot_nb_prc", "100%");
+                $total->new_child("tot_solde_compte", afficheMontant($DATA['mnt'], true));
+                $total->new_child("tot_solde_prc", "100%");
+
+                //Liste des agences consolidées
+				  if (isSiege() && $_POST["agence"] == NULL) {
+				   $list_agence=getListAgenceConsolide();
+				   foreach($list_agence as $id_ag =>$data_agence) {
+				     $enreg_agence=$root->new_child("enreg_agence","");
+				     $enreg_agence->new_child("is_siege", "true");
+				     $enreg_agence->new_child("id_ag", $data_agence['id']);
+				     $enreg_agence->new_child("libel_ag", $data_agence['libel']);
+				     $enreg_agence->new_child("date_max", $data_agence['date_dernier_mouv']);
+				   }
+				  }else{
+				  	 $enreg_agence=$root->new_child("enreg_agence","");
+				  	 $enreg_agence->new_child("is_siege", "false");
+				  }
+
+                return $document->dump_mem(true);
+              }
+
+}
+
+function get_data_repartition_epargne($list_agence,$val, $b1, $b2,$date_rapport,$date_debut,$date_fin,$n_agence= null, $n_guichet = null) {
+	global $adsys;
+
+	$key_value = $key_value2 = $key_value3 = "";
+	$key_name = $key_name2 = $key_name3 = "";
+	$tranche_data_cumul=array();
+	$array_devise=array();
+	$total_data=array();
+	$total_data['mntclient'] =0;
+	$total_data['nbreclient'] =0;
+	$total_data['mnt']=0;
+	$total_data['nbre']=0;
+	$retour['nbre_prc'] = 0;
+	$retour['mnt_prc'] = 0;
+	$retour['retard'] = 0;
+	$retour['retard_prc'] = 0;
+	$retour['val']=$val;
+	$retour['b1']=$b1;
+	$retour['b2']=$b2;
+	if(is_null($date_rapport)) {
+		$date_rapport = date("d/m/Y");
+	}
+
+	foreach($list_agence as $key_id_ag =>$value) {
+		setGlobalIdAgence($key_id_ag);
+		$devises = get_table_devises();
+		array_merge($array_devise,$devises);
+		// Récupère les données
+		$result = get_repartition_epargne($date_rapport,$date_debut,$date_fin,$n_agence,$n_guichet);
+		if ($result->errCode != NO_ERR) {
+			return $result;
+		} else {
+			$data = $result->param;
+		}
+
+		$total_data = $data['totaux'];
+		unset($data['totaux']);
+
+		if ($val == 1) { // produit d'épargne croisé à statut juridique
+
+			$key_name2 = 'statut_juridique';
+			$key_value2 = 1;
+			$key_name3 = 'pp_sexe';
+			$key_value3 = 2;
+			$libel = _("Femmes");
+			$operator = "===";
+			$prod_ep = get_produits_epargne();
+			$critere = _("Produit d'épargne et statut juridique");
+			$retour['produit']=$prod_ep;
+			$retour['critere']=$critere;
+			// Pour chaque produit d'épargne
+			reset($prod_ep);
+			while (list ($k, $prod) = each($prod_ep)) {
+				// sous totaux
+				set_time_limit(0);
+				$retour['lib_niveau1'][$prod['id']] = $prod['libel'];
+
+				for ($i = 0; $i < 5; $i++) {
+					$key_name = 'id_prod';
+					$key_value = $prod['id'];
+					if ($i == 0) { // Hommes
+						$key_name2 = 'statut_juridique';
+						$key_value2 = 1;
+						$key_name3 = 'pp_sexe';
+						$key_value3 = 1;
+						$operator = "===";
+						$libel = _("Hommes");
+					} else
+					if ($i == 1) { // femmes
+						$key_name2 = 'statut_juridique';
+						$key_value2 = 1;
+						$key_name3 = 'pp_sexe';
+						$key_value3 = 2;
+						$libel = _("Femmes");
+						$operator = "===";
+					} else
+					if ($i == 2) { // Personne morale
+						$key_name2 = 'statut_juridique';
+						$key_value2 = $i;
+						$operator = "==";
+						$libel = adb_gettext($adsys["adsys_stat_jur"][$i]);
+					} else
+					if ($i == 3) { // Groupe informel
+						$key_name2 = 'statut_juridique';
+						$key_value2 = $i;
+						$operator = "==";
+						$libel = adb_gettext($adsys["adsys_stat_jur"][$i]);
+					} else
+					if ($i == 4) { // Groupe Solidaire
+						$key_name2 = 'statut_juridique';
+						$key_value2 = $i;
+						$operator = "==";
+						$libel = adb_gettext($adsys["adsys_stat_jur"][$i]);
+					}
+
+					$tranche_data = get_tranche($data, $total_data, $key_name, $key_value, $key_name2, $key_value2, $key_name3, $key_value3, $operator);
+					$retour['lib_niveau2'][$i]=$libel;
+					if (!isset($retour['lib_niveau2']['nbre'][$k][$i]))
+					$retour['lib_niveau2']['nbre'][$k][$i]=0;
+					if (!isset($retour['lib_niveau2']['nbre_prc'][$k][$i]))
+					$retour['lib_niveau2']['nbre_prc'][$k][$i]=0;
+					if (!isset($retour['lib_niveau2']['mnt'][$k][$i]))
+					$retour['lib_niveau2']['mnt'][$k][$i]=0;
+					if (!isset($retour['lib_niveau2']['mnt_prc'][$k][$i]))
+					$retour['lib_niveau2']['mnt_prc'][$k][$i]=0;
+					$retour['lib_niveau2']['nbre'][$k][$i] +=$tranche_data['nbre'];
+					$retour['lib_niveau2']['nbre_prc'][$k][$i] +=$tranche_data['nbre_prc'];
+					$retour['lib_niveau2']['mnt'][$k][$i] +=$tranche_data['mnt'];
+					$retour['lib_niveau2']['mnt_prc'][$k][$i] +=$tranche_data['mnt_prc'];
+					if (!isset($retour['nb_tot'][$k]))
+					$retour['nb_tot'][$k]=0;
+					if (!isset($retour['nb_prc_tot'][$k]))
+					$retour['nb_prc_tot'][$k]=0;
+					if (!isset($retour['mnt_tot'][$k]))
+					$retour['mnt_tot'][$k]=0;
+					if (!isset($retour['mnt_prc_tot'][$k]))
+					$retour['mnt_prc_tot'][$k]=0;
+					$retour['nb_tot'][$k]  += $tranche_data['nbre'];
+					$retour['nb_prc_tot'][$k]  += $tranche_data['nbre_prc'];
+					$retour['mnt_tot'][$k]  += $tranche_data['mnt'];
+					$retour['mnt_prc_tot'][$k]  += $tranche_data['mnt_prc'];
+				}
+			}
+
+			//total général
+			$retour["taille"]=sizeof($prod_ep);
+
+
+		} else
+		if ($val == 2) { // le critère c'est statu juridique
+			$critere = _("Statut juridique");
+
+			$retour['critere']= $critere;
+			for ($i = 0; $i < 5; $i++) {
+
+
+				if ($i == 0) { // Si PP hommes
+					$key_name = 'statut_juridique';
+					$key_value = 1;
+					$key_name2 = 'pp_sexe';
+					$key_value2 = 1;
+					$operator = "==";
+					$libel = _("Personnes physiques, hommes");
+
+					$retour['lib_niveau1'][$i]=$libel;
+				} else
+				if ($i == 1) { // Si PP femmes
+					$key_name = 'statut_juridique';
+					$key_value = 1;
+					$key_name2 = 'pp_sexe';
+					$key_value2 = 2;
+					$operator = "==";
+					$libel = _("Personnes physiques, femmes");
+					$retour['lib_niveau1'][$i]=$libel;
+
+				} else {
+					$key_name = 'statut_juridique';
+					$key_value = $i;
+					$operator = "=";
+					$libel = adb_gettext($adsys["adsys_stat_jur"][$i]);
+					$retour['lib_niveau1'][$i]=$libel;
+
+				}
+
+				$tranche_data = get_tranche($data, $total_data, $key_name, $key_value, $key_name2, $key_value2, $key_name3, $key_value3, $operator);
+				$retour['lib_niveau2'][$i]=$libel;
+				if (!isset($retour['lib_niveau2']['nbre'][$i]))
+				$retour['lib_niveau2']['nbre'][$i]=0;
+				if (!isset($retour['lib_niveau2']['nbre_prc'][$i]))
+				$retour['lib_niveau2']['nbre_prc'][$i]=0;
+				if (!isset($retour['lib_niveau2']['mnt'][$i]))
+				$retour['lib_niveau2']['mnt'][$i]=0;
+				if (!isset($retour['lib_niveau2']['mnt_prc'][$i]))
+				$retour['lib_niveau2']['mnt_prc'][$i]=0;
+				if (!isset($retour['lib_niveau2']['nbre_client'][$i]))
+				$retour['lib_niveau2']['nbre_client'][$i]=0;
+				if (!isset($retour['lib_niveau2']['nbre_prc_client'][$i]))
+				$retour['lib_niveau2']['nbre_prc_client'][$i]=0;
+				if (!isset($retour['lib_niveau2']['mnt_client'][$i]))
+				$retour['lib_niveau2']['mnt_client'][$i]=0;
+				if (!isset($retour['lib_niveau2']['mnt_prc_client'][$i]))
+				$retour['lib_niveau2']['mnt_prc_client'][$i]=0;
+
+				$retour['lib_niveau2']['nbre'][$i] +=$tranche_data['nbre'];
+				$retour['lib_niveau2']['nbre_prc'][$i] +=$tranche_data['nbre_prc'];
+				$retour['lib_niveau2']['mnt'][$i] +=$tranche_data['mnt'];
+				$retour['lib_niveau2']['mnt_prc'][$i] +=$tranche_data['mnt_prc'];
+				$retour['lib_niveau2']['nbre_client'][$i] +=$tranche_data['nbre_client'];
+				$retour['lib_niveau2']['nbre_prc_client'][$i] +=$tranche_data['nbre_prc_client'];
+				$retour['lib_niveau2']['mnt_client'][$i] +=$tranche_data['mnt_client'];
+				$retour['lib_niveau2']['mnt_prc_client'][$i] +=$tranche_data['mnt_prc_client'];
+			}
+
+
+
+		} else
+		if ($val == 3) { // le critère est "Qualité"
+
+			$retour['critere']=_("Qualité");
+			// pour chaque qualité
+			for ($i = 1; $i < 5; $i++) {
+
+				$retour['lib_niveau1'][$i]=adb_gettext($adsys["adsys_qualite_client"][$i]);
+				$key_name = 'qualite';
+				$key_value = $i;
+				$operator = "=";
+				$libel = adb_gettext($adsys["adsys_qualite_client"][$i]);
+
+				$tranche_data = get_tranche($data, $total_data, $key_name, $key_value, $key_name2, $key_value2, $key_name3, $key_value3, $operator);
+				$retour['lib_niveau2'][$i]=$libel;
+
+				if (!isset($retour['lib_niveau2']['nbre'][$i]))
+				$retour['lib_niveau2']['nbre'][$i]=0;
+				if (!isset($retour['lib_niveau2']['nbre_prc'][$i]))
+				$retour['lib_niveau2']['nbre_prc'][$i]=0;
+				if (!isset($retour['lib_niveau2']['mnt'][$i]))
+				$retour['lib_niveau2']['mnt'][$i]=0;
+				if (!isset($retour['lib_niveau2']['mnt_prc'][$i]))
+				$retour['lib_niveau2']['mnt_prc'][$i]=0;
+				if (!isset($retour['lib_niveau2']['nbre_client'][$i]))
+				$retour['lib_niveau2']['nbre_client'][$i]=0;
+				if (!isset($retour['lib_niveau2']['nbre_prc_client'][$i]))
+				$retour['lib_niveau2']['nbre_prc_client'][$i]=0;
+				if (!isset($retour['lib_niveau2']['mnt_client'][$i]))
+				$retour['lib_niveau2']['mnt_client'][$i]=0;
+				if (!isset($retour['lib_niveau2']['mnt_prc_client'][$i]))
+				$retour['lib_niveau2']['mnt_prc_client'][$i]=0;
+
+				$retour['lib_niveau2']['nbre'][$i] +=$tranche_data['nbre'];
+				$retour['lib_niveau2']['nbre_prc'][$i] +=$tranche_data['nbre_prc'];
+				$retour['lib_niveau2']['mnt'][$i] +=$tranche_data['mnt'];
+				$retour['lib_niveau2']['mnt_prc'][$i] +=$tranche_data['mnt_prc'];
+				$retour['lib_niveau2']['nbre_client'][$i] +=$tranche_data['nbre_client'];
+				$retour['lib_niveau2']['nbre_prc_client'][$i] +=$tranche_data['nbre_prc_client'];
+				$retour['lib_niveau2']['mnt_client'][$i] +=$tranche_data['mnt_client'];
+				$retour['lib_niveau2']['mnt_prc_client'][$i] +=$tranche_data['mnt_prc_client'];
+
+			}
+
+
+		} else
+		if ($val == 4) { // secteurs d'activité couplés aux produits d'éparne
+			$secteurs_activite = get_secteurs_activite();
+			$prod_ep = get_produits_epargne();
+			$retour['secteurs_activite']=$secteurs_activite;
+			$retour['produit']=$prod_ep;
+			$retour['lib_niveau2']=array();
+			$retour['lib_niveau1']=array();
+			$critere = _("Secteur d'activité et produit d'épargne");
+			$retour['critere']=$critere;
+			reset($secteurs_activite);
+			//Pour chaque secteur d'activé
+			while (list ($key, $sect) = each($secteurs_activite)) {
+				set_time_limit(0);
+				$retour['lib_niveau1'][$key] =$sect['libel'];
+				// Pour chaque produit d'épargne
+				reset($prod_ep);
+				while (list ($k, $prod) = each($prod_ep)) {
+					$key_name = 'sect_act';
+					$key_value = $sect["id"];
+
+					$key_name2 = 'id_prod';
+					$key_value2 = $prod['id'];
+
+					$operator = "==";
+					$libel = $prod['libel'];
+
+					$tranche_data = get_tranche($data, $total_data, $key_name, $key_value, $key_name2, $key_value2, $key_name3, $key_value3, $operator);
+
+					$retour['lib_niveau2'][$k]=$libel;
+					if (!isset($retour['lib_niveau2']['nbre'][$key][$k]))
+					$retour['lib_niveau2']['nbre'][$key][$k]=0;
+					if (!isset($retour['lib_niveau2']['nbre_prc'][$key][$k]))
+					$retour['lib_niveau2']['nbre_prc'][$key][$k]=0;
+					if (!isset($retour['lib_niveau2']['mnt'][$key][$k]))
+					$retour['lib_niveau2']['mnt'][$key][$k]=0;
+					if (!isset($retour['lib_niveau2']['mnt_prc'][$key][$k]))
+					$retour['lib_niveau2']['mnt_prc'][$key][$k]=0;
+					if (!isset($retour['lib_niveau2']['nbre_client'][$key][$k]))
+					$retour['lib_niveau2']['nbre_client'][$key][$k]=0;
+					if (!isset($retour['lib_niveau2']['nbre_prc_client'][$key][$k]))
+					$retour['lib_niveau2']['nbre_prc_client'][$key][$k]=0;
+					if (!isset($retour['lib_niveau2']['mnt_client'][$key][$k]))
+					$retour['lib_niveau2']['mnt_client'][$key][$k]=0;
+					if (!isset($retour['lib_niveau2']['mnt_prc_client'][$key][$k]))
+					$retour['lib_niveau2']['mnt_prc_client'][$key][$k]=0;
+					//$retour['lib_niveau2'][$i]['data']=$tranche_data;
+					$retour['lib_niveau2']['nbre'][$key][$k] +=$tranche_data['nbre'];
+					$retour['lib_niveau2']['nbre_prc'][$key][$k] +=$tranche_data['nbre_prc'];
+					$retour['lib_niveau2']['mnt'][$key][$k] +=$tranche_data['mnt'];
+					$retour['lib_niveau2']['mnt_prc'][$key][$k] +=$tranche_data['mnt_prc'];
+					$retour['lib_niveau2']['nbre_client'][$key][$k] +=$tranche_data['nbre_client'];
+					$retour['lib_niveau2']['nbre_prc_client'][$key][$k] +=$tranche_data['nbre_prc_client'];
+					$retour['lib_niveau2']['mnt_client'][$key][$k] +=$tranche_data['mnt_client'];
+					$retour['lib_niveau2']['mnt_prc_client'][$key][$k] +=$tranche_data['mnt_prc_client'];
+
+					if (!isset($retour['nb_tot'][$key]))
+					$retour['nb_tot'][$key]=0;
+					if (!isset($retour['nb_prc_tot'][$key]))
+					$retour['nb_prc_tot'][$key]=0;
+					if (!isset($retour['mnt_tot'][$key]))
+					$retour['mnt_tot'][$key]=0;
+					if (!isset($retour['mnt_prc_tot'][$key]))
+					$retour['mnt_prc_tot'][$key]=0;
+					if (!isset($retour['nb_tot_client'][$key]))
+					$retour['nb_tot_client'][$key] =0;
+					if (!isset($retour['nb_prc_tot_client'][$key]))
+					$retour['nb_prc_tot_client'][$key]=0;
+					if (!isset($retour['mnt_tot_client'][$key]))
+					$retour['mnt_tot_client'][$key]=0;
+					if (!isset($retour['mnt_prc_tot_client'][$key]))
+					$retour['mnt_prc_tot_client'][$key]=0;
+					// sous totaux
+					$retour['nb_tot'][$key] += $tranche_data['nbre'];
+					$retour['nb_prc_tot'][$key] += $tranche_data['nbre_prc'];
+					$retour['mnt_tot'][$key] += $tranche_data['mnt'];
+					$retour['mnt_prc_tot'][$key] += $tranche_data['mnt_prc'];
+
+					$retour['nb_tot_client'][$key] += $tranche_data['nbre_client'];
+					$retour['nb_prc_tot_client'][$key] += $tranche_data['nbre_prc_client'];
+					$retour['mnt_tot_client'][$key] += $tranche_data['mnt_client'];
+					$retour['mnt_prc_tot_client'][$key] += $tranche_data['mnt_prc_client'];
+				}
+
+
+
+			}
+
+			// total général
+			$retour['taille']=sizeof($secteurs_activite);
+
+		} else
+		if ($val == 5) { // le critère est "Localisation"
+
+
+			// localisation1
+			$retour['critere'] = _("Localisation");
+			$loc1 = get_localisation(1);
+
+			$retour['loc']=$loc1;
+			for ($i = 0; $i < sizeof($loc1); $i++) {
+				$key_name = 'id_loc1';
+				$key_value = $loc1[$i]['id'];
+				$operator = "=";
+				$libel = $loc1[$i]['libel'];
+				$tranche_data =  get_tranche($data, $total_data, $key_name, $key_value, $key_name2, $key_value2, $key_name3, $key_value3, $operator);
+				$retour['lib_niveau1'][$i]=$libel;
+				if (!isset($retour['lib_niveau1']['nbre'][$i]))
+				$retour['lib_niveau1']['nbre'][$i]=0;
+				if (!isset($retour['lib_niveau1']['nbre_prc'][$i]))
+				$retour['lib_niveau1']['nbre_prc'][$i]=0;
+				if (!isset($retour['lib_niveau1']['nbre_client'][$i]))
+				$retour['lib_niveau1']['nbre_client'][$i]=0;
+				if (!isset($retour['lib_niveau1']['nbre_prc_client'][$i]))
+				$retour['lib_niveau1']['nbre_prc_client'][$i]=0;
+				if (!isset($retour['lib_niveau1']['mnt'][$i]))
+				$retour['lib_niveau1']['mnt'][$i]=0;
+				if (!isset($retour['lib_niveau1']['mnt_prc'][$i]))
+				$retour['lib_niveau1']['mnt_prc'][$i]=0;
+
+				$retour['lib_niveau1']['nbre'][$i] +=$tranche_data['nbre'];
+				$retour['lib_niveau1']['nbre_prc'][$i] +=$tranche_data['nbre_prc'];
+				$retour['lib_niveau1']['nbre_client'][$i] +=$tranche_data['nbre_client'];
+				$retour['lib_niveau1']['nbre_prc_client'][$i] +=$tranche_data['nbre_prc_client'];
+				$retour['lib_niveau1']['mnt'][$i] +=$tranche_data['mnt'];
+				$retour['lib_niveau1']['mnt_prc'][$i] +=$tranche_data['mnt_prc'];
+
+				if (!isset($retour['nb_tot'][1]))
+				$retour['nb_tot'][1]=0;
+				if (!isset($retour['nb_prc_tot'][1]))
+				$retour['nb_prc_tot'][1]=0;
+				if (!isset($retour['mnt_tot'][1]))
+				$retour['mnt_tot'][1]=0;
+				if (!isset($retour['mnt_prc_tot'][1]))
+				$retour['mnt_prc_tot'][1]=0;
+				if (!isset($retour['nb_tot_client'][1]))
+				$retour['nb_tot_client'][1] =0;
+				if (!isset($retour['nb_prc_tot_client'][1]))
+				$retour['nb_prc_tot_client'][1]=0;
+				if (!isset($retour['mnt_tot_client'][1]))
+				$retour['mnt_tot_client'][1]=0;
+				if (!isset($retour['mnt_prc_tot_client'][1]))
+				$retour['mnt_prc_tot_client'][1]=0;
+				// sous totaux
+				$retour['nb_tot'][1] += $tranche_data['nbre'];
+				$retour['nb_prc_tot'][1] += $tranche_data['nbre_prc'];
+				$retour['mnt_tot'][1] += $tranche_data['mnt'];
+				$retour['mnt_prc_tot'][1] += $tranche_data['mnt_prc'];
+
+				$retour['nb_tot_client'][1] += $tranche_data['nbre_client'];
+				$retour['nb_prc_tot_client'][1] += $tranche_data['nbre_prc_client'];
+				$retour['mnt_tot_client'][1] += $tranche_data['mnt_client'];
+				$retour['mnt_prc_tot_client'][1] += $tranche_data['mnt_prc_client'];
+
+
+			}
+
+			// localisation 2
+			$loc2 = get_localisation(2);
+			$retour['loc2']=$loc2;
+
+			for ($i = 0; $i < sizeof($loc2); $i++) {
+				$key_name = 'id_loc2';
+				$key_value = $loc2[$i]['id'];
+				$operator = "=";
+				$libel = $loc2[$i]['libel'];
+				$tranche_data = get_tranche($data, $total_data, $key_name, $key_value, $key_name2, $key_value2, $key_name3, $key_value3, $operator);
+				$retour['lib_niveau2'][$i]=$libel;
+
+				if (!isset($retour['lib_niveau2']['nbre'][$i]))
+				$retour['lib_niveau2']['nbre'][$i]=0;
+				if (!isset($retour['lib_niveau2']['nbre_prc'][$i]))
+				$retour['lib_niveau2']['nbre_prc'][$i]=0;
+				if (!isset($retour['lib_niveau2']['nbre_client'][$i]))
+				$retour['lib_niveau2']['nbre_client'][$i]=0;
+				if (!isset($retour['lib_niveau2']['nbre_prc_client'][$i]))
+				$retour['lib_niveau2']['nbre_prc_client'][$i]=0;
+				if (!isset($retour['lib_niveau2']['mnt'][$i]))
+				$retour['lib_niveau2']['mnt'][$i]=0;
+				if (!isset($retour['lib_niveau2']['mnt_prc'][$i]))
+				$retour['lib_niveau2']['mnt_prc'][$i]=0;
+
+				$retour['lib_niveau2']['nbre'][$i] +=$tranche_data['nbre'];
+				$retour['lib_niveau2']['nbre_prc'][$i] +=$tranche_data['nbre_prc'];
+				$retour['lib_niveau2']['nbre_client'][$i] +=$tranche_data['nbre_client'];
+				$retour['lib_niveau2']['nbre_prc_client'][$i] +=$tranche_data['nbre_prc_client'];
+				$retour['lib_niveau2']['mnt'][$i] +=$tranche_data['mnt'];
+				$retour['lib_niveau2']['mnt_prc'][$i] +=$tranche_data['mnt_prc'];
+
+				if (!isset($retour['nb_tot'][2]))
+				$retour['nb_tot'][2]=0;
+				if (!isset($retour['nb_prc_tot'][2]))
+				$retour['nb_prc_tot'][2]=0;
+				if (!isset($retour['mnt_tot'][2]))
+				$retour['mnt_tot'][2]=0;
+				if (!isset($retour['mnt_prc_tot'][2]))
+				$retour['mnt_prc_tot'][2]=0;
+				if (!isset($retour['nb_tot_client'][2]))
+				$retour['nb_tot_client'][2] =0;
+				if (!isset($retour['nb_prc_tot_client'][2]))
+				$retour['nb_prc_tot_client'][2]=0;
+				if (!isset($retour['mnt_tot_client'][2]))
+				$retour['mnt_tot_client'][2]=0;
+				if (!isset($retour['mnt_prc_tot_client'][2]))
+				$retour['mnt_prc_tot_client'][2]=0;
+				// sous totaux
+				$retour['nb_tot'][2] += $tranche_data['nbre'];
+				$retour['nb_prc_tot'][2] += $tranche_data['nbre_prc'];
+				$retour['mnt_tot'][2] += $tranche_data['mnt'];
+				$retour['mnt_prc_tot'][2] += $tranche_data['mnt_prc'];
+
+				$retour['nb_tot_client'][2] += $tranche_data['nbre_client'];
+				$retour['nb_prc_tot_client'][2] += $tranche_data['nbre_prc_client'];
+				$retour['mnt_tot_client'][2] += $tranche_data['mnt_client'];
+				$retour['mnt_prc_tot_client'][2] += $tranche_data['mnt_prc_client'];
+
+			}
+
+
+		} else
+		if ($val == 6) { //le critère est solde montant
+
+			$retour['critere']=_("Solde compte épargne");
+			for ($i = 0; $i < 3; $i++) {
+
+				$key_name = 'solde';
+				switch ($i) {
+					case 0 :
+						$key_value = $b1;
+						$operator = "<";
+						$libel = _("Moins de ") . afficheMontant($b1, true);
+						$retour['lib_niveau1'][$i]= _("Solde Inférieur à ") . afficheMontant($b1, true);
+
+						break;
+					case 1 :
+						$key_value = $b1;
+						$key_value2 = $b2;
+						$operator = "><";
+						$libel = sprintf(_("Compris entre %s et %s"),afficheMontant($b1, true),afficheMontant($b2, true));
+						$retour['lib_niveau1'][$i]=$libel;
+
+						break;
+					case 2 :
+						$key_value = $b2;
+						$operator = ">";
+						$libel = _("Supérieur à")." ". afficheMontant($b2, true);
+						$retour['lib_niveau1'][$i]=$libel;
+
+						break;
+				}
+
+				$tranche_data = get_tranche($data, $total_data, $key_name, $key_value, $key_name2, $key_value2, $key_name3, $key_value3, $operator);
+				$retour['lib_niveau2'][$i]=$libel;
+				if (!isset($retour['lib_niveau2']['nbre'][$i]))
+				$retour['lib_niveau2']['nbre'][$i]=0;
+				if (!isset($retour['lib_niveau2']['nbre_prc'][$i]))
+				$retour['lib_niveau2']['nbre_prc'][$i]=0;
+				if (!isset($retour['lib_niveau2']['mnt'][$i]))
+				$retour['lib_niveau2']['mnt'][$i]=0;
+				if (!isset($retour['lib_niveau2']['mnt_prc'][$i]))
+				$retour['lib_niveau2']['mnt_prc'][$i]=0;
+
+				$retour['lib_niveau2']['nbre'][$i] +=$tranche_data['nbre'];
+				$retour['lib_niveau2']['nbre_prc'][$i] +=$tranche_data['nbre_prc'];
+				$retour['lib_niveau2']['mnt'][$i] +=$tranche_data['mnt'];
+				$retour['lib_niveau2']['mnt_prc'][$i] +=$tranche_data['mnt_prc'];
+			}
+
+
+		} else
+		if ($val == 7) { // le critère est type de produit : DAV , DAT , CAT
+
+			$retour['critere']=_("Type de produit d'épargne");
+			for ($i = 0; $i < 5; $i++) {
+
+				if ($i == 0)
+				$j = 1; // DAV
+				else
+				if ($i == 1)
+				$j = 2; // DAT
+				else
+				if ($i == 2)
+				$j = 5; // CAT
+				else
+				if ($i == 3)
+				$j = 3; // Autres dépôts (garanties au crédit, etc)
+                else
+                if ($i == 4)
+                $j = 8; // Comptes chèques certifiés
+
+				$key_name = 'classe_comptable';
+				$key_value = $j;
+				$operator = "=";
+				$libel = adb_gettext($adsys["adsys_type_cpte_comptable"][$j]);
+				$retour['lib_niveau1'][$i]=adb_gettext($adsys["adsys_type_cpte_comptable"][$j]);
+
+				$tranche_data = get_tranche($data, $total_data, $key_name, $key_value, $key_name2, $key_value2, $key_name3, $key_value3, $operator);
+				$retour['lib_niveau2'][$i]=$libel;
+				if (!isset($retour['lib_niveau2']['nbre'][$i]))
+				$retour['lib_niveau2']['nbre'][$i]=0;
+				if (!isset($retour['lib_niveau2']['nbre_prc'][$i]))
+				$retour['lib_niveau2']['nbre_prc'][$i]=0;
+				if (!isset($retour['lib_niveau2']['mnt'][$i]))
+				$retour['lib_niveau2']['mnt'][$i]=0;
+				if (!isset($retour['lib_niveau2']['mnt_prc'][$i]))
+				$retour['lib_niveau2']['mnt_prc'][$i]=0;
+
+				$retour['lib_niveau2']['nbre'][$i] +=$tranche_data['nbre'];
+				$retour['lib_niveau2']['nbre_prc'][$i] +=$tranche_data['nbre_prc'];
+				$retour['lib_niveau2']['mnt'][$i] +=$tranche_data['mnt'];
+				$retour['lib_niveau2']['mnt_prc'][$i] +=$tranche_data['mnt_prc'];
+			}
+
+
+		}
+
+		$retour['nbre_prc'] += $tranche_data['nbre_prc'];
+		$retour['mnt_prc'] += $tranche_data['mnt_prc'];
+		$retour['retard'] += $tranche_data['retard'];
+		$retour['retard_prc'] += $tranche_data['retard_prc'];
+	}
+
+	$retour['devise']=$array_devise;
+	$retour['mntclient']=$total_data['mntclient'];
+	$retour['nbre']=$total_data['nbre'] ;
+	$retour['mnt']=$total_data['mnt'] ;
+	$retour['nbreclient']=$total_data['nbreclient'] ;
+
+	// Ajout du nombre d'agence selectionné dans tableau contenant les statistiques de l'agence ou du réseau
+	$retour['a_nombreAgence'] = count($list_agence);
+	if ($retour['a_nombreAgence'] > 1) {
+		resetGlobalIdAgence();
+	}
+	return $retour;
+
+}
+
+/**
+ * Génération du XML pour le rapport Liste des épargnes
+ *
+ * @param unknown_type $val
+ * @param array $DATA : tableau des donnees
+ * @param boolean $export_csv: flag pour savoir si l'etat a produire est un export CSV
+ * @return str Une chaîne contenant le code XML demandé
+ */
+
+function xml_liste_epargne($DATA, $id_prod, $export_csv = false,$date_rapport) {
+	global $adsys;
+	// XML
+	$document = create_xml_doc("liste_epargne", "liste_epargne.dtd");
+	set_time_limit(0);
+	$root = $document->root();
+	gen_header($root, 'EPA-LST',"  ".$date_rapport);
+	$header_contextuel = $root->new_child("header_contextuel", "");
+
+	$devises = $DATA['devises'];
+	unset($DATA['devises']);
+	$mnt_devise = $DATA['mnt'];
+	unset($DATA['mnt']);
+	if (is_array($devises) && sizeof($devises)>0)
+		foreach($devises as $devise=>$value) {
+		if ($value["taux"] != 1) {
+			$total_devise = afficheMontant($mnt_devise*$value['taux'], false, $export_csv);
+			$totaux_devises = $root->new_child("totaux_devises", "");
+			$totaux_devises->set_attribute("nb", $total_devise.$value["libel"]);
+			$totaux_devises->set_attribute("nbc", $total_devise.$value["libel"]);
+		}
+	}
+
+	$critere = $DATA['critere'];
+    $type_epargne = $DATA['type_epargne'];
+	unset($DATA['critere']);
+    unset($DATA['type_epargne']);
+	$header_contextuel->new_child("critere", $critere);
+    $header_contextuel->new_child("type_epargne", $type_epargne);
+    $header_contextuel->new_child("zone", $DATA['zone']);
+    $header_contextuel->new_child("agence", $DATA['agence']);
+    $header_contextuel->new_child("guichet", $DATA['guichet']);
+	$tot_nb_compte = 0;
+	$tot_solde_compte = 0;
+	$taille = $DATA['taille'];
+	unset($DATA['taille']);
+	$total_data = $DATA['totaux'];
+	unset($DATA['totaux']);
+
+    foreach($DATA as $key =>$value) {
+        if($key != "zone") {
+            $type_epargnes[$key] = $root->new_child("type_epargnes", "");
+            $type_epargnes[$key]->new_child("lib_type_ep", $value["lib_type_ep"]);
+            $produit_epargnes = $value["produit_epargnes"];
+//      $recouvrements_par_classe =  $details_recouvrement->new_child("recouvrements_par_classe", ""); //groupement par classe credit
+//      $classe_credit =  $recouvrements_par_classe->new_child("classe_credit", $regroupement_dossiers["classe_credit"]);  //recuperation de libel classecredit
+
+            foreach ($produit_epargnes as $key1 => $value1) {
+                setMonnaieCourante($value["devise"]);
+                $prd_eps = $type_epargnes[$key]->new_child("clients", "");
+                $prd_eps->new_child("type_ep", $value1["type_ep"]);
+                $prd_eps->new_child("lib_prod_ep", $value1["libel_prod_ep"]);
+//        $clients[$key] = $root->new_child("clients", "");
+//        $clients[$key1]->new_child("type_ep", $value1["type_ep"]);
+//        $clients[$key1]->new_child("lib_prod_ep", $value1["libel_prod_ep"]);
+                $titulaires = $value1["titulaires"];
+                $sous_tot_compte = 0;
+                $sous_tot_solde = 0;
+                if (sizeof($titulaires) != 0) {
+                    foreach ($titulaires as $key2 => $value2) {
+                        $comptes = $prd_eps->new_child("comptes", "");
+                        $comptes->new_child("num_client", $value2["id_titulaire"]);
+                        $comptes->new_child("nom_client", $value2["nom"]);
+                        $comptes_client = $value2["comptes"];
+                        $sous_tot_compte += sizeof($comptes_client);
+                        if ($export_csv) {
+                            foreach ($comptes_client as $key3 => $value3) {
+                                //$compte_csv = $comptes->new_child("compte_csv", "");
+                                $comptes->new_child("num_compte", $value3["num_complet_cpte"]);
+                                $comptes->new_child("solde_compte", afficheMontant($value3["solde"], true, $export_csv));
+                                $sous_tot_solde += $value3["solde"];
+                            }
+                        } else {
+                            foreach ($comptes_client as $key3 => $value3) {
+                                $compte_numero = $comptes->new_child("compte_numeros", "");
+                                $compte_numero->new_child("num_compte", $value3["num_complet_cpte"]);
+                                $solde_compte = $comptes->new_child("compte_soldes", "");
+                                $solde_compte->new_child("solde_compte", afficheMontant($value3["solde"], true, $export_csv));
+                                $sous_tot_solde += $value3["solde"];
+                            }
+                        }
+                    }
+                }
+
+                // sous totaux
+                $st = $prd_eps->new_child("sous_total", "");
+                $st->new_child("nb_tot_tit", sizeof($titulaires));
+                $st->new_child("sous_tot_compte", $sous_tot_compte);
+                $st->new_child("mnt_tot", afficheMontant($sous_tot_solde, true, $export_csv));
+                $tot_nb_compte += $sous_tot_compte;
+                $tot_solde_compte += $sous_tot_solde;
+            }
+        }
+    }
+	//total général
+	$total = $prd_eps->new_child("total", "");
+	$total->new_child("tot_nb_compte", $tot_nb_compte);
+	$total->new_child("tot_solde_compte", afficheMontant($tot_solde_compte, true, $export_csv));
+
+	$header_contextuel->new_child("header_tot_compte", $tot_nb_compte);
+	$header_contextuel->new_child("header_tot_solde", afficheMontant($tot_solde_compte, true, $export_csv));
+
+	//Liste des agences consolidées
+	if (isSiege() && $_POST["agence"] == NULL) {
+		$list_agence=getListAgenceConsolide();
+		foreach($list_agence as $id_ag =>$data_agence) {
+			$enreg_agence=$root->new_child("enreg_agence","");
+			$enreg_agence->new_child("is_siege", "true");
+			$enreg_agence->new_child("id_ag", $data_agence['id']);
+			$enreg_agence->new_child("libel_ag", $data_agence['libel']);
+			$enreg_agence->new_child("date_max", $data_agence['date_dernier_mouv']);
+		}
+	}else{
+		$enreg_agence=$root->new_child("enreg_agence","");
+		$enreg_agence->new_child("is_siege", "false");
+	}
+
+
+	return $document->dump_mem(true);
+}
+
+
+function xml_liste_epargne_zone($DATA, $id_prod, $export_csv = false,$date_rapport) {
+    global $adsys;
+    // XML
+    $document = create_xml_doc("liste_epargne", "liste_epargne_zone.dtd");
+    set_time_limit(0);
+    $root = $document->root();
+    gen_header($root, 'EPA-LST',"  ".$date_rapport);
+    $header_contextuel = $root->new_child("header_contextuel", "");
+
+    $devises = $DATA['devises'];
+    unset($DATA['devises']);
+    $mnt_devise = $DATA['mnt'];
+    unset($DATA['mnt']);
+    if (is_array($devises) && sizeof($devises)>0)
+        foreach($devises as $devise=>$value) {
+            if ($value["taux"] != 1) {
+                $total_devise = afficheMontant($mnt_devise*$value['taux'], false, $export_csv);
+                $totaux_devises = $root->new_child("totaux_devises", "");
+                $totaux_devises->set_attribute("nb", $total_devise.$value["libel"]);
+                $totaux_devises->set_attribute("nbc", $total_devise.$value["libel"]);
+            }
+        }
+
+    $critere = $DATA['critere'];
+    $type_epargne = $DATA['type_epargne'];
+    unset($DATA['critere']);
+    unset($DATA['type_epargne']);
+    $header_contextuel->new_child("critere", $critere);
+    $header_contextuel->new_child("type_epargne", $type_epargne);
+    $header_contextuel->new_child("zone", $DATA['zone']);
+    $tot_nb_compte = 0;
+    $tot_solde_compte = 0;
+    $taille = $DATA['taille'];
+    unset($DATA['taille']);
+    $total_data = $DATA['totaux'];
+    unset($DATA['totaux']);
+
+    foreach($DATA as $key =>$value) {
+        if($key != "zone") {
+            $type_epargnes[$key] = $root->new_child("type_epargnes", "");
+            $type_epargnes[$key]->new_child("lib_type_ep", $value["lib_type_ep"]);
+            $produit_epargnes = $value["produit_epargnes"];
+//      $recouvrements_par_classe =  $details_recouvrement->new_child("recouvrements_par_classe", ""); //groupement par classe credit
+//      $classe_credit =  $recouvrements_par_classe->new_child("classe_credit", $regroupement_dossiers["classe_credit"]);  //recuperation de libel classecredit
+
+            foreach ($produit_epargnes as $key1 => $value1) {
+                setMonnaieCourante($value["devise"]);
+                $prd_eps = $type_epargnes[$key]->new_child("clients", "");
+                $prd_eps->new_child("type_ep", $value1["type_ep"]);
+                $prd_eps->new_child("lib_prod_ep", $value1["libel_prod_ep"]);
+                $titulaires = $value1["titulaires"];
+                if (sizeof($titulaires) != 0) {
+                    foreach ($titulaires as $zone_def => $titulaires_dataset) {
+                        $zone = $prd_eps->new_child("zone", "");
+                        $zone->new_child("libelle_zone", $zone_def);
+                        $sous_tot_compte = 0;
+                        $sous_tot_solde = 0;
+                        foreach ($titulaires_dataset as $client_dataset) {
+                            $comptes = $zone->new_child("comptes", "");
+                            $comptes->new_child("num_client", $client_dataset["id_titulaire"]);
+                            $comptes->new_child("nom_client", $client_dataset["nom"]);
+                            $comptes_client = $client_dataset["comptes"];
+                            $sous_tot_compte += sizeof($comptes_client);
+                            if ($export_csv) {
+                                foreach ($comptes_client as $key3 => $value3) {
+                                    //$compte_csv = $comptes->new_child("compte_csv", "");
+                                    $comptes->new_child("num_compte", $value3["num_complet_cpte"]);
+                                    $comptes->new_child("solde_compte", afficheMontant($value3["solde"], true, $export_csv));
+                                    $sous_tot_solde += $value3["solde"];
+                                }
+                            } else {
+                                foreach ($comptes_client as $key3 => $value3) {
+                                    $compte_numero = $comptes->new_child("compte_numeros", "");
+                                    $compte_numero->new_child("num_compte", $value3["num_complet_cpte"]);
+                                    $solde_compte = $comptes->new_child("compte_soldes", "");
+                                    $solde_compte->new_child("solde_compte", afficheMontant($value3["solde"], true, $export_csv));
+                                    $sous_tot_solde += $value3["solde"];
+                                }
+                            }
+                        }
+                        // sous totaux
+                        $st = $zone->new_child("sous_total", "");
+                        $st->new_child("nb_tot_tit", sizeof($titulaires_dataset));
+                        $st->new_child("sous_tot_compte", $sous_tot_compte);
+                        $st->new_child("mnt_tot", afficheMontant($sous_tot_solde, true, $export_csv));
+                        $tot_nb_compte += $sous_tot_compte;
+                        $tot_solde_compte += $sous_tot_solde;
+                    }
+                }
+            }
+        }
+    }
+    //total général
+    $total = $prd_eps->new_child("total", "");
+    $total->new_child("tot_nb_compte", $tot_nb_compte);
+    $total->new_child("tot_solde_compte", afficheMontant($tot_solde_compte, true, $export_csv));
+
+    $header_contextuel->new_child("header_tot_compte", $tot_nb_compte);
+    $header_contextuel->new_child("header_tot_solde", afficheMontant($tot_solde_compte, true, $export_csv));
+
+    //Liste des agences consolidées
+    if (isSiege() && $_POST["agence"] == NULL) {
+        $list_agence=getListAgenceConsolide();
+        foreach($list_agence as $id_ag =>$data_agence) {
+            $enreg_agence=$root->new_child("enreg_agence","");
+            $enreg_agence->new_child("is_siege", "true");
+            $enreg_agence->new_child("id_ag", $data_agence['id']);
+            $enreg_agence->new_child("libel_ag", $data_agence['libel']);
+            $enreg_agence->new_child("date_max", $data_agence['date_dernier_mouv']);
+        }
+    }else{
+        $enreg_agence=$root->new_child("enreg_agence","");
+        $enreg_agence->new_child("is_siege", "false");
+    }
+
+
+    return $document->dump_mem(true);
+}
+
+function xml_liste_epargne2($DATA, $id_prod, $export_csv = false,$date_rapport) {
+	global $adsys;
+	// XML
+	$document = create_xml_doc("liste_epargne", "liste_epargne.dtd");
+	set_time_limit(0);
+	$root = $document->root();
+	gen_header($root, 'EPA-LST',"  ".$date_rapport);
+	$header_contextuel = $root->new_child("header_contextuel", "");
+
+	$devises = $DATA['devises'];
+	unset($DATA['devises']);
+	$mnt_devise = $DATA['mnt'];
+	unset($DATA['mnt']);
+	if (is_array($devises) && sizeof($devises)>0)
+		foreach($devises as $devise=>$value) {
+		if ($value["taux"] != 1) {
+			$total_devise = afficheMontant($mnt_devise*$value['taux'], false);
+			$totaux_devises = $root->new_child("totaux_devises", "");
+			$totaux_devises->set_attribute("nb", $total_devise.$value["libel"]);
+			$totaux_devises->set_attribute("nbc", $total_devise.$value["libel"]);
+		}
+	}
+
+	$critere = $DATA['critere'];
+    $type_epargne = $DATA['type_epargne'];
+	unset($DATA['critere']);
+    unset($DATA['type_epargne']);
+	$header_contextuel->new_child("critere", $critere);
+    $header_contextuel->new_child("type_epargne", $type_epargne);
+	$tot_nb_compte = 0;
+	$tot_solde_compte = 0;
+	$taille = $DATA['taille'];
+	unset($DATA['taille']);
+	$total_data = $DATA['totaux'];
+	unset($DATA['totaux']);
+
+	foreach($DATA as $key =>$value) {
+		setMonnaieCourante($value["devise"]);
+		$clients[$key] = $root->new_child("clients", "");
+		$clients[$key]->new_child("lib_prod_ep", $value["libel_prod_ep"]);
+		$titulaires = $value["titulaires"];
+		$sous_tot_compte = 0;
+		$sous_tot_solde = 0;
+		if(sizeof($titulaires)!=0){
+			foreach($titulaires as $key2 => $value2 ){
+				$comptes = $clients[$key]->new_child("comptes", "");
+				$comptes->new_child("num_client", $value2["id_titulaire"]);
+				$comptes->new_child("nom_client", $value2["nom"]);
+				$comptes_client = $value2["comptes"];
+				$sous_tot_compte += sizeof($comptes_client);
+				if($export_csv){
+					foreach($comptes_client as $key3 => $value3 ){
+						$compte_csv = $comptes->new_child("compte_csv", "");
+						$compte_csv->new_child("num_compte", $value3["num_complet_cpte"]);
+						$compte_csv->new_child("solde_compte",afficheMontant($value3["solde"], true));
+						$sous_tot_solde += $value3["solde"];
+					}
+				}else{
+					foreach($comptes_client as $key3 => $value3 ){
+						$compte_numero = $comptes->new_child("compte_numeros", "");
+						$compte_numero->new_child("num_compte", $value3["num_complet_cpte"]);
+						$solde_compte = $comptes->new_child("compte_soldes", "");
+						$solde_compte->new_child("solde_compte",afficheMontant($value3["solde"], true));
+						$sous_tot_solde += $value3["solde"];
+					}
+				}
+			}
+		}
+
+		// sous totaux
+		$st = $clients[$key]->new_child("sous_total", "");
+		$st->new_child("nb_tot_tit", sizeof($titulaires));
+		$st->new_child("sous_tot_compte", $sous_tot_compte);
+		$st->new_child("mnt_tot", afficheMontant($sous_tot_solde, true));
+		$tot_nb_compte += $sous_tot_compte;
+		$tot_solde_compte += $sous_tot_solde;
+	}
+
+	//total général
+	$total = $clients[$key]->new_child("total", "");
+	$total->new_child("tot_nb_compte", $tot_nb_compte);
+	$total->new_child("tot_solde_compte", afficheMontant($tot_solde_compte, true));
+
+	$header_contextuel->new_child("header_tot_compte", $tot_nb_compte);
+	$header_contextuel->new_child("header_tot_solde", afficheMontant($tot_solde_compte, true));
+
+	//Liste des agences consolidées
+	if (isSiege() && $_POST["agence"] == NULL) {
+		$list_agence=getListAgenceConsolide();
+		foreach($list_agence as $id_ag =>$data_agence) {
+			$enreg_agence=$root->new_child("enreg_agence","");
+			$enreg_agence->new_child("is_siege", "true");
+			$enreg_agence->new_child("id_ag", $data_agence['id']);
+			$enreg_agence->new_child("libel_ag", $data_agence['libel']);
+			$enreg_agence->new_child("date_max", $data_agence['date_dernier_mouv']);
+		}
+	}else{
+		$enreg_agence=$root->new_child("enreg_agence","");
+		$enreg_agence->new_child("is_siege", "false");
+	}
+
+	return $document->dump_mem(true);
+}
+
+/**
+ * Génération du XML pour le rapport Liste des épargnes
+ *
+ * @param unknown_type $val
+ * @param array $DATA : tableau des donnees
+ * @param boolean $export_csv: flag pour savoir si l'etat a produire est un export CSV
+ * @return str Une chaîne contenant le code XML demandé
+ */
+
+function xml_liste_impot_mobilier_collecte($DATA, $date_debut, $date_fin) {
+  global $adsys;
+  // XML
+  $document = create_xml_doc("liste_impot_mobilier_collecte", "liste_impot_mobilier_collecte.dtd");
+  set_time_limit(0);
+  $root = $document->root();
+  gen_header($root, 'CPT-IMP');
+  $header_contextuel = $root->new_child("header_contextuel", "");
+
+  $total_interet_annuel = 0;
+  $total_montant_impot = 0;
+
+  foreach($DATA as $key =>$value) {
+    $clients[$key] = $root->new_child("clients", "");
+    $clients[$key]->new_child("lib_prod_ep", $value["libel_prod_ep"]);
+    $titulaires = $value["titulaires"];
+    $sous_total_interet_annuel = 0;
+    $sous_total_montant_impot = 0;
+    if(sizeof($titulaires)!=0){
+      foreach($titulaires as $key2 => $value2 ){
+        $comptes = $clients[$key]->new_child("comptes", "");
+        $comptes->new_child("date_operation", $value2["date_operation"]);
+        $comptes->new_child("num_client", $value2["id_titulaire"]);
+        $comptes->new_child("nom_client", $value2["nom"]);
+        $comptes->new_child("interet_annuel", afficheMontant($value2["interet_annuel"], false));
+        $comptes->new_child("montant_impot", afficheMontant($value2["montant_impot"], false));
+        $sous_total_interet_annuel += $value2["interet_annuel"];
+        $sous_total_montant_impot += $value2["montant_impot"];
+      }
+    }
+
+    // sous totaux
+    $st = $clients[$key]->new_child("sous_total", "");
+    $st->new_child("sous_total_interet_annuel", afficheMontant($sous_total_interet_annuel, true));
+    $st->new_child("sous_total_montant_impot", afficheMontant($sous_total_montant_impot, true));
+    $total_interet_annuel += $sous_total_interet_annuel;
+    $total_montant_impot += $sous_total_montant_impot;
+  }
+
+  //total général
+//  $total = $clients[$key]->new_child("total", "");
+  $total = $root->new_child("total", "");
+  $total->new_child("total_interet_annuel", afficheMontant($total_interet_annuel, true));
+  $total->new_child("total_montant_impot", afficheMontant($total_montant_impot, true));
+
+  $header_contextuel->new_child("date_debut", $date_debut);
+  $header_contextuel->new_child("date_fin", $date_fin);
+
+  if(isset($DATA['critere'])) {
+    $produit_epargne = $DATA['critere'];
+    unset($DATA['critere']);
+    $header_contextuel->new_child("produit_epargne", $produit_epargne);
+  } else {
+    $header_contextuel->new_child("produit_epargne", "Tous");
+  }
+/*
+  //Liste des agences consolidées
+  if (isSiege() && $_POST["agence"] == NULL) {
+//    $list_agence=getListAgenceConsolide();
+//    foreach($list_agence as $id_ag =>$data_agence) {
+      $enreg_agence=$root->new_child("enreg_agence","");
+      $enreg_agence->new_child("is_siege", "true");
+//      $enreg_agence->new_child("id_ag", $data_agence['id']);
+//      $enreg_agence->new_child("libel_ag", $data_agence['libel']);
+//      $enreg_agence->new_child("date_max", $data_agence['date_dernier_mouv']);
+//    }
+  }else{
+    $enreg_agence=$root->new_child("enreg_agence","");
+    $enreg_agence->new_child("is_siege", "false");
+  }
+*/
+//  $s = $document->dump_mem(true);
+//  print_rn($s);
+  return $document->dump_mem(true);
+}
+
+function get_data_liste_epargne($list_agence, $id_prod_ep, $type_epargne, $limit,$offset,$date_rapport, $zone,$n_agence = null, $n_guichet = null) {
+  global $adsys;
+
+  $key_value = $key_value2 = $key_value3 = "";
+  $key_name = $key_name2 = $key_name3 = "";
+  $tranche_data_cumul=array();
+  $array_devise=array();
+  $total_data=array();
+  $total_data['mntclient'] =0;
+  $total_data['nbreclient'] =0;
+  $total_data['mnt']=0;
+  $total_data['nbre']=0;
+  $retour['nbre_prc'] = 0;
+  $retour['mnt_prc'] = 0;
+  $retour['retard'] = 0;
+  $retour['retard_prc'] = 0;
+  $critere = array();
+ 	$critere["id_prod"] = $id_prod_ep;
+ 	if($id_prod_ep != NULL){
+		$critere["libel"] = getLibelProdEp($id_prod_ep);
+	} else {
+      $critere["libel"] = _("Tous");
+    }
+ 	$retour['val'] = $critere;
+
+  foreach($list_agence as $key_id_ag =>$value) {
+    setGlobalIdAgence($key_id_ag);
+    $devises = get_table_devises();
+    array_merge($array_devise,$devises);
+    // Récupère les données
+    $result = get_liste_epargne($critere, $limit,$offset,$date_rapport, $type_epargne, $zone,$n_agence,$n_guichet);
+    if ($result->errCode != NO_ERR) {
+      return $result;
+    } else {
+      $data = $result->param;
+    }
+    $data["critere"] = $critere["libel"];
+  }
+
+  //Afficher le libelle type_epargne dans le PDF
+  if($type_epargne != NULL) {
+    $data["type_epargne"] = adb_gettext($adsys["adsys_type_cpte_comptable"][$type_epargne]);
+  } else {
+    $data["type_epargne"] = _("Tous");
+  }
+
+  if(empty($zone)){
+      $data["zone"] = _("Tous");
+  }elseif($zone == -1){
+      $data["zone"] = _("Aucun");
+  }else{
+      $libelle_zone = current(getZone(" id = $zone"));
+      $data["zone"] = _($libelle_zone["libelle_zone"]);
+  }
+  if (!empty($n_agence)){
+      $libelle_agence = getLibelLocalisationFenacobu($n_agence);
+      $data["n_agence"] = _($libelle_agence);
+  }
+    if (!empty($n_guichet)){
+        $libelle_agence = getLibelLocalisationFenacobu($n_guichet);
+        $data["n_guichet"] = _($libelle_agence);
+    }
+  return $data;
+}
+
+
+
+function get_data_impot_mobilier_collecte($id_prod_ep, $date_debut, $date_fin, $limit,$offset) {
+  global $adsys;
+
+  $critere = array();
+  $critere["id_prod"] = $id_prod_ep;
+  if($id_prod_ep != NULL){
+    $critere["libel"] = getLibelProdEp($id_prod_ep);
+  }
+  $result = get_impot_mobilier_collecte($critere, $date_debut, $date_fin, $limit, $offset);
+  if ($result->errCode != NO_ERR) {
+    return $result;
+  } else {
+
+    $data = $result->param;
+  }
+
+  if($id_prod_ep != NULL) {
+    $data["critere"] = $critere["libel"];
+  }
+
+  return $data;
+}
+
+/**
+ * Genere le xml pour le rapport des intérêts à payer
+ *
+ * @param $DATAS
+ * @param $criteres
+ * @return string
+ */
+function xml_calc_int_paye($DATAS, $criteres, $export_csv = false)
+{
+  global $adsys, $global_monnaie_courante, $global_langue_rapport, $global_langue_utilisateur;
+
+  if(is_null($global_langue_rapport))
+    $global_langue_rapport = $global_langue_utilisateur;
+
+  $document = create_xml_doc("calc_int_paye", "calc_int_paye.dtd");
+  $code_rapport = 'CPT-IAP';
+  $total_int = 0;
+  $devise = $global_monnaie_courante;
+
+  $count_data = count($DATAS);
+  if (is_null($count_data)) $count_data = "0";
+
+  //Element root
+  $root = $document->root();
+
+  //En-tête généraliste
+  $ref = gen_header($root, $code_rapport);
+
+  //En-tête contextuel
+  $header_contextuel = $root->new_child("header_contextuel", "");
+  $criteres_header = $criteres;
+  gen_criteres_recherche($header_contextuel, $criteres_header);
+
+  // Infos synthetiques
+  $infos_synthetique = $root->new_child("infos_synthetique", "");
+  $total_int_paye = $infos_synthetique->new_child("total_int_paye", afficheMontant(recupMontant($DATAS['total_int_paye']), $devise, $export_csv));
+
+  //Corps du rapport - donnees detaillés
+  $calc_int_paye_data = $root->new_child("calc_int_paye_data", "");
+
+  if($count_data > 0) {
+    foreach ($DATAS['details'] as $id_prod => $donnees_prod)
+    {
+      $prod = $calc_int_paye_data->new_child("prod", "");
+
+      $total_int_prod = $prod->new_child("total_int_prod", afficheMontant(recupMontant($donnees_prod['montant_int_prod']), $devise, $export_csv));
+      $prod_name = $prod->new_child("prod_name", $donnees_prod['prod_name']);
+
+      foreach($donnees_prod as $cpte_infos) {
+        if(is_array($cpte_infos))
+        {
+          $ligne_int_paye = $prod->new_child("ligne_int_paye", "");
+          $devise = $cpte_infos['devise'];
+          $num_client = $ligne_int_paye->new_child("num_client", $cpte_infos['id_titulaire']);
+          $num_cpte = $ligne_int_paye->new_child("num_cpte", $cpte_infos['num_complet_cpte']);
+          $nom_client = $ligne_int_paye->new_child("nom_client", $cpte_infos['nom_client']);
+          $capital = $ligne_int_paye->new_child("capital", afficheMontant(recupMontant($cpte_infos['solde']), $devise, $export_csv));
+          $date_ouvert = $ligne_int_paye->new_child("date_ouvert", localiser_date_rpt($cpte_infos["date_ouvert"]));;
+          $dat_date_fin = $ligne_int_paye->new_child("dat_date_fin", localiser_date_rpt($cpte_infos["dat_date_fin"]));
+          $nb_jours_echus = $ligne_int_paye->new_child("nb_jours_echus", $cpte_infos['max_nb_jours_echus']);
+          $montant_int = $ligne_int_paye->new_child("montant_int", afficheMontant(recupMontant($cpte_infos['tot_montant_int']), $cpte_infos['devise'], $export_csv));
+        }
+      }
+    }
+  }
+
+  $output = $document->dump_mem(true);
+  return($output);
+}
+
+function xml_liste_CompteSupamin($DATA, $devise = NULL, $critere, $export_csv = false) {
+  reset($DATA);
+
+  $document = create_xml_doc("listecomptes", "liste_compte_solde_sup_mnt.dtd");
+
+  $root = $document->root();
+  $mnt = $DATA["minimum"];
+
+  gen_header($root, 'EPA-MAX', " : solde supérieur à " . $mnt . " " . $devise);
+  //En-tête contextuel
+  $header_contextuel = $root->new_child("header_contextuel", "");
+  gen_criteres_recherche($header_contextuel, $critere);
+  $total_solde = 0;
+  $index = 1;
+  while (list (, $valeur) = each($DATA["details"])) {
+    $details = $root->new_child("details", "");
+    $details->new_child("index", $index);
+    $details->new_child("idclient", makeNumClient($valeur["idclient"]));
+    $details->new_child("nom", $valeur["nom"]);
+    $details->new_child("numcpt", $valeur["numcpt"]);
+    $details->new_child("libel", $valeur["libel"]);
+    if($valeur["devise"] != NULL && $export_csv = false){
+ 	     setMonnaieCourante($valeur["devise"]);
+ 	  }
+    $details->new_child("solde", afficheMontant(recupMontant($valeur["solde"]), false, $export_csv));
+    $total_solde += recupMontant($valeur["solde"]);
+    $index++;
+  }
+  $total = $root->new_child("total", "");
+  if($devise != NULL){
+ 	  setMonnaieCourante($devise);
+ 	}
+  $total->new_child("total_solde", afficheMontant($total_solde, true));
+  return $document->dump_mem(true);
+}
+
+function xml_extrait_compte($DATA, $liste_criteres, $export_csv = false) {
+  //Génération de code XML pour les extraits de compte d'un client
+  //DATA contient la liste des opérations pour les extraits de compte
+  //la liste des critères est un tableau associatif : champs=>valeur
+
+  basculer_langue_rpt();
+
+  setMonnaieCourante($DATA["devise"]);
+  global $adsys;
+
+  $document = create_xml_doc("extrait_compte", "extrait_compte.dtd");
+
+  //définition de la racine
+  $root = $document->root();
+
+  //En-tête généraliste
+  gen_header($root, 'EPA-EXC', " : " . $DATA['num_complet_cpte'] . "/" . $DATA['devise'] . " - " . $DATA['intitule_compte']);
+
+  //En-tête contextuel
+  $header_contextuel = $root->new_child("header_contextuel", "");
+  gen_criteres_recherche($header_contextuel, $liste_criteres);
+
+  //body
+  if (is_array($DATA["InfoMvts"])) {
+
+    $eft_id_extrait_prec = '';
+    $total_depot = 0;
+    $total_retrait = 0;
+
+    $info = $root->new_child("info", "");
+    $info->new_child("id_client", $DATA["id_client"]);
+    $info->new_child("nom_client", $DATA["nom_client"]);
+    $info->new_child("num_cpte", $DATA["num_complet_cpte"]);
+
+    $extrait = $root->new_child("extrait", "");
+
+    $start_loop = true;
+
+    foreach ($DATA["InfoMvts"] as $value) {
+      if ($value['eft_id_extrait'] != $eft_id_extrait_prec) {
+        setMonnaieCourante($DATA['devise']);
+
+      if($start_loop) {
+        //Opening balance. Ne doit etre recuperer qu'une seule fois!
+        $balance = $root->new_child("balance", "");
+        $balance->new_child("eft_dern_date", pg2phpDate($value['eft_dern_date']));
+        $balance->new_child("eft_dern_solde", afficheMontant($value['eft_dern_solde'], true, $export_csv));
+        $start_loop = false;
+      }
+        $transaction = $extrait->new_child("transaction", "");
+        $transaction->new_child("date_valeur", pg2phpDate($value['date_valeur']));
+        $transaction->new_child("n_ref", sprintf("%08d", $value['id_his']));
+
+        if ($value['donneur_ordre'] != NULL) {
+          $transaction->new_child("donneur_ordre", $value['donneur_ordre']);
+        }
+
+        if ($value['tireur'] != NULL) {
+          $transaction->new_child("tireur", $value['tireur']);
+        }
+
+        if ($value['information'] != NULL) {
+            $trad_information = new Trad($value['information']);  // Fix - Ticket #288
+            $trad_information=$trad_information->traduction();
+
+          if(in_array($value['type_operation'], $adsys["adsys_operation_cheque_infos"]) ){
+            $trad_information = getChequeno($value["id_his"],$trad_information,$value['info_ecriture']);
+          }
+
+            $transaction->new_child("information", $trad_information);
+        }
+
+        $transaction->new_child("communication", $value['communication']);
+        $transaction->new_child("solde", afficheMontant($value['eft_nouv_solde'], false, $export_csv));
+
+      }
+
+        $montant = afficheMontant(abs($value['montant']), false, $export_csv);
+      if ($value['montant'] >= 0) {
+          $transaction->new_child("depot", $montant);
+          $total_depot += $value['montant'];
+      } else {
+          $transaction->new_child("retrait", $montant);
+          $total_retrait += $value['montant'];
+      }
+    }
+
+      $total = $extrait->new_child("total", "");
+      $total->new_child("total_depot", afficheMontant($total_depot, false, $export_csv));
+      $total->new_child("total_retrait", afficheMontant(abs($total_retrait), false, $export_csv));
+  }
+
+  reset_langue();
+debug($document->dump_mem(true),"voi");
+  return $document->dump_mem(true);
+}
+
+/**
+ * genere le xml des extraits de compte pour le netbank
+ * */
+
+function xml_extrait_cpte_netbank($InfoMvts, $criteres, $export_csv = false){
+	global $global_multidevise;
+	global $global_monnaie;
+  reset($InfoMvts);
+  $document = create_xml_doc("extrait_cpte_netbank", "extrait_cpte_netbank.dtd");
+
+	//définition de la racine
+	$root = $document->root();
+	//En-tête généraliste
+	gen_header($root, 'EPA-EXN');
+  //En-tête contextuel
+	$header_contextuel = $root->new_child("header_contextuel", "");
+	gen_criteres_recherche($header_contextuel, $criteres);
+
+  // Détail par client
+	$details = $root->new_child("details", "");
+
+  //body
+	foreach ($InfoMvts as $value){
+	    $client = $details->new_child("client", "");
+	    $client->new_child("id_extrait_cpte",$value['id_extrait_cpte']);
+	    $client->new_child("id_his",$value['id_his']);
+			$client->new_child("id_cpte", $value['id_cpte']);
+			$client->new_child("num_complet_cpte", $value['num_complet_cpte']);
+      $client->new_child("intitule_compte", $value['intitule_compte']);
+		  $client->new_child("num_client",$value['id_titulaire']);
+      $client->new_child("nom_client",getNomClient($value['id_titulaire']));
+		  $client->new_child("montant", afficheMontant($value['montant'], false, $export_csv));
+		  $client->new_child("devise", $value['devise']);
+		  $client->new_child("date_exec", pg2phpDate($value['date_exec']));
+		  $client->new_child("date_valeur", pg2phpDate($value['date_valeur']));
+	    $client->new_child("libel_operation",$value['intitule']);
+		  $client->new_child("eft_id_extrait", $value['eft_id_extrait']);
+		  $client->new_child("eft_id_mvt", $value['eft_id_mvt']);
+	    $client->new_child("eft_id_client",$value['eft_id_client']);
+	    $client->new_child("eft_annee_oper", $value['eft_annee_oper']);
+	    $client->new_child("eft_dern_solde",afficheMontant($value['eft_dern_solde'], false, $export_csv));
+	    $client->new_child("eft_nouv_solde", afficheMontant($value['eft_nouv_solde'], false, $export_csv));
+		  $client->new_child("eft_dern_date", pg2phpDate($value['eft_dern_date']));
+		  $client->new_child("eft_sceau", pg2phpDate($value['eft_sceau']));
+	    $client->new_child("taux",$value['taux']);
+	    $client->new_child("mnt_frais", afficheMontant($value['mnt_frais'], false, $export_csv));
+	    $client->new_child("mnt_comm_change", afficheMontant($value['mnt_comm_change'], false, $export_csv));
+	    $client->new_child("cptie_mnt", afficheMontant($value['cptie_mnt'], false, $export_csv));
+	    $client->new_child("cptie_devise", $value['cptie_devise']);
+	    $client->new_child("cptie_num_cpte",$value['cptie_num_cpte']);
+	    $client->new_child("cptie_nom", $value['cptie_nom']);
+		  $client->new_child("cptie_adresse", $value['cptie_adresse']);
+	    $client->new_child("cptie_cp",$value['cptie_cp']);
+	    $client->new_child("cptie_ville", $value['cptie_ville']);
+	    $client->new_child("cptie_pays",$value['cptie_pays']);
+	    $client->new_child("communication",$value['communication']);
+
+            $trad_information = new Trad($value['information']); // Fix - Ticket #288
+	    $client->new_child("information",$trad_information->traduction());
+	}
+ return $document->dump_mem(true);
+}
+
+/**
+ * @desc Génération de code XML pour le rapport liste des frais en attente
+ * @author papa
+ * @since 2.8
+ * @param array $DATA  liste des frais en attente à imprimer
+ * @param array $liste_criteres liste des critères de sélection
+ * @return text le code XML généré
+ */
+function xml_frais_attente($DATA, $list_criteres) {
+
+  basculer_langue_rpt();
+
+  global $global_monnaie;
+
+  $document = create_xml_doc("frais_attente", "frais_attente.dtd");
+
+  //définition de la racine
+  $root = $document->root();
+
+  //En-tête généraliste
+  gen_header($root, 'EPA-ATT');
+
+  //En-tête contextuel : liste des critères
+  $header_contextuel = $root->new_child("header_contextuel", "");
+  gen_criteres_recherche($header_contextuel, $list_criteres);
+
+  //En-tête contextuel : informations synthétiques
+  $infos_synthetiques = $header_contextuel->new_child("infos_synthetiques", "");
+  $total_frais = 0; //total frais en attente dans la devsie de référence
+  $total_attente = 0; //  total comptes
+
+  //body
+  foreach ($DATA as $key=>$value) {
+
+    $total_frais += $value['cv'];
+    $total_attente++;
+
+    $attente = $root->new_child("attente", "");
+
+    //gestion des caractères spéciaux
+    $type_operation = ereg_replace("é|è|ê", "e", $value['libel_ope']);
+    $type_operation = ereg_replace("ô", "o", $type_operation);
+    $type_operation = ereg_replace("à", "a", $type_operation);
+    $type_operation = ereg_replace("ù", "u", $type_operation);
+    $attente->new_child("type_frais", $type_operation);
+    $attente->new_child("date_frais", pg2phpDate($value['date_frais']));
+    setMonnaieCourante($value["devise"]);
+    $nom_client = $value['pp_nom']." ".$value['pp_prenom']." ".$value['pm_raison_sociale']."".$value['gi_nom'];
+    $attente->new_child("mnt_frais", afficheMontant($value['montant'],true));
+    $attente->new_child("num_compte", $value['num_complet_cpte']);
+    $attente->new_child("num_client", $value['id_titulaire']);
+    $attente->new_child("nom_client",$nom_client);
+  }
+
+  $infos_synthetiques->new_child("total_attente", $total_attente);
+  setMonnaieCourante($global_monnaie);
+  $infos_synthetiques->new_child("total_frais", afficheMontant($total_frais, true));
+  reset_langue();
+
+  return $document->dump_mem(true);
+
+}
+
+/**
+ * Fonction permettant de générer le fuchier TXT de demande d'autorisation de recharge et le rapport PDF
+ *
+ * @param Array $DATA : Données fournies par Adbanking servant de contenu du XML
+ * @return String $nom_fichier : nom Fichier TXT
+ * @since 2.10 - mai 2007
+ * @version 2
+ * @author Animata, Stefano
+ */
+function autorisationTxt($DATA) {
+  global $REMOTE_ADDR;
+  global $lib_path;
+  global $global_nom_login;
+  $nom_fichier = $DATA['numCarte'].'_'.$DATA['numSeqAuto'];
+   // Copie de fichier XML et du TXT dans le partage SAMBA
+  $ligneTXT = array($DATA['numSeqAuto'], $DATA['codeAntenne'], $DATA['codeAgence'], $DATA['numCarte'], $DATA['compteRecharge'], $DATA['dateDmde'], $DATA['codeTitulaire'], $DATA['montant'], $DATA['devise']);
+  debug($ligneTXT,"Ligne");
+  //echo $lib_path."/ferlo/autorisation/AUT_$nom_fichier";
+  $Fnm=$lib_path."/ferlo/autorisation/AUT_$nom_fichier.txt";
+  //Création du fichier autorisation
+  $fic = creationFichier($ligneTXT,$Fnm);
+  ajout_log_systeme(date("H:i:s d F Y"), _('Demande d\'autorisation de recharge Carte Ferlo: Génération du Fichier TXT').' "'.$lib_path."/ferlo/autorisation/"."AUT_$nom_fichier.txt".'"', $global_nom_login, $REMOTE_ADDR);
+
+  return $nom_fichier;
+}
+
+/**
+ * genere le xml de tous les comptes d'epargne repris
+ * */
+
+function xml_comptes_epargne_repris($DATA,$criteres,$export_csv){
+	global $global_multidevise;
+	global $global_monnaie;
+	//Produits d'epargne financiers'
+	$produits= getListProdEpargne();
+  //XML
+	$document = create_xml_doc("comptes_epargne_repris", "comptes_epargne_repris.dtd");
+
+	//Element root
+	$root = $document->root();
+
+	//En-tête généraliste
+	gen_header($root, 'EPA-CER');
+
+	//En-tête contextuel
+	$header_contextuel = $root->new_child("header_contextuel", "");
+	//critères de recherche
+	gen_criteres_recherche($header_contextuel, $criteres);
+	$infos_synthetiques = $header_contextuel->new_child("infos_synthetiques", "");
+	$nbre_total=count($DATA);
+	$infos_synthetiques->new_child("nbre_total", $nbre_total);
+	//element produit
+	foreach ($produits as  $valeur) {
+		$eltsProduit[$valeur['id']]=$root->new_child("produit", "");
+		$eltsProduit[$valeur['id']]->new_child("libel", $valeur['libel'] . " (" . $valeur["devise"] . ")");
+
+	}
+  //detail
+	foreach ($DATA as $value){
+
+		$compte_repris=$eltsProduit[$value['id_prod']]->new_child("compte_repris", "");
+    $compte_repris->new_child("num_client",$value['id_client']);
+    $compte_repris->new_child("ancien_num_client",$value['anc_id_client']);
+		$compte_repris->new_child("nom_client",getClientNameByArray($value));
+		$compte_repris->new_child("num_cpte", $value['num_complet_cpte']);
+		$compte_repris->new_child("solde", afficheMontant($value['mnt_repris'], false, $export_csv));
+		$compte_repris->new_child("date_reprise", pg2phpDate($value['date_reprise']));
+
+	}
+
+
+return $document->dump_mem(true);
+}
+
+function xml_liste_depots_initiaux($DATA, $critere){
+	global $global_multidevise;
+	global $global_monnaie;
+	global $adsys;
+
+  $document = create_xml_doc("listedepots", "liste_depots_initiaux.dtd");
+
+  $root = $document->root();
+
+  gen_header($root, 'EPA-LDI');
+  //En-tête contextuel
+  $header_contextuel = $root->new_child("header_contextuel", "");
+  gen_criteres_recherche($header_contextuel, $critere);
+  $total_solde = 0;
+
+  foreach ($DATA as $key=>$valeur) {
+    $comptes = $valeur;
+    $details[$key] = $root->new_child("details", "");
+    $details[$key]->new_child("ladevise", "Devise : " .$key);
+    foreach($comptes as $cle=>$value){
+    	$devise = $details[$key]->new_child("devise", "");
+    	$devise->new_child("num_client", $value['id_client']);
+	    $devise->new_child("nom_client", $value['nom_client']);
+	    $devise->new_child("num_cpte", $value['cpte_interne_cli']);
+	    $devise->new_child("date_ouvert", pg2phpDate($value['date_valeur']));
+	    $devise->new_child("libel_prod_ep", $value['libel_prod_ep']);
+	    $devise->new_child("etat_cpte", adb_gettext($adsys["adsys_etat_cpt_epargne"][$value['etat_cpte']]));
+	    $devise->new_child("montant", afficheMontant(recupMontant($value['montant']), false, true));
+	    $devise->new_child("devise", $value['devise']);
+	    $total_solde += recupMontant($value['montant']);
+	  }
+	 $total = $details[$key]->new_child("total", "");
+   $total->new_child("total_solde", afficheMontant($total_solde, false));
+ }
+
+ return $document->dump_mem(true);
+}
+
+//XML pour la génération de la concentration de l'épargne par produit d'épargne et par solde
+//Cette fonction est une alternative à xml_repartition_epargne qui bloquait lorque'il y a beaucoup de sonnées: voir #1758.
+function  xml_concentration_epargne($DATA, $critere, $export_csv=false,$date_rapport,$date_debut,$date_fin){
+
+	  global $adsys;
+	  global $global_multidevise,$global_id_agence, $global_monnaie, $global_monnaie_courante;
+	   //XML
+	  $document = create_xml_doc("concentration_epargne1", "concentration_epargne1.dtd");
+
+	  //Element root
+ 	  $root = $document->root();
+
+ 	  //En-tête généraliste
+    //ticket 659
+  $v_date = "  du ".$date_debut." au ".$date_fin;
+  if(is_null($date_debut) && is_null($date_fin)){
+    $v_date = "  ".$date_rapport;
+  }
+ 	  gen_header($root, 'EPA-CON',$v_date);
+ 	  //En-tête contextuel
+ 	  $header_contextuel = $root->new_child("header_contextuel", "");
+ 	  $header_contextuel->new_child("critere", $critere);
+
+ 	  //element produit
+ 	  foreach ($DATA as $key=>$valeur) {
+ 	    $eltsProduit[$key] = $root->new_child("produit", "");
+ 	    $eltsProduit[$key]->new_child("libel", $valeur['libel_prod']);
+ 	  }
+ 	  $cpte_total = 0;
+ 	  $solde_total = 0;
+ 	  //detail
+ 	  foreach ($DATA as $key=>$value){
+ 	    if($value['devise'] == NULL){
+ 	      $value['devise'] = $global_monnaie;
+ 	    }
+ 	    setMonnaieCourante($value['devise']);
+ 	    //$tranche = $produit->new_child("tranche", "");
+ 	    foreach ($value as $cle=>$valeur){
+ 	      if($cle == 'homme' || $cle == 'femme' || $cle == 'pm' || $cle == 'gi' || $cle == 'gs'){
+ 	        $tranche = $eltsProduit[$key]->new_child("tranche", "");
+ 	        $tranche->new_child("statut_juridique", $valeur['statut_juridique']);
+ 	        $tranche->new_child("nbre", $valeur['nbre']);
+ 	        $tranche->new_child("nbre_prc", affichePourcentage($valeur['nbre_prc'], 2));
+ 	        $tranche->new_child("solde", afficheMontant($valeur['solde'], $value['devise'], true));
+ 	        $tranche->new_child("solde_prc", affichePourcentage($valeur['solde_prc'], 2));
+ 	      }
+ 	    }
+ 	    $sous_total = $eltsProduit[$key]->new_child("sous_total", "");
+ 	    $sous_total->new_child("libel", $value['Total']['libel']);
+ 	    $sous_total->new_child("total_cpte", $value['Total']['total_cpte']);
+ 	    $sous_total->new_child("total_cpte_prc", affichePourcentage($value['Total']['total_cpte_prc'], 2));
+ 	    $sous_total->new_child("total_solde", afficheMontant($value['Total']['total_solde'], $value['devise'], true));
+ 	    $sous_total->new_child("total_solde_prc", affichePourcentage($value['Total']['total_solde_prc'], 2));
+ 	    //total général
+ 	    $cpte_total += $value['Total']['total_cpte'];
+ 	    $solde_total += $value['Total']['total_solde'];
+ 	  }
+ 	  if(!$global_multidevise){
+ 	    $total = $root->new_child("total", "");
+ 	    $total->new_child("cpte_total", $cpte_total);
+ 	    $total->new_child("cpte_total_prc", "100% ");
+ 	    $total->new_child("solde_total", afficheMontant($solde_total, $value['devise'], true));
+ 	    $total->new_child("solde_total_prc", "100%");
+ 	  }
+ 	  return $document->dump_mem(true);
+}
+
+/* xml pour la génération du rapport d'inventaire de dépot */
+function xml_list_epargne_libre_DAT($DATA, $list_criteres,$date_deb,$date_fin,&$linenum, $isCsv = false, $isInfoSynt=false) {
+
+    global $global_id_agence, $global_id_profil, $adsys;
+    if($isCsv) {
+      $document = create_xml_doc("inventaire_depot", "inventaire_depot_csv.dtd");
+    } else {
+      $document = create_xml_doc("inventaire_depot", "inventaire_depot.dtd");
+    }
+    //Element root
+    $root = $document->root();
+
+    //recuperation des données de l'agence'
+    $AG = getAgenceDatas($global_id_agence);
+
+    //En-tête généraliste
+     gen_header($root, 'EPA-IDP');
+
+    $header_contextuel = $root->new_child("header_contextuel", "");
+
+  if ($isInfoSynt) {
+    gen_informations_synthetiques($header_contextuel, $list_criteres);
+  }
+
+    //Corps
+    $body = $root->new_child("body", "");
+
+    //$linenum=0;
+    foreach($DATA as $id_prod =>$value) {
+
+        $tot_solde_debut=0;
+        $tot_mouvement_depot=0;
+        $tot_mouvement_retrait=0;
+        $tot_solde_fin=0;
+
+        $produit_epargne = $body -> new_child("produit_epargne","");
+        $produit_epargne -> new_child("epargne",getLibelProdEp($id_prod));
+
+        foreach($value as $id_cpte => $value2){
+
+            $solde_deb=$value2['solde_debut'];
+            $solde_fin=$value2['solde_fin'];
+            $mvt_dep=$value2['montant_depot'];
+            $mvt_ret=$value2['montant_retrait'];
+
+            $ligne_produit = $produit_epargne->new_child("ligne_produit", "");
+            $ligne_produit->new_child("num", ($linenum+1));
+            $ligne_produit->new_child("num_cpte", $value2['num_complet_cpte']);
+            $ligne_produit->new_child("nom_client",$value2['nom_complet']);
+            $ligne_produit->new_child("sexe", getClientGender($value2['id_client']));
+            $ligne_produit->new_child("solde_debut_periode", afficheMontant($solde_deb));
+            $ligne_produit->new_child("total_mouvement_depot", afficheMontant($mvt_dep));
+            $ligne_produit->new_child("total_mouvement_retrait", afficheMontant($mvt_ret));
+            $ligne_produit->new_child("solde_fin_periode", afficheMontant($solde_fin));
+            $ligne_produit->new_child("date_naissance", $value2['pp_date_naissance']);
+            $ligne_produit->new_child("etat_civile", $adsys["adsys_etat_civil"][$value2['pp_etat_civil']]);
+            $ligne_produit->new_child("sector", $value2['sector']);
+            $ligne_produit->new_child("tel", $value2['num_tel']);
+            $ligne_produit->new_child("idnumber", $value2['pp_nm_piece_id']);
+
+            $linenum += 1;
+            $tot_solde_debut += $solde_deb;
+            $tot_mouvement_depot += $mvt_dep;
+            $tot_mouvement_retrait += $mvt_ret;
+            $tot_solde_fin += $solde_fin;
+
+        }
+        $totals = $produit_epargne -> new_child("totals","");
+        $totals -> new_child("tot_solde_debut",afficheMontant($tot_solde_debut));
+        $totals -> new_child("tot_mouvement_depot",afficheMontant($tot_mouvement_depot));
+        $totals -> new_child("tot_mouvement_retrait",afficheMontant($tot_mouvement_retrait));
+        $totals -> new_child("tot_solde_fin",afficheMontant($tot_solde_fin));
+    }
+
+    $xml = $document->dump_mem(true);
+
+    return $xml;
+
+}
+
+/**
+ *
+ * Renvoie le xml pour la generation du rapport des comptes dormants
+ *
+ * @param number $id_prd
+ * @param date $date_rapport
+ * @param string $export_csv
+ * @return NULL|array
+ */
+function xml_rapport_compte_dormant($id_prd, $date_rapport, $export_csv = false)
+{
+  global $global_multidevise;
+  global $global_monnaie;
+  global $adsys;
+
+  // Création racine
+  global $global_id_agence;
+
+  $document = create_xml_doc("rapport_compte_dormant", "rapport_compte_dormant.dtd");
+
+  $DATAS = get_rapport_compte_dormant_data($id_prd, $date_rapport);
+
+  if ($DATAS == NULL) {
+    return NULL;
+  }
+
+  $root = $document->root();
+
+  //En-tête généraliste
+  gen_header($root, 'EPA-CDT');
+
+  //En-tête contextuel
+  $header_contextuel = $root->new_child("header_contextuel", "");
+
+  if(empty($id_prd)) {
+    $libel_prd = _("Tous");
+  } else {
+    $libel_prd = getLibelPrdt($id_prd, "adsys_produit_epargne");
+  }
+
+  // Affichage critere de recherches
+  $criteres = array (
+      _("Produit d'épargne") => _($libel_prd),
+      _("Date") => $date_rapport
+  );
+
+  gen_criteres_recherche($header_contextuel, $criteres);
+
+  // Recup des sections du rapport
+  $grand_recap_arr = $DATAS['grand_recap'];
+  $details_compte_dormant_arr = $DATAS['details_compte_dormant'];
+
+  // Donnees Infos Synthetique
+  $nombre_comptes_dormants_total = $grand_recap_arr['nombre_comptes_dormants_total'];
+  $solde_comptes_dormants_total = $grand_recap_arr['solde_comptes_dormants_total'];
+
+  // Xml Infos synthetique
+  $infos_synthetique = $root->new_child("infos_synthetiques", "");
+  $infos_synthetique->new_child("nombre_comptes_dormants_total", $nombre_comptes_dormants_total);
+  $infos_synthetique->new_child("solde_comptes_dormants_total", afficheMontant($solde_comptes_dormants_total, true));
+
+  // Recupérer les produits d'épargne
+  $produit_epargne = getListeProduitEpargne();
+
+  $produit = $total = array ();
+  while (list ($key, $value) = each($produit_epargne)) {
+    $produit[$key] = $root->new_child("ligneCompteDormant", "");
+    $produit[$key]->new_child("lib_prod", $value);
+    $total[$key]['tot_solde_cpte'] = 0;
+  }
+
+  // Contenu
+  if (is_array($details_compte_dormant_arr)) {
+    foreach ($details_compte_dormant_arr as $id_cpte=>$value) {
+
+      $infosCompteDormant = $produit[$value["id_prod"]]->new_child("infosCompteDormant", "");
+      $infosCompteDormant->new_child("num_client", $value["num_client"]);
+      $infosCompteDormant->new_child("num_compte", $value["num_compte"]);
+      $infosCompteDormant->new_child("nom_client", $value["nom_client"]);
+      $infosCompteDormant->new_child("solde_compte", afficheMontant($value["solde_compte"], false, $export_csv));
+      $infosCompteDormant->new_child("date_blocage", pg2phpDate($value["date_blocage"]));
+
+      $total[$value['id_prod']]['tot_solde_cpte'] += $value['solde_compte'];
+    }
+
+    reset($produit_epargne);
+
+    while (list ($key, $value) = each($produit_epargne)) {
+      if ($total[$key]['tot_solde_cpte'] == 0) {
+        $root->remove_child($produit[$key]);
+      } else {
+        $xml_total = $produit[$key]->new_child("xml_total", "");
+        $xml_total->new_child("tot_solde_cpte", afficheMontant($total[$key]['tot_solde_cpte'], false, $export_csv));
+      }
+    }
+  }
+
+  return $document->dump_mem(true);
+}
+
+/**
+ * AT-33/AT-77 - Fonction dupliqué de la fonction existante get_data_repartition_epargne
+ * @param $list_agence
+ * @param $val
+ * @param $b1
+ * @param $b2
+ * @param $date_rapport
+ * @param $date_debut
+ * @param $date_fin
+ * @param $niveau_localisation - Niveau/type de localisation (Province, District, Secteur, Cellule, Village)
+ * @param $crit_loc - Les localisations
+ * @return mixed
+ */
+function get_data_repartition_epargne_rwanda($list_agence,$val, $b1, $b2,$date_rapport,$date_debut,$date_fin,$niveau_localisation,$crit_loc) {
+  global $adsys;
+
+  $key_value = $key_value2 = $key_value3 = "";
+  $key_name = $key_name2 = $key_name3 = "";
+  $tranche_data_cumul=array();
+  $array_devise=array();
+  $total_data=array();
+  $total_data['mntclient'] =0;
+  $total_data['nbreclient'] =0;
+  $total_data['mnt']=0;
+  $total_data['nbre']=0;
+  $retour['nbre_prc'] = 0;
+  $retour['mnt_prc'] = 0;
+  $retour['retard'] = 0;
+  $retour['retard_prc'] = 0;
+  $retour['val']=$val;
+  $retour['b1']=$b1;
+  $retour['b2']=$b2;
+  if(is_null($date_rapport)) {
+    $date_rapport = date("d/m/Y");
+  }
+
+  foreach($list_agence as $key_id_ag =>$value) {
+    setGlobalIdAgence($key_id_ag);
+    $devises = get_table_devises();
+    array_merge($array_devise,$devises);
+    // Récupère les données
+    $result = get_repartition_epargne_rwanda($date_rapport,$date_debut,$date_fin,$niveau_localisation,$crit_loc);
+    if ($result->errCode != NO_ERR) {
+      return $result;
+    } else {
+      $data = $result->param;
+    }
+
+    $total_data = $data['totaux'];
+    unset($data['totaux']);
+
+    if ($val == 5) { // le critère est "Localisation"
+
+
+      // localisation1
+      $retour['critere'] = _("Localisation");
+      $loc1 = get_localisation_rwanda($niveau_localisation,$crit_loc);//get_localisation(1);
+      if ($niveau_localisation == 1){
+        $key_name = 'province';
+      }
+      if ($niveau_localisation == 2){
+        $key_name = 'district';
+      }
+      if ($niveau_localisation == 3){
+        $key_name = 'secteur';
+      }
+      if ($niveau_localisation == 4){
+        $key_name = 'cellule';
+      }
+      if ($niveau_localisation == 5){
+        $key_name = 'village';
+      }
+
+      $retour['loc']=$loc1;
+      for ($i = 0; $i < sizeof($loc1); $i++) {
+        $key_name = $key_name;//'id_loc1';
+        $key_value = $loc1[$i]['id'];
+        $operator = "=";
+        $libel = $loc1[$i]['libel'];
+        $tranche_data =  get_tranche($data, $total_data, $key_name, $key_value, $key_name2, $key_value2, $key_name3, $key_value3, $operator);
+        $retour['lib_niveau1'][$i]=$libel;
+        if (!isset($retour['lib_niveau1']['nbre'][$i]))
+          $retour['lib_niveau1']['nbre'][$i]=0;
+        if (!isset($retour['lib_niveau1']['nbre_prc'][$i]))
+          $retour['lib_niveau1']['nbre_prc'][$i]=0;
+        if (!isset($retour['lib_niveau1']['nbre_client'][$i]))
+          $retour['lib_niveau1']['nbre_client'][$i]=0;
+        if (!isset($retour['lib_niveau1']['nbre_prc_client'][$i]))
+          $retour['lib_niveau1']['nbre_prc_client'][$i]=0;
+        if (!isset($retour['lib_niveau1']['mnt'][$i]))
+          $retour['lib_niveau1']['mnt'][$i]=0;
+        if (!isset($retour['lib_niveau1']['mnt_prc'][$i]))
+          $retour['lib_niveau1']['mnt_prc'][$i]=0;
+
+        $retour['lib_niveau1']['nbre'][$i] +=$tranche_data['nbre'];
+        $retour['lib_niveau1']['nbre_prc'][$i] +=$tranche_data['nbre_prc'];
+        $retour['lib_niveau1']['nbre_client'][$i] +=$tranche_data['nbre_client'];
+        $retour['lib_niveau1']['nbre_prc_client'][$i] +=$tranche_data['nbre_prc_client'];
+        $retour['lib_niveau1']['mnt'][$i] +=$tranche_data['mnt'];
+        $retour['lib_niveau1']['mnt_prc'][$i] +=$tranche_data['mnt_prc'];
+
+        if (!isset($retour['nb_tot'][1]))
+          $retour['nb_tot'][1]=0;
+        if (!isset($retour['nb_prc_tot'][1]))
+          $retour['nb_prc_tot'][1]=0;
+        if (!isset($retour['mnt_tot'][1]))
+          $retour['mnt_tot'][1]=0;
+        if (!isset($retour['mnt_prc_tot'][1]))
+          $retour['mnt_prc_tot'][1]=0;
+        if (!isset($retour['nb_tot_client'][1]))
+          $retour['nb_tot_client'][1] =0;
+        if (!isset($retour['nb_prc_tot_client'][1]))
+          $retour['nb_prc_tot_client'][1]=0;
+        if (!isset($retour['mnt_tot_client'][1]))
+          $retour['mnt_tot_client'][1]=0;
+        if (!isset($retour['mnt_prc_tot_client'][1]))
+          $retour['mnt_prc_tot_client'][1]=0;
+        // sous totaux
+        $retour['nb_tot'][1] += $tranche_data['nbre'];
+        $retour['nb_prc_tot'][1] += $tranche_data['nbre_prc'];
+        $retour['mnt_tot'][1] += $tranche_data['mnt'];
+        $retour['mnt_prc_tot'][1] += $tranche_data['mnt_prc'];
+
+        $retour['nb_tot_client'][1] += $tranche_data['nbre_client'];
+        $retour['nb_prc_tot_client'][1] += $tranche_data['nbre_prc_client'];
+        $retour['mnt_tot_client'][1] += $tranche_data['mnt_client'];
+        $retour['mnt_prc_tot_client'][1] += $tranche_data['mnt_prc_client'];
+
+
+      }
+    }
+
+    $retour['nbre_prc'] += $tranche_data['nbre_prc'];
+    $retour['mnt_prc'] += $tranche_data['mnt_prc'];
+    $retour['retard'] += $tranche_data['retard'];
+    $retour['retard_prc'] += $tranche_data['retard_prc'];
+  }
+
+  $retour['devise']=$array_devise;
+  $retour['mntclient']=$total_data['mntclient'];
+  $retour['nbre']=$total_data['nbre'] ;
+  $retour['mnt']=$total_data['mnt'] ;
+  $retour['nbreclient']=$total_data['nbreclient'] ;
+
+  // Ajout du nombre d'agence selectionné dans tableau contenant les statistiques de l'agence ou du réseau
+  $retour['a_nombreAgence'] = count($list_agence);
+  if ($retour['a_nombreAgence'] > 1) {
+    resetGlobalIdAgence();
+  }
+  return $retour;
+
+}
+
+/**
+ * AT-33/AT-77 - Fonction dupliqué de la fonction existante xml_repartition_epargne
+ * Génération du XML pour le rapport Concentration de l'épargne
+ *
+ * @param unknown_type $val
+ * 			 1 : produit d'épargne et statut juridique;
+ * 	     2 : statut juridique;
+ * 	     3 : qualité;
+ * 	     4 : secteur d'activité et produit d'épargne;
+ * 	     5 : localisation;
+ * 	     6 : solde (b1 précise le premier palier et b2 le second;
+ * @param int $b1 : si $val == 6, valeur du 1er palier
+ * @param int $b2 : si $val == 6, valeur du 2ème palier
+ * @param boolean $export_csv: flag pour savoir si l'etat a produire est un export CSV
+ * @return str Une chaîne contenant le code XML demandé
+ */
+
+function xml_repartition_epargne_rwanda($DATA, $export_csv = false,$date_rapport,$date_debut,$date_fin,$niveau_localisation) {
+  global $adsys;
+  // XML
+  $document = create_xml_doc("concentration_epargne", "repartition_epargne.dtd");
+  $root = $document->root();
+  //ticket 659
+  $v_date = "  du ".$date_debut." au ".$date_fin;
+  if(is_null($date_debut) && is_null($date_fin)){
+    $v_date = "  ".$date_rapport;
+  }
+  gen_header($root, 'EPA-CON',$v_date);
+  $header_contextuel = $root->new_child("header_contextuel", "");
+  $header_contextuel->new_child("nb1", $DATA['nbre']);
+  $header_contextuel->new_child("nb2", afficheMontant($DATA['mnt'], true, $export_csv));
+  $header_contextuel->new_child("nbc1", $DATA['nbreclient']);
+  $header_contextuel->new_child("nbc2", afficheMontant($DATA['mntclient'], true, $export_csv));
+  if (is_array($DATA['devises']) && sizeof($DATA['devises'])>0)
+    foreach($DATA['devises'] as $devise=>$value) {
+      if ($value["taux"] != 1) {
+        $total_devise = afficheMontant($DATA['mnt']*$value['taux'], $export_csv);
+        $totaux_devises = $root->new_child("totaux_devises", "");
+        $totaux_devises->set_attribute("nb", $total_devise.$value["libel"]);
+        $totaux_devises->set_attribute("nbc", $total_devise.$value["libel"]);
+      }
+    }
+
+
+    if ($DATA['val'] == 5) { // le critère est "Localisation"
+      $header_contextuel->new_child("critere", _("Localisation"));
+
+      // localisation1
+      if ($niveau_localisation == 1){
+        $lib_niveau1 = _("Province");
+      }
+      if ($niveau_localisation == 2){
+        $lib_niveau1 = _("District");
+      }
+      if ($niveau_localisation == 3){
+        $lib_niveau1 = _("Secteur");
+      }
+      if ($niveau_localisation == 4){
+        $lib_niveau1 = _("Cellule");
+      }
+      if ($niveau_localisation == 5){
+        $lib_niveau1 = _("Village");
+      }
+
+      $niveau1[0] = $root->new_child("niveau1", "");
+      $niveau1[0]->new_child("lib_niveau1", _("$lib_niveau1"));
+
+      for ($i = 0; $i < sizeof($DATA['loc']); $i++) {
+
+        $niveau2 = $niveau1[0]->new_child("niveau2", "");
+        $niveau2->new_child("lib_niveau2", $DATA['lib_niveau1'][$i]);
+        $niveau2->new_child("nb_compte", $DATA['lib_niveau1']['nbre'][$i]);
+        $niveau2->new_child("nb_prc", affichePourcentage($DATA['lib_niveau1']['nbre_prc'][$i], 2));
+        $niveau2->new_child("solde_compte", afficheMontant($DATA['lib_niveau1']['mnt'][$i], false, $export_csv));
+        $niveau2->new_child("solde_prc", affichePourcentage($DATA['lib_niveau1']['mnt_prc'][$i], 2));
+
+        $niveau2->new_child("nb_client", $DATA['lib_niveau1']['nbre_client'][$i]);
+        $niveau2->new_child("nb_prc_client", affichePourcentage($DATA['lib_niveau1']['nbre_prc_client'][$i], 2));
+        $niveau2->new_child("solde_client", afficheMontant($DATA['lib_niveau1']['mnt_client'][$i], false, $export_csv));
+        $niveau2->new_child("solde_prc_client", affichePourcentage($DATA['lib_niveau1']['mnt_prc_client'][$i], 2));
+
+      }
+
+      $total = $niveau1[0]->new_child("total", "");
+      $total->new_child("tot_nb_compte", $DATA['nb_tot'][1]);
+      $total->new_child("tot_nb_prc", "100%");
+      if ($export_csv === true){
+        $total->new_child("tot_solde_compte", afficheMontant($DATA['mnt_tot'][1], false, $export_csv));
+      }
+      else{
+        $total->new_child("tot_solde_compte", afficheMontant($DATA['mnt_tot'][1], true, $export_csv));
+      }
+      $total->new_child("tot_solde_prc", "100%");
+
+      $total->new_child("tot_nb_client", $DATA['nb_tot_client'][1]);
+      $total->new_child("tot_nb_prc_client", "100%");
+      if ($export_csv === true){
+        $total->new_child("tot_solde_client", afficheMontant($DATA['mnt_tot_client'][1], false, $export_csv));
+      }
+      else{
+        $total->new_child("tot_solde_client", afficheMontant($DATA['mnt_tot_client'][1], true, $export_csv));
+      }
+      $total->new_child("tot_solde_prc_client", "100%");
+
+      return $document->dump_mem(true);
+
+    }
+
+}
+
+
+?>

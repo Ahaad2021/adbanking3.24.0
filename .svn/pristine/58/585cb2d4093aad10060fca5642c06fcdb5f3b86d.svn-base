@@ -1,0 +1,35 @@
+<!-- DTD pour le rapport situation de compensation des transactions en deplacé -->
+
+        <!-- Element root -->
+        <!ELEMENT situation_compensation_siege (header, footer, header_contextuel, devise, solde_deb, situation_agence, solde_compensation_global, mvmts_deb, mvmts_cred, solde_fin)>
+
+        <!-- Un en-tete commun a tous -->
+        <!ENTITY % mod_header SYSTEM "header.dtd">
+        %mod_header;
+
+        <!ELEMENT situation_agence (compensations_par_agence*)>
+        <!ELEMENT compensations_par_agence (nom_agence, title, situation_local, situation_distant, synthese)>
+
+        <!ELEMENT situation_local (nom_agence_distant, total_depot, total_retrait, cpte_liaison, solde_operation_local, solde_compensation_local,comm_od_retrait_local, comm_od_depot_local)>
+        <!ELEMENT situation_distant (nom_agence_distant, total_depot, total_retrait, cpte_liaison, solde_operation_distant,comm_od_retrait_distant, comm_od_depot_distant)>
+        <!ELEMENT synthese (#PCDATA)>
+
+        <!ELEMENT nom_agence (#PCDATA)>
+        <!ELEMENT title (#PCDATA)>
+        <!ELEMENT nom_agence_distant (#PCDATA)>
+        <!ELEMENT total_depot (#PCDATA)>
+        <!ELEMENT total_retrait (#PCDATA)>
+        <!ELEMENT cpte_liaison (#PCDATA)>
+        <!ELEMENT devise (#PCDATA)>
+        <!ELEMENT solde_deb (#PCDATA)>
+        <!ELEMENT solde_fin (#PCDATA)>
+        <!ELEMENT mvmts_deb (#PCDATA)>
+        <!ELEMENT mvmts_cred (#PCDATA)>
+        <!ELEMENT comm_od_retrait_local (#PCDATA)>
+        <!ELEMENT comm_od_depot_local (#PCDATA)>
+        <!ELEMENT comm_od_retrait_distant (#PCDATA)>
+        <!ELEMENT comm_od_depot_distant (#PCDATA)>
+        <!ELEMENT solde_compensation_global (#PCDATA)>
+        <!ELEMENT solde_operation_local (#PCDATA)>
+        <!ELEMENT solde_operation_distant (#PCDATA)>
+        <!ELEMENT solde_compensation_local (#PCDATA)>

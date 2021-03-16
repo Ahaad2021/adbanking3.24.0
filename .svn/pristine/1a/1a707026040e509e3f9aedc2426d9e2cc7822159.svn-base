@@ -1,0 +1,16 @@
+#this is context properties
+#Wed Mar 28 15:38:59 MUT 2018
+
+#Context variables from repository context:BDD_SIEGE
+DB_host=null
+DB_name=null
+DB_pass=null
+DB_port=
+DB_user=null
+DB_schema=null
+
+#Build-in context variables
+fichier_param=C\:/multiagence/properties/adbanking.ini
+fichier_agences=C\:/multiagence/properties/multiagence.csv
+max_id_log_multiagence=0
+error_count=0

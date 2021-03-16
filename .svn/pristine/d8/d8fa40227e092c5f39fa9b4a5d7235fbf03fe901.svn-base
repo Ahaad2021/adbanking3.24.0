@@ -1,0 +1,862 @@
+<?Php
+/* vim: set expandtab softtabstop=2 shiftwidth=2: */
+/**
+ * Fonctions pour la gestion des utilisateurs.
+ * @package Systeme
+ **/
+
+require_once "lib/dbProcedures/parametrage.php";
+require_once "lib/dbProcedures/agence.php";
+
+function get_utilisateur_id() {
+  /*
+     Renvoie le prochain id d'utilisateur disponible
+  */
+  global $dbHandler, $global_id_agence;
+  $db = $dbHandler->openConnection();
+
+  $sql = "SELECT nextval('ad_uti_id_utilis_seq')";
+  $result = $db->query($sql);
+  if (DB::isError($result)) {
+    $dbHandler->closeConnection(false);
+    signalErreur(__FILE__,__LINE__,__FUNCTION__);
+  }
+
+  $row = $result->fetchrow();
+  $db = $dbHandler->closeConnection(true);
+  return $row[0];
+}
+
+function get_logins() {
+  /*
+    Renvoie la liste des logins existants
+  */
+  global $dbHandler, $global_id_agence;
+  $db = $dbHandler->openConnection();
+
+  $sql = "SELECT login FROM ad_log";
+  $result = $db->query($sql);
+  if (DB::isError($result)) {
+    $dbHandler->closeConnection(false);
+    signalErreur(__FILE__,__LINE__,__FUNCTION__);
+  }
+
+  $retour = array();
+  $i = 0;
+  while ($row = $result->fetchrow()) {
+    $retour[$i] = $row[0];
+    ++$i;
+  }
+  $db = $dbHandler->closeConnection(true);
+  return $retour;
+}
+
+function get_libels_guichets() {
+  /*
+    Renvoie la liste des libellés de guichets existants
+  */
+  global $dbHandler, $global_id_agence;
+  $db = $dbHandler->openConnection();
+
+  $sql = "SELECT libel_gui, id_gui FROM ad_gui WHERE id_ag = ".$global_id_agence;
+  $result = $db->query($sql);
+  if (DB::isError($result)) {
+    $dbHandler->closeConnection(false);
+    signalErreur(__FILE__,__LINE__,__FUNCTION__);
+  }
+
+  $retour = array();
+  while ($row = $result->fetchrow()) {
+    $retour[$row[1]] = $row[0];
+  }
+  $db = $dbHandler->closeConnection(true);
+  return $retour;
+}
+
+function get_profils_guichet() {
+//Renvoie un tableau renvoyant uniquement les ID de profils ayant un guichet associé
+  global $dbHandler, $global_id_agence;
+  $db = $dbHandler->openConnection();
+
+  $sql = "SELECT id, guichet FROM adsys_profils";
+  $result = $db->query($sql);
+  if (DB::isError($result)) {
+    $dbHandler->closeConnection(false);
+    signalErreur(__FILE__,__LINE__,__FUNCTION__);
+  }
+
+  $retour = array();
+  while ($row = $result->fetchrow()) {
+    if ($row[1] == 't') {
+      array_push($retour, $row[0]);
+    }
+  }
+
+  $db = $dbHandler->closeConnection(true);
+  return $retour;
+}
+
+function ajout_utilisateur($DATA) {
+  /* Paramètre entrant : infos de l'utilisateur & login à créer
+     Paramètre sortant : bolléen */
+  global $dbHandler, $global_id_agence;
+  $db = $dbHandler->openConnection();
+
+  $DATA = array_make_pgcompatible($DATA);
+  $DATA["pwd"]=strtolower("pwd");
+
+  //Insertion dans la table des utilisateurs
+  $sql = "INSERT INTO ad_uti ";
+  $sql .= "(id_utilis, nom, prenom, date_naiss, lieu_naiss, sexe, type_piece_id, num_piece_id, adresse, tel, date_crea, utilis_crea, ";
+  if ($DATA['ml_code_agent'] = ''){
+    $sql .= "date_modif, utilis_modif, id_ag, statut, is_gestionnaire, is_agent_ml) ";
+    $sql .= "VALUES('".$DATA['id_utilis']."', '".$DATA['nom']."', '".$DATA['prenom']."', '".$DATA['date_naiss']."', '".$DATA['lieu_naiss']."', '".$DATA['sexe']."', '".$DATA['type_piece_id']."', '".$DATA['num_piece_id']."', '".$DATA['adresse']."', '".$DATA['tel']."', '".$DATA['date_crea']."', '".$DATA['utilis_crea']."', '".$DATA['date_modif']."', '".$DATA['utilis_modif']."', $global_id_agence, '".$DATA['statut']."','".$DATA['is_gestionnaire']."','".$DATA['is_agent_ml']."')";
+
+  }  else{
+    $sql .= "date_modif, utilis_modif, id_ag, statut, is_gestionnaire, is_agent_ml, ml_code_agent) ";
+    $sql .= "VALUES('".$DATA['id_utilis']."', '".$DATA['nom']."', '".$DATA['prenom']."', '".$DATA['date_naiss']."', '".$DATA['lieu_naiss']."', '".$DATA['sexe']."', '".$DATA['type_piece_id']."', '".$DATA['num_piece_id']."', '".$DATA['adresse']."', '".$DATA['tel']."', '".$DATA['date_crea']."', '".$DATA['utilis_crea']."', '".$DATA['date_modif']."', '".$DATA['utilis_modif']."', $global_id_agence, '".$DATA['statut']."','".$DATA['is_gestionnaire']."','".$DATA['is_agent_ml']."','".$DATA['ml_code_agent']."')";
+
+  }
+
+  $result = $db->query($sql);
+  if (DB::isError($result)) {
+    $dbHandler->closeConnection(false);
+    signalErreur(__FILE__,__LINE__,__FUNCTION__);
+  }
+
+  if (isset($DATA["login"])) { // Si on désire associer un login à l'utilisateur
+    if ($DATA['guichet']) {//Si présence d'un guichet
+      //Récupération du prochain ID de guichet
+      $sql = "SELECT nextval('ad_gui_id_gui_seq')";
+      $result = $db->query($sql);
+      if (DB::isError($result)) {
+        $dbHandler->closeConnection(false);
+        signalErreur(__FILE__,__LINE__,__FUNCTION__);
+      } else if ($result->numrows() != 1) {
+        $dbHandler->closeConnection(false);
+        signalErreur(__FILE__,__LINE__,__FUNCTION__); // "Retour DB inattendu"
+      }
+      $row = $result->fetchrow();
+      $id_gui = $row[0];
+      $id_agence=getNumAgence();
+      //Insertion du guichet
+      $sql = "INSERT INTO ad_gui ";
+      $sql .= "(id_gui,id_ag, libel_gui, date_crea, utilis_crea, encaisse, date_enc, date_modif, utilis_modif, cpte_cpta_gui) ";
+      $sql .= "VALUES($id_gui,$global_id_agence,'".$DATA['libelGuichet']."','".$DATA['date_crea']."','".$DATA['utilis_crea']."', 0, '";
+      $sql .= $DATA['date_crea']."', '".$DATA['date_modif']."', '".$DATA['utilis_modif']."','".$DATA['cptecpta_gui']."')";
+      $result = $db->query($sql);
+      if (DB::isError($result)) {
+        $dbHandler->closeConnection(false);
+        signalErreur(__FILE__,__LINE__,__FUNCTION__);
+      }
+    }
+
+    //Insertion du login
+    $sql = "INSERT INTO ad_log(login, pwd, profil, guichet, id_utilisateur, have_left_frame, id_ag) VALUES('".$DATA['login']."', md5('".$DATA['pwd']."'), '".$DATA['profil']."', '$id_gui', '".$DATA['id_utilis']."', 't', $global_id_agence)";
+    $result = $db->query($sql);
+    if (DB::isError($result)) {
+      $dbHandler->closeConnection(false);
+      signalErreur(__FILE__,__LINE__,__FUNCTION__);
+    }
+  }
+  global $global_nom_login;
+  ajout_historique(270,NULL, $DATA['id_utilis'], $global_nom_login, date("r"), NULL);
+
+  $db = $dbHandler->closeConnection(true);
+  return true;
+}
+
+
+function get_logins_utilisateur($utilisateur) { //Renvoie tous les logins d'un utilisateur donné
+  global $dbHandler, $global_id_agence;
+  $db = $dbHandler->openConnection();
+
+  $sql = "SELECT login, profil  FROM ad_log WHERE id_utilisateur=$utilisateur";
+  $result = $db->query($sql);
+  if (DB::isError($result)) {
+    $dbHandler->closeConnection(false);
+    signalErreur(__FILE__,__LINE__,__FUNCTION__);
+  }
+
+  $retour = array();
+  $i = 0;
+  while ($row = $result->fetchrow()) {
+    $retour[$i]['login'] = $row[0];
+    $retour[$i]['profil'] = get_profil_nom($row[1]);
+    ++$i;
+  }
+  $db = $dbHandler->closeConnection(true);
+  return $retour;
+}
+
+function get_utilisateur_nom($id_utilisateur) {//Renvoie le nom complet d'un utilisateur à partir de son ID
+  global $dbHandler, $global_id_agence;
+  $db = $dbHandler->openConnection();
+
+  $sql = "SELECT nom, prenom  FROM ad_uti WHERE id_utilis=$id_utilisateur";
+  $result = $db->query($sql);
+  if (DB::isError($result)) {
+    $dbHandler->closeConnection(false);
+    signalErreur(__FILE__,__LINE__,__FUNCTION__);
+  }
+
+  $row = $result->fetchrow();
+  $retour = $row[1]." ".$row[0];
+
+  $db = $dbHandler->closeConnection(true);
+  return $retour;
+}
+
+function delUtilisateur($id_utilisateur) {
+  // Fonction qui supprime un utilisateur de la base de données (table ad_uti)
+  // IN : $id_utilisateur
+  // OUT: ErrorObj
+  //       NO_ERR = OK
+  //       ERR_EXIST_REFERENCE = Contraintes d'intégrité non respectées
+
+  global $dbHandler, $global_id_agence;
+  $db = $dbHandler->openConnection();
+
+  // Vérification au niveau client
+  $sql = "SELECT count(id_client) FROM ad_cli WHERE id_ag = ".$global_id_agence." AND gestionnaire = ".$id_utilisateur." AND etat = 2";
+  $result = $db->query($sql);
+  if (DB::isError($result)) {
+    $dbHandler->closeConnection(false);
+    signalErreur(__FILE__,__LINE__,__FUNCTION__);
+  }
+  $tmprow = $result->fetchrow();
+  $nombre = $tmprow[0];
+  if ($nombre > 0) {
+    $dbHandler->closeConnection(false);
+    return new ErrorObj(ERR_EXIST_REFERENCE, sprintf(_("Utilisateur gestionnaire de %d clients"),$nombre));
+  }
+
+  // Vérification au niveau crédit
+  $sql = "SELECT count(id_doss) FROM ad_dcr WHERE id_ag = ".$global_id_agence." AND (etat = 5 OR etat = 7 OR etat = 14 OR etat = 15) AND id_agent_gest = $id_utilisateur";
+  $result = $db->query($sql);
+  if (DB::isError($result)) {
+    $dbHandler->closeConnection(false);
+    signalErreur(__FILE__,__LINE__,__FUNCTION__);
+  }
+  $tmprow = $result->fetchrow();
+  $nombre = $tmprow[0];
+  if ($nombre > 0) {
+    $dbHandler->closeConnection(false);
+    return new ErrorObj(ERR_EXIST_REFERENCE, sprintf(_("Utilisateur gestionnaire de %d dossiers de crédit"),$nombre));
+  }
+
+  $sql = "DELETE FROM ad_uti WHERE id_utilis=$id_utilisateur";
+  $result = $db->query($sql);
+  if (DB::isError($result)) {
+    $dbHandler->closeConnection(false);
+    signalErreur(__FILE__,__LINE__,__FUNCTION__);
+  }
+
+  global $global_nom_login;
+  ajout_historique(273,NULL, $id_utilisateur, $global_nom_login, date("r"), NULL);
+
+  $db = $dbHandler->closeConnection(true);
+  return new ErrorObj(NO_ERR);
+}
+
+function modif_utilisateur($DATA) {
+  global $dbHandler, $global_id_agence;
+  $db = $dbHandler->openConnection();
+
+  $DATA = array_make_pgcompatible($DATA);
+
+if ($DATA['ml_code_agent'] == null) {
+    $ml_conditions =  empty($DATA['is_agent_ml'])?"":",is_agent_ml = " . $DATA['is_agent_ml'];
+  $sql = "UPDATE ad_uti SET nom='" . $DATA['nom'] . "', prenom='" . $DATA['prenom'] . "', date_naiss='" . $DATA['date_naiss'] . "', lieu_naiss='" . $DATA['lieu_naiss'] . "', sexe=" . $DATA['sexe'] . ", type_piece_id=" . $DATA['type_piece_id'] . ", num_piece_id='" . $DATA['num_piece_id'] . "', adresse='" . $DATA['adresse'] . "', tel='" . $DATA['tel'] . "', date_modif='" . $DATA['date_modif'] . "', utilis_modif=" . $DATA['utilis_modif'] . ", statut=" . $DATA['statut'] . ", is_gestionnaire= " . $DATA['is_gestionnaire'] . $ml_conditions. " WHERE id_utilis = " . $DATA['id_utilis'];
+}else{
+    $ml_conditions =  empty($DATA['is_agent_ml'])?"":",is_agent_ml = " . $DATA['is_agent_ml'];
+    $ml_conditions .=  " ".empty($DATA['ml_code_agent'])?"":"ml_code_agent = " . $DATA['ml_code_agent'];
+
+  $sql = "UPDATE ad_uti SET nom='" . $DATA['nom'] . "', prenom='" . $DATA['prenom'] . "', date_naiss='" . $DATA['date_naiss'] . "', lieu_naiss='" . $DATA['lieu_naiss'] . "', sexe=" . $DATA['sexe'] . ", type_piece_id=" . $DATA['type_piece_id'] . ", num_piece_id='" . $DATA['num_piece_id'] . "', adresse='" . $DATA['adresse'] . "', tel='" . $DATA['tel'] . "', date_modif='" . $DATA['date_modif'] . "', utilis_modif=" . $DATA['utilis_modif'] . ", statut=" . $DATA['statut'] . ", is_gestionnaire= " . $DATA['is_gestionnaire'] . $ml_conditions . " WHERE id_utilis = " . $DATA['id_utilis'];
+}
+  $result = $db->query($sql);
+  if (DB::isError($result)) {
+    $dbHandler->closeConnection(false);
+    signalErreur(__FILE__,__LINE__,__FUNCTION__);
+  }
+
+  global $global_nom_login;
+  ajout_historique(272,NULL, $DATA['id_utilis'], $global_nom_login, date("r"), NULL);
+
+  $db = $dbHandler->closeConnection(true);
+  return true;
+}
+
+function get_logins_and_utilisateurs() {
+  /*
+  Renvoie la liste des logins existants et des utilisateurs associés
+  */
+
+  global $dbHandler, $global_id_agence;
+
+  $db = $dbHandler->openConnection();
+
+  $sql = "SELECT login, id_utilisateur FROM ad_log";
+  $result = $db->query($sql);
+  if (DB::isError($result)) {
+    $dbHandler->closeConnection(false);
+    signalErreur(__FILE__,__LINE__,__FUNCTION__);
+  }
+
+  $i = 0;
+  while ($row = $result->fetchrow()) {
+    $retour[$i]['login'] = $row[0];
+    $retour[$i]['id_utilisateur'] = $row[1];
+    ++$i;
+  }
+
+  $db = $dbHandler->closeConnection(true);
+  return $retour;
+}
+
+function get_login_full_info($id_login) {
+
+  global $dbHandler, $global_id_agence;
+
+  $db = $dbHandler->openConnection();
+
+  //Info login
+  $sql = "SELECT * FROM ad_log WHERE login='$id_login'";
+  $result = $db->query($sql);
+  if (DB::isError($result)) {
+    $dbHandler->closeConnection(false);
+    signalErreur(__FILE__,__LINE__,__FUNCTION__);
+  } else if ($result->numrows() != 1) {
+    $dbHandler->closeConnection(false);
+    signalErreur(__FILE__,__LINE__,__FUNCTION__); // "Retour invalide"
+  }
+  $retour = $result->fetchrow(DB_FETCHMODE_ASSOC);
+
+  //Info guichet
+  if ($retour['guichet'] != 0) { //Si guichet associé
+    //Info guichet admin
+
+    $sql = "SELECT libel_gui, date_crea, utilis_crea, date_modif, utilis_modif, cpte_cpta_gui ";
+    $sql .= "FROM ad_gui WHERE id_ag = ".$global_id_agence." AND id_gui = ".$retour['guichet'];
+
+    $result = $db->query($sql);
+    if (DB::isError($result)) {
+      $dbHandler->closeConnection(false);
+      signalErreur(__FILE__,__LINE__,__FUNCTION__);
+    } else if ($result->numrows() != 1) {
+      $dbHandler->closeConnection(false);
+      signalErreur(__FILE__,__LINE__,__FUNCTION__); // "Retour invalide n°2"
+    }
+
+    $retour2 = $result->fetchrow(DB_FETCHMODE_ASSOC);
+    $retour = array_merge($retour, $retour2);
+  }
+
+  $db = $dbHandler->closeConnection(true);
+  return $retour;
+}
+
+function modif_login($id_login, $DATA) {
+  //Renvoie 0 si tout OK et -1 si login loggé
+  global $dbHandler, $global_id_agence;
+  $global_id_agence=getNumAgence();
+  $db = $dbHandler->openConnection();
+  $DATA = array_make_pgcompatible($DATA);
+
+  //$DATA["pwd"]=strtolower($DATA["pwd"]);
+  $id_login=addslashes($id_login);
+  //Vérifie si la personne n'est pas loggée
+  $sql = "DELETE FROM ad_ses WHERE login = '$id_login'";
+  $result = $db->query($sql);
+  if (DB::isError($result)) {
+    $dbHandler->closeConnection(false);
+    signalErreur(__FILE__,__LINE__,__FUNCTION__);
+  }
+
+  //Met à jour le login
+  if ($DATA['have_left_frame']) $val_left = 't';
+  else $val_left = 'f';
+  if ($DATA['billet_req']) $bil_req = 't';
+  else $bil_req = 'f';
+  if ($DATA['depasse_plafond_retrait']) $depasse_plafond_retrait = 't';
+  else $depasse_plafond_retrait = 'f';
+  if ($DATA['depasse_plafond_depot']) $depasse_plafond_depot = 't';
+  else $depasse_plafond_depot = 'f';
+  if ($DATA['pwd_non_expire']) $pwd_non_expire = 't';
+  else $pwd_non_expire = 'f';
+if (isEngraisChimiques()) {
+  if ($DATA['is_agent_ec']) $is_agent_ec = 't';
+  else $is_agent_ec = 'f';
+}
+  else{
+    $is_agent_ec = 'f';
+  }
+
+
+  $sql = "UPDATE ad_log SET login='".$DATA['login']."', have_left_frame='$val_left', billet_req = '$bil_req', depasse_plafond_retrait = '$depasse_plafond_retrait', depasse_plafond_depot = '$depasse_plafond_depot', pwd_non_expire  = '$pwd_non_expire', langue='".$DATA['langue']."' ,login_attempt=".$DATA['login_attempt']." , is_agent_ec = '".$is_agent_ec."' ";
+
+  if (isFusion()){
+      if (isset($DATA['n_agence']) && isset($DATA['n_guichet'])){
+        $sql .= " , n_agence = ".$DATA['n_agence']." , n_guichet = ".$DATA['n_guichet']." ";
+      }
+  }
+
+  $sql .= "WHERE login='$id_login'";
+
+  $result = $db->query($sql);
+  if (DB::isError($result)) {
+    $dbHandler->closeConnection(false);
+    signalErreur(__FILE__,__LINE__,__FUNCTION__);
+  }
+
+  //Met à jour le guichet
+  if ($DATA['guichet']) {
+    // Le compte comptable doit être renseigné
+    if ( $DATA['cpte_cpta_gui']=='' || $DATA['cpte_cpta_gui']==="0") { //on force la compraison pour prendre les comptes 0.0, 0.0.1, etc..
+      $dbHandler->closeConnection(false);
+      return -1;
+    }
+
+    // Vérifier l'unicité des comptes comptables des guichets
+    $sql = "SELECT * FROM ad_gui WHERE id_ag = ".$global_id_agence." AND cpte_cpta_gui ='".$DATA['cpte_cpta_gui']."' AND id_gui !=".$DATA['guichet'];
+    $result = $db->query($sql);
+    if (DB::isError($result)) {
+      $dbHandler->closeConnection(false);
+      signalErreur(__FILE__,__LINE__,__FUNCTION__);
+    }
+
+    $nb = $result->numrows();
+    if ($nb != 0) {
+      $dbHandler->closeConnection(false);
+      return -1;
+    }
+
+    $sql = "UPDATE ad_gui SET libel_gui='".$DATA['libel_gui']."', date_modif='".$DATA['date_modif_gui']."', utilis_modif=".$DATA['utilis_modif_gui'].", cpte_cpta_gui ='".$DATA['cpte_cpta_gui']."' WHERE id_ag = ".$global_id_agence." AND id_gui=".$DATA['guichet'];
+
+    $result = $db->query($sql);
+    if (DB::isError($result)) {
+      $dbHandler->closeConnection(false);
+      signalErreur(__FILE__,__LINE__,__FUNCTION__);
+    }
+  }
+
+  //Met à jour le mot de passe
+  if ($DATA['pwd'] != "") {
+    $sql = "UPDATE ad_log SET pwd= md5('".$DATA['pwd']."') WHERE login='".$DATA['login']."'";
+    $result = $db->query($sql);
+    if (DB::isError($result)) {
+      $dbHandler->closeConnection(false);
+      signalErreur(__FILE__,__LINE__,__FUNCTION__);
+    }
+  }
+
+  global $global_nom_login;
+  ajout_historique(290,NULL, $DATA['login'], $global_nom_login, date("r"), NULL);
+
+  $db = $dbHandler->closeConnection(true);
+  return 0;
+}
+
+function del_login($id_login) {
+  //Retourne 1 si tout OK, -1 si loggé, -2 si encaisse != 0
+  global $dbHandler, $global_id_agence;
+  $db = $dbHandler->openConnection();
+  $id_login = addslashes($id_login);
+  //Loggé ?
+  $sql = "SELECT count(*) FROM ad_ses WHERE login='$id_login'";
+  $result = $db->query($sql);
+  if (DB::isError($result)) {
+    $dbHandler->closeConnection(false);
+    signalErreur(__FILE__,__LINE__,__FUNCTION__);
+  }
+  $nbre = $result->fetchrow();
+  $nbre = $nbre[0];
+  if ($nbre != 0) {
+    $dbHandler->closeConnection(true);
+    return -1;
+  }
+
+  //Encaisse == 0 ?
+  $sql = "SELECT guichet FROM ad_log WHERE login='$id_login'"; //Recherche si guichet
+  $result = $db->query($sql);
+  if (DB::isError($result)) {
+    $dbHandler->closeConnection(false);
+    signalErreur(__FILE__,__LINE__,__FUNCTION__);
+  }
+  $guichet = $result->fetchrow();
+  $guichet = $guichet[0];
+
+  // si un guichet est associé au login, vérifier que son encaisse est non null
+  if ($guichet) {
+    if (!isEncaisseNul($id_login)) {
+      $dbHandler->closeConnection(true);
+      // FIXME Meilleur message d'erreur à prévoir !
+      return -2;
+    }
+  }
+
+  //Del login
+  $sql = "DELETE FROM ad_log WHERE login = '$id_login'";
+  $result = $db->query($sql);
+  if (DB::isError($result)) {
+    $dbHandler->closeConnection(false);
+    signalErreur(__FILE__,__LINE__,__FUNCTION__);
+  }
+  //Del guichet & compte
+  if ($guichet) {
+    $sql = "DELETE FROM ad_gui WHERE id_ag = ".$global_id_agence." AND id_gui = '$guichet'";
+    $result = $db->query($sql);
+    if (DB::isError($result)) {
+      $dbHandler->closeConnection(false);
+      signalErreur(__FILE__,__LINE__,__FUNCTION__);
+    }
+  }
+
+  global $global_nom_login;
+  ajout_historique(291, NULL, $id_login, $global_nom_login, date("r"), NULL);
+
+  $db = $dbHandler->closeConnection(true);
+  return 1;
+}
+
+function ajout_login($DATA) {
+  global $dbHandler, $global_id_agence;
+  $db = $dbHandler->openConnection();
+
+  $DATA = array_make_pgcompatible($DATA);
+  if ($DATA['guichet']) { //Si présence d'un guichet
+    // Le compte comptable doit être renseigné
+    if ( $DATA['cptecpta_gui']=='' || $DATA['cptecpta_gui']==0) {
+      $dbHandler->closeConnection(false);
+      return false;
+    }
+
+    // Vérifier l'unicité des comptes comptables des guichets
+    $sql = "SELECT * FROM ad_gui WHERE id_ag = ".$global_id_agence." AND cpte_cpta_gui ='".$DATA['cptecpta_gui']."'";
+    $result = $db->query($sql);
+    if (DB::isError($result)) {
+      $dbHandler->closeConnection(false);
+      signalErreur(__FILE__,__LINE__,__FUNCTION__);
+    }
+
+    $nb = $result->numrows();
+    if ($nb != 0) {
+      $dbHandler->closeConnection(false);
+      return false;
+    }
+
+    //Récupération du prochain ID de guichet
+    $sql = "SELECT nextval('ad_gui_id_gui_seq')";
+    $result = $db->query($sql);
+    if (DB::isError($result)) {
+      $dbHandler->closeConnection(false);
+      signalErreur(__FILE__,__LINE__,__FUNCTION__);
+    } else if ($result->numrows() != 1) {
+      $dbHandler->closeConnection(false);
+      signalErreur(__FILE__,__LINE__,__FUNCTION__); // "Retour DB inattendu"
+    }
+    $row = $result->fetchrow();
+    $id_gui = $row[0];
+    $id_agence=getNumAgence();
+    //Insertion du guichet
+    $sql = "INSERT INTO ad_gui ";
+    $sql .= "(id_gui,id_ag, libel_gui, date_crea, utilis_crea, date_modif, utilis_modif, cpte_cpta_gui) ";
+    $sql .= "VALUES($id_gui,$global_id_agence, '".$DATA['libelGuichet']."', '".$DATA['date']."', '".$DATA['utilis']."',";
+    $sql .="'". $DATA['date']."', '".$DATA['utilis']."','".$DATA['cptecpta_gui']."')";
+    $result = $db->query($sql);
+    if (DB::isError($result)) {
+      $dbHandler->closeConnection(false);
+      signalErreur(__FILE__,__LINE__,__FUNCTION__);
+    }
+  }
+
+  if ($id_gui == 0)
+    $id_gui = "NULL";
+
+  //Insertion du login
+  if ($DATA['have_left_frame']) $val_left = 't';
+  else $val_left = 'f';
+  if ($DATA['billet_req']) $bil_req = 't';
+  else $bil_req = 'f';
+  if (isEngraisChimiques()) {
+    $sql = "INSERT INTO ad_log(login, pwd, profil, guichet, id_utilisateur, have_left_frame, billet_req, langue,is_agent_ec, id_ag) VALUES('" . $DATA['login'] . "', md5('" . $DATA['pwd'] . "')," . $DATA['profil'] . ",$id_gui," . $DATA['id_utilisateur'] . ",'$val_left','$bil_req','" . $DATA['langue'] . "','".$DATA['is_agent_ec']."', $global_id_agence)";
+  }
+  else if (isFusion()){
+      $sql = "INSERT INTO ad_log(login, pwd, profil, guichet, id_utilisateur, have_left_frame, billet_req, langue, id_ag,n_agence,n_guichet) VALUES('" . $DATA['login'] . "', md5('" . $DATA['pwd'] . "')," . $DATA['profil'] . ",$id_gui," . $DATA['id_utilisateur'] . ",'$val_left','$bil_req','" . $DATA['langue'] . "', $global_id_agence," . $DATA['n_agence'] . "," . $DATA['n_guichet'] . ")";
+  }
+  else{
+    $sql = "INSERT INTO ad_log(login, pwd, profil, guichet, id_utilisateur, have_left_frame, billet_req, langue, id_ag) VALUES('" . $DATA['login'] . "', md5('" . $DATA['pwd'] . "')," . $DATA['profil'] . ",$id_gui," . $DATA['id_utilisateur'] . ",'$val_left','$bil_req','" . $DATA['langue'] . "', $global_id_agence)";
+  }
+  $result = $db->query($sql);
+  if (DB::isError($result)) {
+    $dbHandler->closeConnection(false);
+    signalErreur(__FILE__,__LINE__,__FUNCTION__);
+  }
+
+  global $global_nom_login;
+  ajout_historique(292,NULL, $DATA['login'], $global_nom_login, date("r"), NULL);
+
+  $db = $dbHandler->closeConnection(true);
+  return true;
+}
+
+function change_login_profil($login, $old_profil, $new_profil, $DATA) {
+  /* Renvoie 0 si tout OK
+     -1 si encaisse != 0 et qu'on doit supprimer caisse
+  */
+  global $dbHandler, $global_id_agence;
+  $global_id_agence=getNumAgence();
+  $db = $dbHandler->openConnection();
+
+  $old_has_guichet = profil_has_guichet($old_profil);
+  $new_has_guichet = profil_has_guichet($new_profil);
+  $id_gui = '0'; //Nouveau id du guichet (aucun par défaut)
+
+  if (($old_has_guichet == true) && ($new_has_guichet == false)) { //Si on doit supprimer le guichet
+    if (!isEncaisseNul($login)) { //Verif que l'encaisse soit nul
+      $dbHandler->closeConnection(false);
+      return -1;
+    }
+
+    $guichet = get_login_guichet($login);
+
+    $sql = "DELETE FROM ad_gui WHERE id_ag = ".$global_id_agence." AND id_gui=".$guichet; //Supprime guichet
+    $result = $db->query($sql);
+    if (DB::isError($result)) {
+      $dbHandler->closeConnection(false);
+      signalErreur(__FILE__,__LINE__,__FUNCTION__);
+    }
+  } else if (($old_has_guichet == false) && ($new_has_guichet == true)) { //Si on doit créer le guichet
+    //Récupération du prochain ID de guichet
+    $sql = "SELECT nextval('ad_gui_id_gui_seq')";
+    $result = $db->query($sql);
+    if (DB::isError($result)) {
+      $dbHandler->closeConnection(false);
+      signalErreur(__FILE__,__LINE__,__FUNCTION__);
+    } else if ($result->numrows() != 1) {
+      $dbHandler->closeConnection(false);
+      signalErreur(__FILE__,__LINE__,__FUNCTION__); // "Retour DB inattendu"
+    }
+    $row = $result->fetchrow();
+    $id_gui = $row[0];
+    $id_agence=getNumAgence();
+    //Insertion du guichet
+    $sql = "INSERT INTO ad_gui(id_gui,id_ag, libel_gui, date_crea, utilis_crea, encaisse, date_enc, date_modif, utilis_modif) VALUES($id_gui,$global_id_agence, '".$DATA['libelGuichet']."', '".$DATA['date']."', '".$DATA['utilis']."', 0, '".$DATA['date']."', '".$DATA['date']."', '".$DATA['utilis']."')";
+    $result = $db->query($sql);
+    if (DB::isError($result)) {
+      $dbHandler->closeConnection(false);
+      signalErreur(__FILE__,__LINE__,__FUNCTION__);
+    }
+  } else if (($old_has_guichet == true) && ($new_has_guichet == true)) { //Si on doit mettre à jour le libellé du guichet
+    $id_gui = get_login_guichet($login);
+
+    $sql = "UPDATE ad_gui SET libel_gui='".$DATA['libelGuichet']."' WHERE id_ag = ".$global_id_agence." AND id_gui=$id_gui";
+    $result = $db->query($sql);
+    if (DB::isError($result)) {
+      $dbHandler->closeConnection(false);
+      signalErreur(__FILE__,__LINE__,__FUNCTION__);
+    }
+  }
+
+  if ($id_gui == 0)
+    $id_gui = "NULL";
+
+  //Mise à jour du login
+  $sql = "UPDATE ad_log SET guichet=".$id_gui.", profil=".$new_profil." WHERE login='$login'";
+  $result = $db->query($sql);
+  if (DB::isError($result)) {
+    $dbHandler->closeConnection(false);
+    signalErreur(__FILE__,__LINE__,__FUNCTION__);
+  }
+
+  $db = $dbHandler->closeConnection(true);
+  return 0;
+}
+
+function profil_has_guichet($profil) {
+  global $dbHandler, $global_id_agence;
+  $db = $dbHandler->openConnection();
+
+  $sql = "SELECT guichet FROM adsys_profils WHERE id=$profil";
+  $result = $db->query($sql);
+  if (DB::isError($result)) {
+    $dbHandler->closeConnection(false);
+    signalErreur(__FILE__,__LINE__,__FUNCTION__);
+  }
+  $row = $result->fetchrow();
+
+  $db = $dbHandler->closeConnection(true);
+  return ($row[0] == 't');
+}
+
+function get_login_utilisateur($login) {
+  global $dbHandler, $global_id_agence;
+  $db = $dbHandler->openConnection();
+
+  $sql = "SELECT id_utilisateur FROM ad_log WHERE login='$login'";
+  $result = $db->query($sql);
+  if (DB::isError($result)) {
+    $dbHandler->closeConnection(false);
+    signalErreur(__FILE__,__LINE__,__FUNCTION__);
+  }
+  $row = $result->fetchrow();
+  $retour = $row[0];
+
+  $db = $dbHandler->closeConnection(true);
+  return $retour;
+}
+
+function get_login_guichet($login) {
+  global $dbHandler, $global_id_agence;
+  $db = $dbHandler->openConnection();
+
+  $sql = "SELECT guichet FROM ad_log WHERE login='$login'";
+  $result = $db->query($sql);
+  if (DB::isError($result)) {
+    $dbHandler->closeConnection(false);
+    signalErreur(__FILE__,__LINE__,__FUNCTION__);
+  }
+  $row = $result->fetchrow();
+  $retour = $row[0];
+
+  $db = $dbHandler->closeConnection(true);
+  return $retour;
+}
+
+/**
+ * Fonction qui renvoie tous les utilisateurs
+ * @return array Tableau indicé des id utilisateurs. Il contient la liste de tous les utilisateurs
+ **/
+function getUtilisateurs() {
+  global $dbHandler, $global_id_agence;
+  $db = $dbHandler->openConnection();
+
+  $utilisateur = array();
+  $sql = "SELECT * FROM ad_uti ORDER BY id_utilis";
+  $result = $db->query($sql);
+  if (DB::isError($result)) {
+    $dbHandler->closeConnection(false);
+    signalErreur(__FILE__,__LINE__,__FUNCTION__);
+  }
+
+  while ($row = $result->fetchrow(DB_FETCHMODE_ASSOC))
+    $utilisateur[$row['id_utilis']] = $row;
+
+  $db = $dbHandler->closeConnection(true);
+  return $utilisateur;
+}
+
+/**
+ * Fonction qui renvoie tous les utilisateurs
+ * @return array Tableau indicé des id utilisateurs. Il contient la liste de tous les utilisateurs
+ **/
+function getGestionnaires() {
+  global $dbHandler, $global_id_agence;
+  $db = $dbHandler->openConnection();
+
+  $sql = "SELECT id_utilis, nom, prenom FROM ad_uti where is_gestionnaire = true ";
+  $result = $db->query($sql);
+  if (DB::isError($result)) {
+    $dbHandler->closeConnection(false);
+    signalErreur(__FILE__,__LINE__,__FUNCTION__);
+  }
+  $utilisateur = array();
+//  while ($row = $result->fetchrow(DB_FETCHMODE_ASSOC))
+//    array_push($utilisateur, $row);
+  while ($row = $result->fetchrow(DB_FETCHMODE_ASSOC))
+    $utilisateur[$row['id_utilis']] = $row;
+
+  $dbHandler->closeConnection(true);
+  return $utilisateur;
+}
+
+/**
+ * Fonction qui renvoie tous les utilisateurs relativement a leur profils.
+ * @profil :Prends en entré le paramètre id_profil qui par défaut est null
+ * @return :array Tableau qui contient la liste de tous les utilisateurs
+ * Ticket #499
+ **/
+function getUtilisateursInfo($profil=null) {
+  global $dbHandler, $global_id_agence;
+  $db = $dbHandler->openConnection();
+
+  $profils=array();
+  $utilisateur = array();
+  $sql = " select
+          profils.libel as profil,
+          uti.nom as nom,
+          uti.prenom as prenom,
+          case when uti.is_gestionnaire = 'true' then 'Oui' else 'Non' end as is_gestionnaire,
+          l.login as login,
+          uti.date_crea ::date,
+          case when uti.statut = 1 then 'Actif'  when uti.statut = 2 then 'Inactif' end as statut
+          from ad_uti uti
+          inner join ad_log l on uti.id_utilis = l.id_utilisateur and uti.id_ag = l.id_ag
+          inner join adsys_profils profils on l.profil = profils.id
+          where uti.id_ag = $global_id_agence ";
+  if (isset($profil)){
+    $sql .= "and profils.id = $profil ";
+  }
+  $sql .= "order by profil,nom,prenom,login ";
+
+  $result = $db->query($sql);
+  if (DB::isError($result)) {
+    $dbHandler->closeConnection(false);
+    signalErreur(__FILE__,__LINE__,__FUNCTION__);
+  }
+
+  while ($row = $result->fetchrow(DB_FETCHMODE_ASSOC))
+    $utilisateur[$row['profil']."_".$row['login']] = $row;
+
+  $db = $dbHandler->closeConnection(true);
+  return $utilisateur;
+}
+
+/**
+ * Fonction qui renvoie tous les profils.
+ * @return :array Tableau qui contient la liste de tous les profils
+ * Ticket #365
+ **/
+function getAllProfil() {
+  global $dbHandler, $global_id_agence;
+  $db = $dbHandler->openConnection();
+
+  $profils=array();
+  $sql = " select * from adsys_profils WHERE is_profil_agent ='f' order by libel ";
+  $result = $db->query($sql);
+  if (DB::isError($result)) {
+    $dbHandler->closeConnection(false);
+    signalErreur(__FILE__,__LINE__,__FUNCTION__);
+  }
+
+  while ($row = $result->fetchrow(DB_FETCHMODE_ASSOC))
+    $profils[$row['id']] = $row;
+
+  $db = $dbHandler->closeConnection(true);
+  return $profils;
+}
+
+function getUtilisateursViaCodeAgent($code_agent, $condi = null) {
+  global $dbHandler, $global_id_agence;
+  $db = $dbHandler->openConnection();
+
+  $utilisateur = array();
+  $sql = "SELECT * FROM ad_uti WHERE ml_code_agent = '".$code_agent."'";
+
+  if ($condi != null){
+    $sql .= " AND $condi";
+  }
+
+  $result = $db->query($sql);
+  if (DB::isError($result)) {
+    $dbHandler->closeConnection(false);
+    signalErreur(__FILE__,__LINE__,__FUNCTION__);
+  }
+
+  while ($row = $result->fetchrow(DB_FETCHMODE_ASSOC))
+    $utilisateur[$row['id_utilis']] = $row;
+
+  $db = $dbHandler->closeConnection(true);
+  return $utilisateur;
+}
+?>

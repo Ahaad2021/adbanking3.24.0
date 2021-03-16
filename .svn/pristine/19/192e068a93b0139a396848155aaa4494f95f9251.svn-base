@@ -1,0 +1,1553 @@
+<?php
+/* vim: set expandtab softtabstop=2 shiftwidth=2: */
+
+/**
+ * Fonctions diverses
+ * Défini des constantes utilisées pour la gestion des calculs en virgule flottante
+ * @package Systeme
+ **/
+
+/**
+ * Ecart en deça duquel on considère que deux montants sont égaux
+ */
+define("EPSILON", 0.000001);
+/**
+ * Précision au delà de laquelle on considère que deux montants sont égaux
+ */
+define("EPSILON_PRECISION", 6);
+/**
+ * L'infini au sens d'un nombre de jours de retard d'un crédit
+ */
+define("RETARD_INFINI", 999999);
+/**
+ * Taille maximum d'une image pouvant etre uploadée dans la DB
+ */
+define("MAX_UPLOAD_IMAGE_SIZE", 500000);
+
+require_once 'lib/misc/VariablesGlobales.php';
+require_once 'lib/dbProcedures/devise.php';
+require_once 'lib/dbProcedures/client.php';
+require_once 'lib/dbProcedures/rapports.php';
+
+/**
+ * Vérifie si une année est bissextile
+ * @param int $annee Année à vérifier
+ * @return bool Vrai si bissextile, faux sinon.
+ */
+function Bissextile($annee) {
+  if ((($annee % 4 == 0) && ($annee % 100 != 0)) || ($annee % 400 == 0))
+    return true;
+  else return false;
+
+}
+
+
+function pg2phpHeure($Date) {
+  if ($Date == "") return "";
+  return substr($Date,11,8);
+}
+
+/**
+ * Transforme une date venant de Postgres vers le format de PHP
+/**
+ * Transforme une date venant de Postgres vers le format de PHP
+ * @param str $a_date Date au format aaaa-mm-jj
+ * @return str Date au format jj/mm/aaaa
+ */
+function pg2phpDate($a_date) {
+  if ($a_date == "") return "";
+  // Ex : 2002-02-05
+  $a_date = substr($a_date,0,10);
+  $M = substr($a_date,5,2);
+  $J = substr($a_date,8,2);
+  $A = substr($a_date,0,4);
+  return "$J/$M/$A";
+}
+/**
+ * Transforme une date venant de PHP vers le format de Postgres
+ * @param str $a_date Date au format jj/mm/aaaa
+ * @return str Date au format aaaa-mm-jj
+ */
+function php2pg($a_date)
+{
+  if ($a_date == "") return "";
+  $J = substr($a_date,0,2);
+  $M = substr($a_date,3,2);
+  $A = substr($a_date,6,4);
+  return "$A-$M-$J";
+
+}
+
+function dateCompare($DatePG, $DatePHP) {
+  /* Renvoie -1 si DatePG < DatePHP
+              0 si DatePG = DatePHP
+              1 si DatePG > DatePHP
+  */
+
+  //Format PG :  AAAA-MM-JJ
+  $J_PG = substr($DatePG,8,2);
+  $M_PG = substr($DatePG,5,2);
+  $A_PG = substr($DatePG,0,4);
+  $dummyPG = $A_PG.$M_PG.$J_PG;
+
+  //Format PHP : JJ/MM/AAAA
+  $J_PHP = substr($DatePHP,0,2);
+  $M_PHP = substr($DatePHP,3,2);
+  $A_PHP = substr($DatePHP,6,4);
+  $dummyPHP = $A_PHP.$M_PHP.$J_PHP;
+
+  //Compare
+  if ($dummyPG < $dummyPHP) return -1;
+  else if ($dummyPG == $dummyPHP) return 0;
+  else return 1;
+}
+
+function isBefore($date1, $date2, $equal = false) {
+  // Fonction qui renvoie true si $date1 est antérieure à $date2
+  // false si $date1 est postérieure ou égale à $date2
+  // IN : $date1 au format jj/mm/aaaa
+  //      $date2 au format jj/mm/aaaa
+  // OUT: true ou false
+
+  $j1 = substr($date1,0,2);
+  $m1 = substr($date1,3,2);
+  $a1 = substr($date1,6,4);
+
+  $j2 = substr($date2,0,2);
+  $m2 = substr($date2,3,2);
+  $a2 = substr($date2,6,4);
+
+  $time1 = mktime(0,0,0,$m1, $j1, $a1);
+  $time2 = mktime(0,0,0,$m2, $j2, $a2);
+
+  if($equal) {
+    return ($time1 <= $time2);
+  }
+  else {
+    return ($time1 < $time2);
+  }
+}
+function isAfter($date1, $date2, $equal = false) {
+  // Fonction qui renvoie true si $date1 est postérieure à $date2
+  // false si $date1 est antérieure ou égale à $date2
+  // IN : $date1 au format jj/mm/aaaa
+  //      $date2 au format jj/mm/aaaa
+  // OUT: true ou false
+
+  $j1 = substr($date1,0,2);
+  $m1 = substr($date1,3,2);
+  $a1 = substr($date1,6,4);
+
+  $j2 = substr($date2,0,2);
+  $m2 = substr($date2,3,2);
+  $a2 = substr($date2,6,4);
+
+  $time1 = mktime(0,0,0,$m1, $j1, $a1);
+  $time2 = mktime(0,0,0,$m2, $j2, $a2);
+
+  if($equal) {
+    return ($time1 >= $time2);
+  }
+  else {
+    return ($time1 > $time2);
+  }
+}
+/**
+ * Renvoie la date du lendemain (+1).
+ * @param str $date Date du jour, au format jj/mm/aaaa
+ * @return str $date Date du lendemain, au format jj/mm/aaaa
+ */
+function demain($date) {
+  $dateInfos = splitEuropeanDate($date);
+  $demain = date("d/m/Y", mktime(0,0,0,$dateInfos[1], $dateInfos[0]+1, $dateInfos[2]));
+  return $demain;
+}
+
+/**
+ * Renvoie la date augmentée de la durée en mois.
+ * @param str $date Date de référence, au format jj/mm/aaaa
+ * @param int $dureeMois Nombre de mois, au format jj/mm/aaaa
+ * @return str $date Date si on augmente le nombre de mois, au format jj/mm/aaaa
+ */
+function calculDateDureeMois($date, $dureeMois) {
+  $dateInfos = splitEuropeanDate($date);
+  $dateDureeMois = date("d/m/Y", mktime(0,0,0,$dateInfos[1]+$dureeMois, $dateInfos[0], $dateInfos[2]));
+  return $dateDureeMois;
+}
+
+/**
+ * Renvoie la date de la veille (-1).
+ * @param str $date Date du jour, au format jj/mm/aaaa
+ * @return str $date Date de la veille, au format jj/mm/aaaa
+ */
+function hier($date) {
+  $dateInfos = splitEuropeanDate($date);
+  $hier = date("d/m/Y", mktime(0,0,0,$dateInfos[1], $dateInfos[0]-1, $dateInfos[2]));
+  return $hier;
+}
+
+function nbreDiffJours($date1, $date2) {
+  /*
+   Renvoie le nbre de jours qui séparent ces deux dates (valeur absolue)
+
+   En entrée, on attend des dates au format jj/mm/AAAA qui sont transformés
+   en array de format (0 => jour,1 => mois,2 => ann?ée]
+
+  */
+
+  $d1 = splitEuropeanDate($date1);
+  $d2 = splitEuropeanDate($date2);
+
+  $timestamp1 = gmmktime(12,0,0, $d1[1], $d1[0], $d1[2]);
+  $timestamp2 = gmmktime(12,0,0, $d2[1], $d2[0], $d2[2]);
+  return round((abs($timestamp1 - $timestamp2))/(24*3600));
+}
+
+/**
+ * Revoie la difference entre deux date en format jj/mm/AAAA.
+ * KgBD-2014
+ */
+function calcNmbreJr($date1, $date2) {
+	global $dbHandler,$global_id_agence;
+	
+	$db = $dbHandler->openConnection();
+	
+	//SELECT date '2001-10-01' - date '2001-09-28';
+	$sql = "SELECT date '$date1' - date '$date2' " ;
+	
+     
+
+		$result = $db->query($sql);
+		$dbHandler->closeConnection(true);
+		if (DB::isError($result)) {
+			signalErreur(__FILE__,__LINE__,__FUNCTION__);
+		}
+		
+		$row = $result->fetchrow();
+		
+		return $row[0];
+				
+	
+}
+
+
+
+function pg2phpDatebis($Date) {
+  if ($Date == "") return "";
+  // Ex : 2002-02-05
+  $Date = substr($Date,0,16);
+  $M = substr($Date,5,2);
+  $J = substr($Date,8,2);
+  $A = substr($Date,0,4);
+  $HH = substr($Date,11,2);//heure
+  $HM = substr($Date,14,2);//minutes
+
+  return array("0"=>$M, "1"=>$J, "2"=>$A, "3"=>$HH, "4"=>$HM);
+}
+
+function pg2phpTime ($timestamp) {
+  if ($timestamp == "")
+    return "";
+  return substr($timestamp, 11, 5);
+}
+
+function isPHPDate($date) {// Cette fonction renvoie true si la date est au format jj/mm/aaaa et false dans les autres cas.
+  if (strlen($date) == 10 && $date[2] == '/' && $date[5] == '/')
+    $OK = true;
+  else
+    $OK = false;
+  return $OK;
+}
+
+function splitEuropeanDate($date) {
+  /*
+
+    Splitte une date au format j/m/AAAA et renvoie un array jour,mois,ann?ée si OK, sinon false
+
+  */
+
+  $parts = explode("/", $date);
+
+  if (sizeof($parts) != 3) return false;
+
+  return $parts;
+}
+
+/**
+ * Formatte le montant avec le séparateur de milliers et la décimale propre à la devise courante
+ *
+ * @param str $montant Le montant à formater
+ * @param bool $devise Si vrai alors ajoute le libellé de la devise à la chaine
+ * @return str Une chaine contenant le montant formaté
+ */
+function afficheMontant ($montant, $devise=false, $typ_raport=false) {
+  global $global_monnaie_courante;
+  global $global_monnaie_courante_prec;
+  global $mnt_sep_mil;
+  global $mnt_sep_mil_csv;
+  global $mnt_sep_dec;
+  global $mnt_sep_dec_csv;
+  $montant = "$montant";         // Conversion en string au cas où on passe un entier
+  if ($montant == "") return "";
+  if ($typ_raport) $montant = number_format((doubleval($montant)), $global_monnaie_courante_prec, $mnt_sep_dec_csv, $mnt_sep_mil_csv);
+  else $montant = number_format((doubleval($montant)), $global_monnaie_courante_prec, $mnt_sep_dec, $mnt_sep_mil);
+  if ($devise) $montant .= " ".$global_monnaie_courante;
+  // Attention, le second " " est un blanc insécable !  Il est encodé en UTF-8 &#160;
+  $montant = mb_ereg_replace(" ", " ", $montant);
+
+  return $montant;
+}
+/**
+ * recupMontant Renvoie en format numérique un string contenant un montant formaté (sans le libellé de la devise)
+ *
+ * @param str $montant La chaine contenant le montant
+ * @access public
+ * @return double Le montant sous format numérique
+ */
+function recupMontant($montant) {
+  global $mnt_sep_mil;
+  global $mnt_sep_dec;
+
+  if ($montant == "")
+    return NULL;
+
+  // Il faut transformer les blancs insécables en blancs simples, pour retrouver les bon séparateurs.
+  // C'est donc ici le premier " " qui est un blanc insécable !
+  $montant = mb_ereg_replace(" ", " ", $montant);
+  $montant = str_replace($mnt_sep_mil, "", $montant);
+  $montant = str_replace($mnt_sep_dec, ".", $montant);
+  return doubleval($montant);
+}
+
+/**
+ * Formatte un nombre pour l'afficher sous forme de pourcentage, avec % à la fin.
+ *
+ * Exemple : 0.015 devient 1,5 %
+ *
+ * @param float $valeur La valeur à afficher
+ * @param int $prec Le nombre de chiffre après la virgule
+ * @param bool $signe_prc indique s'il faut ajouter '%' à la fin
+ * @return str La chaîne de caractères à afficher
+ */
+function affichePourcentage($valeur, $prec=-1, $signe_prc=true, $mnt_sep_dec=",", $mnt_sep_mil=NULL) {
+  $valeur = number_format(doubleval($valeur*100), $prec, $mnt_sep_dec, $mnt_sep_mil);
+  if ($signe_prc) $valeur .= "%";
+  return $valeur;
+}
+
+/**
+ * Fabrique un numéro de compte à partir du id client et éventullement du rang
+ * @author Mamadou Mbaye
+ * @param int $id_cli ID du client titulaire
+ * @param int $rang Rang du compte (uniquement si type de numérotation = RDC)
+ * @return text Numéro de compte
+ */
+function makeNumCpte($id_cli, $rang=NULL) {
+  global $global_id_agence,$dbHandler,$db;
+  $db = $dbHandler->openConnection();
+  $DATA = getAgenceDatas($global_id_agence);
+  if ($rang==NULL)
+    $rang = getRangDisponible($id_cli);
+  if ($DATA["type_numerotation_compte"] == 1) {
+    // Crée un numéro de compte au format AA-CCCCCC-RR-DD à partir du rang (R) et de l'ID client (C)
+    $NumCompletCompte = sprintf("%03d-%06d-%02d", $global_id_agence, $id_cli, $rang);
+    $Entier = sprintf("%03d%06d%02d", $global_id_agence, $id_cli, $rang);
+    $CheckDigit = fmod($Entier, 97);
+    $NumCompletCompte .= sprintf("-%02d", $CheckDigit);
+  } else if ($DATA["type_numerotation_compte"] == 2)
+  {
+    // Crée un numéro de compte au format BBVV-CCCCCRR-DD à partir du rang (R) et de l'ID client (C) pour la RDC
+    $NumCompletCompte = sprintf("%02d%02d-%05d%02d", $DATA["code_banque"], $DATA["code_ville"], $id_cli, $rang);
+    $Entier = sprintf("%02d%02d%05d%02d", $DATA["code_banque"], $DATA["code_ville"], $id_cli, $rang);
+    $CheckDigit = fmod($Entier, 97);
+    $NumCompletCompte .= sprintf("-%02d", $CheckDigit);
+  } else if ($DATA["type_numerotation_compte"] == 3) {
+    // Crée un numéro de compte au format BBB-CCCCCCCCCC-RR à partir du rang (R) et de l'ID client (C) pour le Rwanda
+    $NumCompletCompte = sprintf("%03d-%010d-%02d", $DATA["code_banque"], formatCpteCmpltAgc($id_cli), $rang);
+  } else if ($DATA["type_numerotation_compte"] == 4) {
+    // Crée un numéro de compte au format AA-CCCCCC-RR-DD à partir du rang (R) et de l'ID client (C)
+    $numAntenne=$DATA['code_antenne'];
+    if ($numAntenne!= '0' && $numAntenne!= NULL) {
+      $NumCompletCompte=$numAntenne.$global_id_agence;
+      $Entier =$numAntenne.$global_id_agence;
+    } else {
+      $NumCompletCompte=$global_id_agence;
+      $Entier =$global_id_agence;
+
+    }
+    $NumCompletCompte .= sprintf("-%06d-%02d", $id_cli, $rang);
+    $Entier .= sprintf("%06d%02d", $id_cli, $rang);
+    $CheckDigit = fmod($Entier, 97);
+    $NumCompletCompte .= sprintf("-%02d", $CheckDigit);
+  } else {
+    $message=_("Rang non défini");
+    signalErreur(__FILE__,__LINE__,__FUNCTION__); // $message
+  }
+
+  $dbHandler->closeConnection(true);
+  return $NumCompletCompte;
+}
+
+/**
+ * Fabrique un numéro de compteclient à partir du id client et éventullement
+ * @author Saourou MBODJ
+ * @param int $id_cli ID du client titulaire
+ * @return text Numéro de compteclient
+ */
+function makeNumClient($id_cli,$id_agence=NULL) {
+  global $global_id_agence;
+
+  if ($id_agence==NULL || $id_agence=="")
+    $id_agence=$global_id_agence;
+  $DATA = getAgenceDatas($id_agence);
+
+  $NumCompletClient=$id_cli;
+  if ($DATA["type_numerotation_compte"] == 4) {
+    // Crée un numéro de compte au format AAB-CCCCCC à partir de l'id agence(AA), du numéro de bureau(B) et de l'ID client (C)
+    $numAntenne= $DATA['code_antenne'];
+    if ($numAntenne!= '0' && $numAntenne!= NULL)
+      $NumCompletClient =$numAntenne.$global_id_agence;
+    else
+      $NumCompletClient =$global_id_agence;
+    $NumCompletClient .= sprintf("-%06d", $id_cli);
+  } else {
+    $NumCompletClient = sprintf("%06d",$id_cli);
+  }
+
+
+  return $NumCompletClient;
+}
+
+
+/**
+ * Fonction qui arrondit un montant selon la plus petite pièce existante.
+ *
+ * Le sens de l'arrondi dépend de $sens, la précision est prise comme le billet de plus petite valeur.
+ * Ex: $mnt = 14 FCFA et $sens = -1 donne 10 si la plus petite pièce est 5 FCFA
+ * @param float $mnt Montant à arrondir
+ * @param int $sens : = 0 : Arrondi à l'unité la plus proche
+ *                    < 0 : Arrondi à l'unité inférieure
+ *                    > 0 : Arrondi à l'unité supérieure
+ * @return float Montant arrondi
+ */
+function arrondiMonnaie($mnt, $sens, $devise=NULL) {
+
+  global $global_billets;
+  global $dbHandler;
+  global $global_monnaie,$global_id_agence;
+
+  if ($devise == NULL)
+    $devise = $global_monnaie;
+
+  $db = $dbHandler->openConnection();
+
+  $sql = "SELECT MIN(valeur) FROM adsys_types_billets WHERE id_ag=$global_id_agence and devise = '$devise'";
+  $result = $db->query($sql);
+  if (DB::isError($result)) {
+    $dbHandler->closeConnection(false);
+    signalErreur(__FILE__,__LINE__,__FUNCTION__);
+  }
+
+  $tmprow = $result->fetchrow();
+  $dbHandler->closeConnection(true);
+
+  $min = $tmprow[0];
+
+  if ($min == 0) {
+    echo "<BR><B><FONT COLOR=red> *** ".sprintf(_("Le billetage pour la devise %s n'a pas été renseigné"), $devise)."<BR> *** "._("On suppose la plus petite unité monétaire à 1")."</FONT></B><BR>";
+    $min = 1;
+  }
+  $DEV = getInfoDevise($devise);// recuperation d'info sur la devise'
+  $precision_devise=pow(10,$DEV["precision"]);
+  $reste = fmod($mnt*$precision_devise, $min*$precision_devise)/$precision_devise;
+  if ($reste == 0)
+    return $mnt;
+
+  if ($sens == 0)
+    $sens = ((2*$reste > $min)? 1 : -1);
+
+  if ($sens < 0)
+    $arrondi = $mnt - ($reste);
+  else if ($sens > 0)
+    $arrondi = $mnt + $min - ($reste);
+
+  return $arrondi;
+}
+
+
+/**
+ *
+ * Arrondi un montant selon la precision du devise
+ * @author B&D
+ * @param numeric $mnt
+ * @param string $devise
+ * @return numeric
+ */
+function arrondiMonnaiePrecision($mnt, $devise = NULL)
+{
+    global $global_monnaie,$global_id_agence;
+
+    if (empty($devise)) {
+        $devise = $global_monnaie;
+    }
+
+    $precisionDevise = getPrecisionDevise($devise);
+    $mnt = round($mnt, $precisionDevise);
+
+    return $mnt;
+}
+
+/**
+ * Construit une URL pour affichage et chemin d'accès local pour une logo
+ * @return Array Tableau "url" => URL de l'image, "localfilepath" => chemin d'accès local de l'image
+ */
+function imageLocationLogo() {
+  global $http_prefix;
+  global $lib_path;
+  $backup_path = $lib_path."/backup";
+
+  $logo	= "/images_agence/logo";
+  $chemin['logo_chemin_local'] = $backup_path.$logo;
+  $chemin['logo_chemin_web'] = $http_prefix.$logo;
+
+  return $chemin;
+}
+
+function isMultiAgenceSameServer()
+{
+  global $dbHandler;
+
+  $isMultiAgenceSameServer = false;
+
+  if(isMultiAgence())
+  {
+    $db = $dbHandler->openConnection();
+    $sql = "SELECT distinct app_db_host FROM adsys_multi_agence;";
+
+    $result = $db->query($sql);
+    if (DB::isError($result)) {
+      $dbHandler->closeConnection(false);
+      signalErreur(__FILE__, __LINE__, __FUNCTION__);
+    }
+
+    if ($result->numRows() == 1) {
+      $isMultiAgenceSameServer = true;
+    }
+    $dbHandler->closeConnection(true);
+  }
+
+  return $isMultiAgenceSameServer;
+}
+
+/**
+ * Construit une URL pour affichage et chemin d'accès local pour une image
+ * Utilisé dans le cadre de la gestion des photos et signatures
+ * @author Thomas FASTENAKEL
+ * @since 2.1
+ * @param string $imagename Nom de l'image
+ * @return Array Tableau "url" => URL de l'image, "localfilepath" => chemin d'accès local de l'image
+ */
+function imageLocationClient($index) {
+  global $http_prefix, $global_id_agence;
+  global $lib_path;
+  $backup_path = $lib_path."/backup";
+
+  $imagename = strval($index);
+  $photo = '';
+  $signature = '';
+
+  // We now append the id_agence for atomicity across agencies if multi_agences and same physical server
+  if(isMultiAgenceSameServer()) {
+    $photo = "/images_clients/clients/photos/".$imagename {0}."/".$global_id_agence."_".$imagename;
+    $signature = "/images_clients/clients/signatures/".$imagename {0}."/".$global_id_agence."_".$imagename;
+  }
+  else {
+    $photo = "/images_clients/clients/photos/".$imagename {0}."/".$imagename;
+    $signature = "/images_clients/clients/signatures/".$imagename {0}."/".$imagename;
+  }
+
+
+  $chemin['photo_chemin_local'] = $backup_path.$photo;
+  $chemin['signature_chemin_local'] = $backup_path.$signature;
+
+  $chemin['photo_chemin_web'] = $http_prefix.$photo;
+  $chemin['signature_chemin_web']= $http_prefix.$signature;
+
+
+  return $chemin;
+}
+
+
+function imageLocationPersExt($index) {
+  global $http_prefix, $global_id_agence;
+  global $lib_path;
+  $backup_path = $lib_path."/backup";
+
+  $chemin = array();
+  $photo = '';
+  $signature = '';
+
+  $imagename = strval($index);
+
+  if(isMultiAgenceSameServer()) {
+    $photo = "/images_clients/perso_ext/photos/".$imagename {0}."/".$global_id_agence."_".$imagename;
+    $signature = "/images_clients/perso_ext/signatures/".$imagename {0}."/".$global_id_agence."_".$imagename;
+  }
+  else {
+    $photo = "/images_clients/perso_ext/photos/".$imagename {0}."/".$imagename;
+    $signature = "/images_clients/perso_ext/signatures/".$imagename {0}."/".$imagename;
+  }
+
+  $chemin['photo_chemin_local'] = $backup_path.$photo;
+  $chemin['signature_chemin_local'] = $backup_path.$signature;
+
+  $chemin['photo_chemin_web']= $http_prefix.$photo;
+  $chemin['signature_chemin_web']= $http_prefix.$signature;
+
+  return $chemin;
+}
+
+function makeImagePaths($imagename) {
+  global $http_prefix;
+  global $lib_path;
+  $backup_path = $lib_path."/backup";
+
+  $RES = array();
+
+  if ($imagename == "") {
+    return array("url" => $http_prefix."/images/travaux.gif", "localfilepath" => NULL);
+  } else {
+    // Construction du localfilepath
+    $RES["localfilepath"] = $backup_path."/images_tmp/".$imagename;
+
+    // Construction de l'URL
+    $RES["url"] = $http_prefix."/images_tmp/".$imagename;
+
+    return $RES;
+  }
+}
+
+/**
+ * Etablit la devise avec laquelle on travaille
+ * Met ?à jour les variables $global_monnaie_courante et $global_monnaie_courante_prec
+ * @param $devise char(3) Code ISO de la devise
+ * @return void
+ */
+function setMonnaieCourante($devise) {
+  global $global_monnaie_courante;
+  global $global_monnaie_courante_prec;
+
+  if ($devise == NULL) { // Utile pour des écrans dans lesquels la devise n'est pas fixe
+    $global_monnaie_courante = NULL;
+    $global_monnaie_courante_prec = 0;
+  } else {
+    $DEV = getInfoDevise($devise);
+    $global_monnaie_courante = $devise;
+    $global_monnaie_courante_prec = $DEV["precision"];
+  }
+}
+
+/**
+ * Renvoie true si toutes les valeurs de l'array sont à 0
+ * @param Array $arr
+ * @return bool
+ */
+function isArrayNull($arr) {
+  foreach ($arr as $key => $value) {
+    if ($value != 0)
+      return false;
+  }
+  return true;
+}
+
+/**
+ * Assign zero to value if its empty
+ * @param numeric $value
+ * @return number
+ */
+function check_null_numeric_value($value)
+{
+    if(empty($value)) $value = 0;
+    return $value;
+}
+
+/**
+ * Fonction permettant d'afficher des informations de debugging
+ *
+ * Ne sera activée que si la variable globale $DEBUG est à true
+ * Si le module Xdebug installé pour php, l'affichage des variables se fait avec {@see xdebug_var_dump}
+ *
+ * @param unknow $variable : variable à afficher
+ * @param String $commentaire : Commentaire pour reconnaitre la variable affichée; Valeur par défaut NULL
+ * @return null - Affiche la variable en entrée
+ *
+ * @author Bernard De Bois
+ * @author Modifié par Stefano AMEKOUDI et Antoine Delvaux {@since version 3.0 - Sept 07}
+ */
+function debug($variable, $commentaire=null) {
+  global $DEBUG;
+
+  if ($DEBUG) {
+   	$output = "<pre>*****************************************************************************\n";
+    if (function_exists('xdebug_enable')) {
+      $output .= "<b>".xdebug_call_function()."</b> "._("à la ligne")." <b>".xdebug_call_line()."</b> "._("du fichier")." <b>".xdebug_call_file()."</b>\n";
+    }
+    if (isset($commentaire)) {
+      $output .= $commentaire."\n";
+    }
+    echo $output."</pre>\n";
+    if (function_exists('xdebug_enable')) {
+      xdebug_var_dump($variable);
+    } else {
+    	echo "<pre>\n";
+    	if (is_array($variable) || is_object($variable)) {
+       	print_r($variable);
+      } else {
+      	var_dump($variable);
+   		}
+    	echo "\n</pre>\n";
+   	}
+    echo "\n<pre>*****************************************************************************</pre>";
+  }
+}
+
+/**
+ * Fonction utilisée en mode DEBUG pour afficher els variables transmises
+ * @author Bernard De Bois
+ * @since 2.0
+ */
+function getVariablesTransmises() {
+  $nombreSession = count($_SESSION['SESSION_VARS']);
+  $nombrePost = count($_POST);
+  $nombreGet = count($_GET);
+  $lien = "";
+  if ($nombreSession>0) {
+    $lien .= "<a href=\"#\" onMouseOver=\"show_it('cacheS')\" onMouseOut=\"hide_it('cacheS')\">Session($nombreSession)</a> ";
+  } else {
+    $lien .= "Session(0) ";
+  }
+  if ($nombrePost>0) {
+    $lien .= "<a href=\"#\" onMouseOver=\"show_it('cacheP')\" onMouseOut=\"hide_it('cacheP')\">Post($nombrePost)</a> ";
+  } else {
+    $lien .= "Post(0) ";
+  }
+  if ($nombreGet>0) {
+    $lien .= "<a href=\"#\" onMouseOver=\"show_it('cacheG')\" onMouseOut=\"hide_it('cacheG')\">Get($nombreGet)</a> ";
+  } else {
+    $lien .= "Get(0) ";
+  }
+
+  return $lien;
+}
+/**
+ * Estimation des traitements en temps
+ */
+class ObjTime
+{
+
+  //Les attributs de la classe
+  var $_time_start = 0;
+  var $_time_tmp = 0;
+  var $_function = "";
+
+  /**
+ * Débute le chronométrage d'un bloc d'instructions
+ * @param string $a__function c'est  le nom du bloc d'instructions
+ */
+ function start_time_counter($a_function){
+	  $this->_time_start = time();
+	  $this->_function = $a_function;
+ }
+
+ /**
+ * Met à zéro le chronométrage
+ */
+function stop_time_counter(){
+	 $this->_time_start = 0;
+}
+
+/**
+ * Récupère le temps passé dans un bloc d'instructions
+ */
+function get_time_counter(){
+	global $DEBUG;
+	$this->_time_tmp = (int)time()-(int)$this->_time_start;
+	if($DEBUG){
+	   echo "<BR><li>"._("Nom de la fonction")." :<B> ".$this->_function."</B><ul>"._("Compteur début")." = <B>".$this->_time_start." "._("Secondes")."</B></ul><ul>"._("Compteur fin")." = <B>".time()." "._("Secondes")."</B></ul><ul>"._("Durée du traitement")." = <B>".$this->_time_tmp." "._("Secondes")."</B></ul><BR>";
+	}
+}
+
+}
+
+/**
+ * Fonction utilisée pour crypter un text avec le procédé de cryptage Blowfish
+ * @author B&D
+ * @since 1.0
+ */
+function phpseclib_Encrypt($plaintext, $password="") {
+    // Include SSH library
+    /*
+    require_once('ad_ma/batch/phpseclib0.3.5/Crypt/RC4.php');
+    
+    $cipher = new Crypt_RC4();
+
+    $cipher->setPassword($password);
+
+    return utf8_encode($cipher->encrypt(trim($plaintext)));
+    */
+    
+    require_once('lib/misc/cryptage.php');
+    
+    return Crypte($plaintext, $password);
+}
+
+/**
+ * Fonction utilisée pour décrypter un text avec le procédé de cryptage Blowfish
+ * @author B&D
+ * @since 1.0
+ */
+function phpseclib_Decrypt($ciphertext, $password="") {
+    // Include SSH library
+    /*
+    require_once('ad_ma/batch/phpseclib0.3.5/Crypt/RC4.php');
+    
+    $cipher = new Crypt_RC4();
+
+    $cipher->setPassword($password);
+
+    return $cipher->decrypt(utf8_decode($ciphertext));
+    */
+    
+    require_once('lib/misc/cryptage.php');
+    
+    return Decrypte($ciphertext, $password);
+}
+
+/**
+ * Fonction utilisée pour vérifier si on est en mode multi-agence
+ * @author B&D
+ * @since 1.0
+ */
+function isMultiAgence() {
+    
+    global $dbHandler, $global_mode_agence;
+    
+    $mode_multi = false;
+    
+    // Récupéré le chemin physique du fichier
+    preg_match("/(.*)\/lib\/misc\/divers\.php/",__FILE__,$doc_prefix);
+    $doc_prefix = $doc_prefix[1];
+    
+    $licence2_path = "$doc_prefix/licence2.txt";
+
+    // Vérification de l'existence du fichier licence2.txt
+    if (file_exists($licence2_path)) {
+
+        // Check agence mode in session
+        if(trim($global_mode_agence)!='') {
+            if(trim($global_mode_agence)=='multi') {
+                $mode_multi = true;
+            }
+        }
+        else {
+
+            // Check agence mode in file
+            require_once('lib/misc/cryptage.php');
+
+            $global_mode_agence = 'mono';
+
+            $crypte_key = "adbankingpublic";
+
+            $crypte_text = file_get_contents($licence2_path);
+            $decrypte_arr = unserialize(Decrypte($crypte_text, $crypte_key));
+
+            // Save licence expiration date
+            if(isset($decrypte_arr[0]) && isset($decrypte_arr[1]) && trim($decrypte_arr[0])!='' && trim($decrypte_arr[1])!='') {
+                $date_crea = pg2phpDate($decrypte_arr[0]);
+                $date_exp = pg2phpDate($decrypte_arr[1]);
+                
+                $MyErr = checkLicenceValidity($date_exp);
+
+                if ($MyErr->errCode == NO_ERR) {
+                    
+                    // Check/set multi agence mode
+                    if(isset($decrypte_arr[2]) && trim($decrypte_arr[2])=='multi') {
+                        $global_mode_agence = 'multi';
+                        $mode_multi = true;
+                    }
+
+                    // Check for licences
+                    $MyErr = checkADBankingLicence($decrypte_arr[3], $date_crea, $date_exp);
+
+                    if ($MyErr->errCode != NO_ERR) {
+                      signalErreur(__FILE__, __LINE__, __FUNCTION__);
+                    }
+
+                    // Ouvrir une connexion
+                    $db = $dbHandler->openConnection();
+                    
+                    // Check/set agence restriction
+                    $acces_allowed = false;
+
+                    if(isset($decrypte_arr[3]) && trim($decrypte_arr[3]) != '' && trim($decrypte_arr[3]) != 'n') {
+
+                        // Get agence code identifier
+                        $sql_request = "SELECT licence_key, licence_code_identifier, id_ag FROM ad_agc WHERE id_ag=".getNumAgence();
+
+                        $result_request = $db->query($sql_request);
+
+                        if (!DB::isError($result_request)) {
+
+                            $row_request = $result_request->fetchrow(DB_FETCHMODE_ASSOC);
+
+                            $licence_key = trim($row_request['licence_key']);
+                            $db_licence_code_identifier = trim($row_request['licence_code_identifier']);
+                            $id_ag = trim($row_request['id_ag']);
+
+                            $lic_code_ident_arr = explode("-", trim($decrypte_arr[3]));
+                            $code_banque = trim($lic_code_ident_arr[0]);
+                            $license_exp_yr = trim($lic_code_ident_arr[1]);
+
+                            $str_to_crypt = sprintf("%s-%s", $code_banque, $license_exp_yr);
+
+                            $gen_licence_code_identifier = crypt($str_to_crypt, $db_licence_code_identifier);
+
+                            if (sha1($code_banque) === $licence_key && $db_licence_code_identifier === $gen_licence_code_identifier) {
+                              $acces_allowed = true;
+                            }
+                        }
+                    }
+
+                    if(!$acces_allowed) {
+                        $global_mode_agence = '';
+
+                        echo displayErrAuthMsg();
+                        exit;
+                    }
+                }
+            }
+        }
+    }
+    else{
+        $global_mode_agence = 'mono';
+    }
+
+    return $mode_multi;
+}
+
+/**
+ * Fonction utilisée pour vérifier si l'agence est parametré comme siège dans licence2.txt
+ * @author B&D
+ * @since 1.0
+ */
+function isAgenceSiege() {
+
+    global $dbHandler;
+
+    $agence_siege = false;
+
+    // Récupéré le chemin physique du fichier
+    preg_match("/(.*)\/lib\/misc\/divers\.php/",__FILE__,$doc_prefix);
+    $doc_prefix = $doc_prefix[1];
+    
+    $licence2_path = "$doc_prefix/licence2.txt";
+
+    // Vérification de l'existence du fichier licence2.txt
+    if (file_exists($licence2_path)) {
+
+        // Check agence mode in file
+        require_once('lib/misc/cryptage.php');
+
+        $crypte_key = "adbankingpublic";
+
+        $crypte_text = file_get_contents($licence2_path);
+        $decrypte_arr = unserialize(Decrypte($crypte_text, $crypte_key));
+
+        // Save licence expiration date
+        if(null !== $decrypte_arr[4] && strtolower(trim($decrypte_arr[4]))=='y') {
+            $agence_siege = true;
+        }
+    }
+
+    return $agence_siege;
+}
+
+/**
+ * Fonction utilisée pour vérifier si la compensation se fait dans l'agence siège
+ * @author B&D
+ * @since 1.0
+ */
+function isCompensationSiege() {
+
+    global $dbHandler, $global_mode_compensation;
+
+    $mode_compensation = false;
+
+    // Récupéré le chemin physique du fichier
+    preg_match("/(.*)\/lib\/misc\/divers\.php/",__FILE__,$doc_prefix);
+    $doc_prefix = $doc_prefix[1];
+    
+    $licence2_path = "$doc_prefix/licence2.txt";
+
+    // Vérification de l'existence du fichier licence2.txt
+    if (file_exists($licence2_path)) {
+        
+        // Check agence mode in session
+        if(trim($global_mode_compensation)!='') {
+            if(trim($global_mode_compensation)=='siege') {
+                $mode_compensation = true;
+            }
+        }
+        else {
+
+            // Check agence mode in file
+            require_once('lib/misc/cryptage.php');
+
+            $global_mode_compensation = 'interagence';
+
+            $crypte_key = "adbankingpublic";
+
+            $crypte_text = file_get_contents($licence2_path);
+            $decrypte_arr = unserialize(Decrypte($crypte_text, $crypte_key));
+
+            // Check/set multi agence mode
+            if(isset($decrypte_arr[5]) && trim($decrypte_arr[5])=='siege') {
+                $global_mode_compensation = 'siege';
+                $mode_compensation = true;
+            }
+        }
+    }
+    else{
+        $global_mode_compensation = 'interagence';
+    }
+
+    return $mode_compensation;
+}
+
+/**
+ * Fonction utilisée pour vérifier si on les droits d utilisation ADBanking
+ * @author B&D
+ * @since 1.0
+ */
+function checkADBankingAccess() {
+
+  global $dbHandler;
+
+  // Récupéré le chemin physique du fichier
+  preg_match("/(.*)\/lib\/misc\/divers\.php/",__FILE__,$doc_prefix);
+  $doc_prefix = $doc_prefix[1];
+
+  $licence2_path = "$doc_prefix/licence2.txt";
+
+  $acces_allowed = false;
+
+  // Vérification de l'existence du fichier licence2.txt
+  if (file_exists($licence2_path)) {
+
+      // Check agence mode in file
+      require_once 'lib/misc/Erreur.php';
+      require_once 'lib/dbProcedures/agence.php';
+      require_once 'lib/multilingue/traductions.php';
+      require_once 'lib/misc/cryptage.php';
+
+      $crypte_key = "adbankingpublic";
+
+      $crypte_text = file_get_contents($licence2_path);
+      $decrypte_arr = unserialize(Decrypte($crypte_text, $crypte_key));
+
+      // Save licence expiration date
+      if(isset($decrypte_arr[0]) && isset($decrypte_arr[1]) && trim($decrypte_arr[0])!='' && trim($decrypte_arr[1])!='') {
+        $date_crea = pg2phpDate($decrypte_arr[0]);
+        $date_exp = pg2phpDate($decrypte_arr[1]);
+
+        $MyErr = checkLicenceValidity($date_exp);
+
+        if ($MyErr->errCode == NO_ERR) {
+
+          // Check for licences
+          $MyErr = checkADBankingLicence($decrypte_arr[3], $date_crea, $date_exp);
+
+          if ($MyErr->errCode != NO_ERR) {
+            signalErreur(__FILE__, __LINE__, __FUNCTION__);
+          }
+
+          // Ouvrir une connexion
+          $db = $dbHandler->openConnection();
+
+          // Check/set agence restriction
+          if(isset($decrypte_arr[3]) && trim($decrypte_arr[3]) != '' && trim($decrypte_arr[3]) != 'n') {
+
+              // Query agence
+              $sql_request = "SELECT licence_key, licence_code_identifier, id_ag FROM ad_agc WHERE id_ag=".getNumAgence();
+
+              $result_request = $db->query($sql_request);
+
+              if (!DB::isError($result_request)) {
+
+                $row_request = $result_request->fetchrow(DB_FETCHMODE_ASSOC);
+
+                // Get agence info
+                $licence_key = trim($row_request['licence_key']);
+                $db_licence_code_identifier = trim($row_request['licence_code_identifier']);
+                $id_ag = trim($row_request['id_ag']);
+
+                // Build identifier string
+                $lic_code_ident_arr = explode("-", trim($decrypte_arr[3]));
+                $code_banque = trim($lic_code_ident_arr[0]);
+                $license_exp_yr = trim($lic_code_ident_arr[1]);
+
+                $str_to_crypt = sprintf("%s-%s", $code_banque, $license_exp_yr);
+
+                // Encrypt identifier string
+                $gen_licence_code_identifier = crypt($str_to_crypt, $db_licence_code_identifier);
+
+                // Compare generate identifier with agence identifier
+                if (sha1($code_banque) === $licence_key && $db_licence_code_identifier === $gen_licence_code_identifier) {
+                  $acces_allowed = true;
+                }
+              }
+          }
+
+          $dbHandler->closeConnection(true);
+        }
+      }
+  }
+
+  if(!$acces_allowed) {
+    $global_mode_agence = '';
+
+    echo displayErrAuthMsg();
+    exit;
+  }
+
+  return $acces_allowed;
+}
+
+function checkADBankingLicence($code_identifier, $date_crea, $date_exp) {
+
+  global $dbHandler, $global_id_agence;
+
+  // Ouvrir une connexion
+  $db = $dbHandler->openConnection();
+
+  // Check for licences
+  $sql_select = "SELECT COUNT(1) AS nb_count FROM adsys_licence WHERE id_agc=".getNumAgence();
+  $result_select = $db->query($sql_select);
+
+  if (!DB::isError($result_select) && $result_select->numRows() == 1) {
+
+    $row_select = $result_select->fetchrow(DB_FETCHMODE_ASSOC);
+
+    if($row_select['nb_count']==0) {
+
+      $MyErr = checkLicenceValidity($date_exp);
+
+      if ($MyErr->errCode == NO_ERR) {
+
+        // Ajouter une nouvelle licence de la table adsys_licence
+        $sql_insert = "INSERT INTO adsys_licence(id_licence, id_agc, date_creation, date_expiration, statut_licence) VALUES (nextval('adsys_licence_id_licence_seq'), ".getNumAgence().", '".php2pg($date_crea)."', '".php2pg($date_exp)."', 't');";
+        $result_insert = $db->query($sql_insert);
+        if (DB::isError($result_insert)) {
+          $dbHandler->closeConnection(false);
+          signalErreur(__FILE__,__LINE__,__FUNCTION__);
+        } else {
+
+            if (isset($code_identifier) && trim($code_identifier) != '' && trim($code_identifier) != 'n') {
+
+              // Get agence code institution
+              $sql_request = "SELECT licence_key, licence_code_identifier, id_ag FROM ad_agc WHERE id_ag=".getNumAgence();
+
+              $result_request = $db->query($sql_request);
+
+              if (!DB::isError($result_request)) {
+
+                $row_request = $result_request->fetchrow(DB_FETCHMODE_ASSOC);
+
+                $licence_key = trim($row_request['licence_key']);
+                $db_licence_code_identifier = trim($row_request['licence_code_identifier']);
+                $id_ag = trim($row_request['id_ag']);
+
+                $lic_code_ident_arr = explode("-", trim($code_identifier));
+                $code_banque = trim($lic_code_ident_arr[0]);
+                $license_exp_yr = trim($lic_code_ident_arr[1]);
+
+                if (empty($licence_key) && empty($db_licence_code_identifier)) {
+
+                  $str_to_crypt = sprintf("%s-%s", $code_banque, $license_exp_yr);
+                  $new_licence_code_identifier = crypt($str_to_crypt);
+
+                  // Update sql
+                  $Fields['licence_key'] = sha1($code_banque);
+                  $Fields['licence_code_identifier'] = trim($new_licence_code_identifier);
+                  $Where["id_ag"] = getNumAgence();
+
+                  $sql = buildUpdateQuery("ad_agc", $Fields, $Where);
+
+                  $result = executeDirectQuery($sql);
+                  if ($result->errCode != NO_ERR){
+                    $dbHandler->closeConnection(false);
+                    return new ErrorObj($result->errCode);
+                  }
+                }
+              }
+            }
+        }
+      }
+    }
+  }
+
+  $dbHandler->closeConnection(true);
+
+  return new ErrorObj(NO_ERR);
+}
+
+
+function checkLicenceNbClients() {
+
+  global $dbHandler, $global_id_agence;
+
+  $clients_actifs = $_SESSION['nb_clients_actifs'];
+
+  // Récupéré le chemin physique du fichier
+  preg_match("/(.*)\/lib\/misc\/divers\.php/",__FILE__,$doc_prefix);
+  $doc_prefix = $doc_prefix[1];
+
+  $licence2_path = "$doc_prefix/licence2.txt";
+
+  $acces_allowed = false;
+
+  // Vérification de l'existence du fichier licence2.txt
+  if (file_exists($licence2_path)) {
+
+    // Check agence mode in file
+    require_once 'lib/misc/Erreur.php';
+    require_once 'lib/dbProcedures/agence.php';
+    require_once 'lib/multilingue/traductions.php';
+    require_once 'lib/misc/cryptage.php';
+
+    $crypte_key = "adbankingpublic";
+
+    $crypte_text = file_get_contents($licence2_path);
+    $decrypte_arr = unserialize(Decrypte($crypte_text, $crypte_key));
+
+    // Check licence number of clients
+    if (!isset($decrypte_arr[6]) || (isset($decrypte_arr[6]) && trim($decrypte_arr[6]) > 0 && (int)$decrypte_arr[6] > $clients_actifs)) {
+        $acces_allowed = true;
+    }
+  }
+
+  if(!$acces_allowed) {
+    $global_mode_agence = '';
+
+    echo displayErrAuthMsg("Erreur Cr&eacute;ation client", "Vous avez d&eacute;pass&eacute; le nombre de clients qui peuvent &ecirc;tre cr&eacute;er pour la licence pay&eacute;e");
+    exit;
+  }
+
+  return $acces_allowed;
+}
+
+function displayErrAuthMsg($title = "Erreur d'autorisation", $message = "Vous n'&ecirc;tes plus autoris&eacute; &agrave; utiliser ADBanking") {
+  return <<<ACCESS
+<h1 align="center" style="font-family: arial;">$title</h1>
+	<br><br>
+	<form name="ADForm" action="/login/login2.php" method="get" target="_parent">
+		<table width="80%" cellpadding="8" align="center" valign="middle" bgcolor="#FDF2A6">
+			<tbody>
+				<tr bgcolor="#FDF2A6">
+					<td align="center" colspan="1">
+						<p><font color="#FF0000" style="font-family: arial;">$message</font></p>
+					</td>
+				</tr>
+				<tr bgcolor="#FDF2A6">
+					<td align="left" colspan="1">&nbsp;</td>
+				</tr>
+				<!--<tr bgcolor="#FDF2A6">
+					<td align="center">
+						<input type="submit" value="OK">
+					</td>
+				</tr>-->
+			</tbody>
+		</table>
+	</form>
+</h1>
+ACCESS;
+
+}
+
+
+function beginsWith( $str, $sub ) {
+  return ( substr( $str, 0, strlen( $sub ) ) === $sub );
+}
+function endsWith( $str, $sub ) {
+  return ( substr( $str, strlen( $str ) - strlen( $sub ) ) === $sub );
+}
+
+function cleanSpecialCharacters($text) {
+  $utf8 = array(
+      '/[áàâä]/u'     =>   'a',
+      '/[ÁÀÂÃÄ]/u'    =>   'A',
+      '/[ÍÌÎÏ]/u'     =>   'I',
+      '/[íìîï]/u'     =>   'i',
+      '/[éèêë]/u'     =>   'e',
+      '/[ÉÈÊË]/u'     =>   'E',
+      '/[óòôõºö]/u'   =>   'o',
+      '/[ÓÒÔÕÖ]/u'    =>   'O',
+      '/[úûü]/u'      =>   'u',
+      '/[ÚÙÛÜ]/u'     =>   'U',
+      '/ç/'           =>   'c',
+      '/Ç/'           =>   'C',
+      '/ñ/'           =>   'n',
+      '/Ñ/'           =>   'N',
+      "/ +/"          =>   '_',
+      "/-+/"          =>   '_',
+  );
+  $result = preg_replace(array_keys($utf8), array_values($utf8), $text);
+
+  return preg_replace('/[^A-Za-z_0-9]/', "", $result);
+}
+
+
+/**
+ * @param $date_compta
+ * @return bool|str|string
+ */
+function getValideDateComptaProvForBatch($date_compta)
+{
+  global $global_id_exo, $global_id_agence;
+
+  // la date comptable doit être dans la période de l'exercice en cours à cours
+  $exo_encours = getExercicesComptables($global_id_exo);
+  $date_debut = pg2phpDate($exo_encours[0]["date_deb_exo"]);
+  $date_fin = pg2phpDate($exo_encours[0]["date_fin_exo"]);
+
+  // date comptable
+  if ($date_compta == NULL) {
+    $date_comptable = date("d/m/Y"); // date du jour
+    if (isAfter($date_comptable, $date_fin))
+      $date_comptable = pg2phpDate(get_last_batch($global_id_agence));
+  } else
+    $date_comptable = $date_compta;
+
+  if ( (isAfter($date_debut, $date_comptable)) or (isAfter($date_comptable, $date_fin))) {
+    signalErreur(__FILE__, __LINE__, __FUNCTION__, _(" La date n'est pas dans la période de l'exercice en cours"));
+  }
+
+  return $date_comptable;
+}
+
+
+/*
+ * Récuperation du nombre de pages dans un fichier pdf
+ *
+ * @parm lien $document
+ * @return int pagecount*/
+
+function getPDFPages($document)
+{
+  $cmd = "pdfinfo";           // Linux
+
+  // Parse entire output
+  // Surround with double quotes if file name has spaces
+  exec("$cmd \"$document\"", $output);
+
+  // Iterate through lines
+  $pagecount = 0;
+  foreach($output as $op)
+  {
+    // Extract the number
+    if(preg_match("/Pages:\s*(\d+)/i", $op, $matches) === 1)
+    {
+      $pagecount = intval($matches[1]);
+      break;
+    }
+  }
+
+  return $pagecount;
+}
+
+/**
+ * Fonction utilisée pour vérifier si l'agence est parametré comme engrais chimiques dans licence2.txt
+ * @author Roshan Bolah
+ * @since 1.0
+ */
+function isEngraisChimiques() {
+
+  global $dbHandler;
+
+  $engrais_chimiques = false;
+
+  // Récupéré le chemin physique du fichier
+  preg_match("/(.*)\/lib\/misc\/divers\.php/",__FILE__,$doc_prefix);
+  $doc_prefix = $doc_prefix[1];
+
+  $licence2_path = "$doc_prefix/licence2.txt";
+
+  // Vérification de l'existence du fichier licence2.txt
+  if (file_exists($licence2_path)) {
+
+    // Check agence mode in file
+    require_once('lib/misc/cryptage.php');
+
+    $crypte_key = "adbankingpublic";
+
+    $crypte_text = file_get_contents($licence2_path);
+    $decrypte_arr = unserialize(Decrypte($crypte_text, $crypte_key));
+
+    // check engrais chimiques
+    if(null !== $decrypte_arr[8] && strtolower(trim($decrypte_arr[8]))=='y') {
+      $engrais_chimiques = true;
+    }
+  }
+
+  return $engrais_chimiques;
+}
+
+/**
+ * Fonction utilisée pour vérifier si l'agence est parametré commeagency banking dans licence2.txt
+ * @author Ahaad M
+ * @since 1.0
+ */
+function isAgencyBanking() {
+
+  global $dbHandler;
+
+  $agency_banking = false;
+
+  // Récupéré le chemin physique du fichier
+  preg_match("/(.*)\/lib\/misc\/divers\.php/",__FILE__,$doc_prefix);
+  $doc_prefix = $doc_prefix[1];
+
+  $licence2_path = "$doc_prefix/licence2.txt";
+
+  // Vérification de l'existence du fichier licence2.txt
+  if (file_exists($licence2_path)) {
+
+    // Check agence mode in file
+    require_once('lib/misc/cryptage.php');
+
+    $crypte_key = "adbankingpublic";
+
+    $crypte_text = file_get_contents($licence2_path);
+    $decrypte_arr = unserialize(Decrypte($crypte_text, $crypte_key));
+
+    // check engrais chimiques
+    if(null !== $decrypte_arr[10] && strtolower(trim($decrypte_arr[10]))=='y') {
+      $agency_banking = true;
+    }
+  }
+
+  return $agency_banking;
+}
+
+/**
+ * Fonction utilisée pour vérifier si l'agence est parametré comme nobile lending dans licence2.txt
+ * @author Ahaad M
+ * @since 1.0
+ */
+function isMobileLending() {
+
+    global $dbHandler;
+
+    $mobile_lending = false;
+
+    // Récupéré le chemin physique du fichier
+    preg_match("/(.*)\/lib\/misc\/divers\.php/",__FILE__,$doc_prefix);
+    $doc_prefix = $doc_prefix[1];
+
+    $licence2_path = "$doc_prefix/licence2.txt";
+
+    // Vérification de l'existence du fichier licence2.txt
+    if (file_exists($licence2_path)) {
+
+        // Check agence mode in file
+        require_once('lib/misc/cryptage.php');
+
+        $crypte_key = "adbankingpublic";
+
+        $crypte_text = file_get_contents($licence2_path);
+        $decrypte_arr = unserialize(Decrypte($crypte_text, $crypte_key));
+
+        // check engrais chimiques
+        if(null !== $decrypte_arr[11] && strtolower(trim($decrypte_arr[11]))=='y') {
+            $mobile_lending = true;
+        }
+    }
+
+    return $mobile_lending;
+}
+function getFiles($dir, $pattern){
+    $files = scandir($dir);
+    $files_metadata = array();
+    foreach($files as $key => $file){
+        preg_match($pattern, $file, $matches);
+        if(!empty($matches)){
+            $parts = explode("_", $file);
+            if(file_exists($dir.'/'.$file)){
+                $files_metadata[$parts[count($parts) -1]] = array(
+                    "file_name" => $file,
+                    "relative_path" => $dir.'/'.$file
+                );
+            }
+        }
+    }
+
+    ksort($files_metadata);
+    return $files_metadata;
+}
+
+function updateTableliste($DATA, $where){
+    global $dbHandler;
+
+    $db = $dbHandler->openConnection();
+    $sql = buildUpdateQuery('d_tableliste', $DATA, $where);
+
+    $result1 = $db->query($sql);
+    if (DB::isError($result1)) {
+        $dbHandler->closeConnection(false);
+        signalErreur(__FILE__,__LINE__,__FUNCTION__);
+    }
+
+    $dbHandler->closeConnection(true);
+}
+
+function getTableliste($nomc){
+    global $dbHandler;
+    $db = $dbHandler->openConnection();
+    $sql = "select * from tableliste where nomc = '$nomc'";
+    $result = $db->query($sql);
+    if (DB :: isError($result)) {
+        $dbHandler->closeConnection(false);
+        signalErreur(__FILE__, __LINE__, __FUNCTION__);
+    }
+    $rows = $result->fetchrow(DB_FETCHMODE_ASSOC);
+    $dbHandler->closeConnection(true);
+    return $rows["ident"];
+}
+
+function file_add_timestamp($dir, $pattern, $meta){
+    global $dbHandler, $global_id_client, $global_id_agence;
+    $files = getFiles($dir, $pattern);
+    $file_timestamp = null;
+    if(!empty($files)){
+        $files_keys = array_keys($files);
+        if(file_exists($files[$files_keys[0]]["relative_path"])){
+            $file_timestamp = $files[$files_keys[0]]["relative_path"]."_".time();
+            rename($files[$files_keys[0]]["relative_path"], $file_timestamp);
+        }
+    }
+
+    //Due to AT-239, the database data related to this file need also to be updated
+    $db = $dbHandler->openConnection();
+    $meta_key = array_keys($meta);
+    $file_path = empty($file_timestamp)?"adbanking/images/travaux.gif":(dirname($meta[$meta_key[0]])."/".basename($file_timestamp));
+    $sql = "INSERT INTO ad_cli_hist (".$meta_key[0].", id_ag, id_client) VALUES ('".$file_path."', $global_id_agence, $global_id_client)";
+
+    $result1 = executeQuery($db, $sql);
+    if (DB::isError($result1)) {
+        $dbHandler->closeConnection(false);
+        signalErreur(__FILE__,__LINE__,__FUNCTION__);
+    }
+
+    $dbHandler->closeConnection(true);
+}
+?>

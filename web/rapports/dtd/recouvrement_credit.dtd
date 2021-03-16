@@ -1,0 +1,100 @@
+<!-- DTD pour le rapport sur le recouvrement -->
+
+<!-- Element root -->
+<!ELEMENT recouvrement_credit (header, infos_synthetique, recap_par_classe, details_recouvrement*)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!ELEMENT infos_synthetique (cap_restant_tot, cap_theorique_tot, interets_tot, penalites_tot, capital_total, capital_attendu_total, interet_attendu_total, penalite_attendu_total, capital_rembourse_total, interet_rembourse_total, penalite_rembourse_total, capital_impaye_total, interet_impaye_total, penalite_impaye_total, total_rembourse_total, montant_tot, coeff_tot)>
+<!ELEMENT cap_restant_tot (#PCDATA)>
+<!ELEMENT cap_theorique_tot (#PCDATA)>
+<!ELEMENT interets_tot (#PCDATA)>
+<!ELEMENT penalites_tot (#PCDATA)>
+<!ELEMENT capital_total (#PCDATA)>
+<!ELEMENT capital_attendu_total (#PCDATA)>
+<!ELEMENT interet_attendu_total (#PCDATA)>
+<!ELEMENT penalite_attendu_total (#PCDATA)>
+<!ELEMENT capital_rembourse_total (#PCDATA)>
+<!ELEMENT interet_rembourse_total (#PCDATA)>
+<!ELEMENT penalite_rembourse_total (#PCDATA)>
+<!ELEMENT total_rembourse_total (#PCDATA)>
+<!ELEMENT capital_impaye_total (#PCDATA)>
+<!ELEMENT interet_impaye_total (#PCDATA)>
+<!ELEMENT penalite_impaye_total (#PCDATA)>
+<!ELEMENT montant_tot (#PCDATA)>
+<!ELEMENT coeff_tot (#PCDATA)>    
+             
+<!ELEMENT recap_par_classe (entete_recap, details_recap*)>
+<!ELEMENT entete_recap (#PCDATA)>
+    
+<!ELEMENT details_recap (ligne_recap*)>
+<!ELEMENT ligne_recap (etat, cap_restant_recap, cap_theorique_recap, interets_recap, penalites_recap, capital_recap, capital_attendu_recap, interet_attendu_recap, penalite_attendu_recap, capital_rembourse_recap, interet_rembourse_recap, penalite_rembourse_recap, total_rembourse_recap, capital_impaye_recap, interet_impaye_recap, penalite_impaye_recap, montant_recap, coeff_recap)>
+<!ELEMENT etat (#PCDATA)>
+<!ELEMENT cap_restant_recap (#PCDATA)>
+<!ELEMENT cap_theorique_recap (#PCDATA)>
+<!ELEMENT interets_recap (#PCDATA)>
+<!ELEMENT penalites_recap (#PCDATA)>
+<!ELEMENT capital_recap (#PCDATA)>
+<!ELEMENT capital_attendu_recap (#PCDATA)>
+<!ELEMENT interet_attendu_recap (#PCDATA)>
+<!ELEMENT penalite_attendu_recap (#PCDATA)>
+<!ELEMENT capital_rembourse_recap (#PCDATA)>
+<!ELEMENT interet_rembourse_recap (#PCDATA)>
+<!ELEMENT penalite_rembourse_recap (#PCDATA)>
+<!ELEMENT total_rembourse_recap (#PCDATA)>
+<!ELEMENT capital_impaye_recap (#PCDATA)>
+<!ELEMENT interet_impaye_recap (#PCDATA)>
+<!ELEMENT penalite_impaye_recap (#PCDATA)>
+<!ELEMENT montant_recap (#PCDATA)>
+<!ELEMENT coeff_recap (#PCDATA)>
+
+<!ELEMENT details_recouvrement (recouvrements_par_classe*)>
+<!ELEMENT recouvrements_par_classe (classe_credit, recouvrements_par_produits*)>
+<!ELEMENT classe_credit (#PCDATA)>
+
+<!ELEMENT recouvrements_par_produits (libel_prod, montant_debourse_tot, cap_restant_tot, cap_theorique_tot, interets_tot, penalites_tot, capital_retard_tot, montant_retard_tot, capital_attendu_tot, interet_attendu_tot, penalite_attendu_tot, capital_rembourse_tot, interet_rembourse_tot, penalite_rembourse_tot, penalite_impaye_tot, total_rembourse_tot, dossiers_recouvrement*)>
+<!ELEMENT libel_prod (#PCDATA)>
+<!ELEMENT montant_debourse_tot (#PCDATA)>
+<!ELEMENT cap_restant_tot (#PCDATA)>
+<!ELEMENT cap_theorique_tot (#PCDATA)>
+<!ELEMENT interets_tot (#PCDATA)>
+<!ELEMENT penalites_tot (#PCDATA)>
+<!ELEMENT capital_retard_tot (#PCDATA)>
+<!ELEMENT montant_retard_tot (#PCDATA)>
+<!ELEMENT capital_attendu_tot (#PCDATA)>
+<!ELEMENT interet_attendu_tot (#PCDATA)>
+<!ELEMENT penalite_attendu_tot (#PCDATA)>
+<!ELEMENT capital_rembourse_tot (#PCDATA)>
+<!ELEMENT interet_rembourse_tot (#PCDATA)>
+<!ELEMENT penalite_rembourse_tot (#PCDATA)>
+<!ELEMENT penalite_impaye_tot (#PCDATA)>
+<!ELEMENT total_rembourse_tot (#PCDATA)>
+
+<!ELEMENT dossiers_recouvrement (ligne_recouvrement*)>       
+<!ELEMENT ligne_recouvrement (num_pret, num_client, nom_client, gestionnaire, montant_debourse, cap_restant, date_dernier_ech, date_dernier_remb, cap_theorique, interets, penalites, capital_retard, montant_retard, coeff, capital_attendu, interet_attendu, penalite_attendu, capital_rembourse, interet_rembourse, penalite_rembourse, penalite_impaye, total_rembourse, etat_credit*)>
+           
+<!ELEMENT num_pret (#PCDATA)>
+<!ELEMENT num_client (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT gestionnaire (#PCDATA)>
+<!ELEMENT montant_debourse (#PCDATA)>    
+<!ELEMENT cap_restant (#PCDATA)>
+<!ELEMENT date_dernier_ech (#PCDATA)>
+<!ELEMENT date_dernier_remb (#PCDATA)>
+<!ELEMENT cap_theorique (#PCDATA)>
+<!ELEMENT interets (#PCDATA)>
+<!ELEMENT penalites (#PCDATA)>
+<!ELEMENT capital_retard (#PCDATA)>
+<!ELEMENT montant_retard (#PCDATA)>
+<!ELEMENT coeff (#PCDATA)>
+<!ELEMENT capital_attendu (#PCDATA)>
+<!ELEMENT interet_attendu (#PCDATA)>
+<!ELEMENT penalite_attendu (#PCDATA)>
+<!ELEMENT capital_rembourse (#PCDATA)>
+<!ELEMENT interet_rembourse (#PCDATA)>
+<!ELEMENT penalite_rembourse (#PCDATA)>
+<!ELEMENT penalite_impaye (#PCDATA)>
+<!ELEMENT total_rembourse (#PCDATA)>
+<!ELEMENT etat_credit (#PCDATA)>

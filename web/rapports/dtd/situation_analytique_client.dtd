@@ -1,0 +1,48 @@
+<!-- DTD pour le rapport situation analytique d'un client -->
+
+<!-- Element root -->
+<!ELEMENT situation_analytique_client (header, header_contextuel, epargne, credits, ord_permanent)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- En-tete contextuel -->
+<!ELEMENT header_contextuel (num_client, nom_client)>
+<!ELEMENT num_client (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+
+<!ELEMENT epargne (compte*)>
+<!ELEMENT ord_permanent (compte_ord*)>
+<!ELEMENT credits (dossier*)>
+
+<!ELEMENT  compte (num_cpte, prod_ep, date_ouvert, etat_cpte, devise, solde, mnt_bloq, mnt_disponible)>
+
+<!ELEMENT num_cpte (#PCDATA)>
+<!ELEMENT prod_ep (#PCDATA)>
+<!ELEMENT date_ouvert (#PCDATA)>
+<!ELEMENT etat_cpte (#PCDATA)>
+<!ELEMENT devise (#PCDATA)>
+<!ELEMENT solde (#PCDATA)>
+<!ELEMENT mnt_bloq (#PCDATA)>
+<!ELEMENT mnt_disponible (#PCDATA)>
+
+<!ELEMENT  compte_ord (num_cpte_ord, prod, date_ouverture, montant, periodicite, date_fin, mnt_solde)>
+
+<!ELEMENT num_cpte_ord (#PCDATA)>
+<!ELEMENT prod (#PCDATA)>
+<!ELEMENT date_ouverture (#PCDATA)>
+<!ELEMENT montant (#PCDATA)>
+<!ELEMENT periodicite (#PCDATA)>
+<!ELEMENT date_fin (#PCDATA)>
+<!ELEMENT mnt_solde (#PCDATA)>
+
+<!ELEMENT  dossier (id_doss, cap_du, int_du, gar_du, cap_rest, int_rest, gar_rest, cre_retard_etat_max)>
+<!ELEMENT id_doss (#PCDATA)>
+<!ELEMENT cap_du (#PCDATA)>
+<!ELEMENT int_du (#PCDATA)>
+<!ELEMENT gar_du (#PCDATA)>
+<!ELEMENT cap_rest (#PCDATA)>
+<!ELEMENT int_rest (#PCDATA)>
+<!ELEMENT gar_rest (#PCDATA)>
+<!ELEMENT cre_retard_etat_max (#PCDATA)>

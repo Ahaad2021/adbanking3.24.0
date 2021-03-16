@@ -1,0 +1,35 @@
+<!-- DTD pour la prevision des liquidites -->
+
+<!-- Element root -->
+<!ELEMENT prevision_liquidite (header, body)>
+<!ATTLIST recu type CDATA #REQUIRED>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- Corps -->
+<!ELEMENT body (dates, credit, epargne)>
+
+<!ELEMENT dates (previsions)>
+
+<!ELEMENT credit (cap_attendu, int_attendu)>
+<!ELEMENT cap_attendu (previsions)>
+<!ELEMENT int_attendu (previsions)>
+
+<!ELEMENT epargne (ep_nantie, ep_terme, ep_libre)>
+<!ELEMENT ep_nantie (previsions)>
+<!ELEMENT ep_terme (previsions)>
+<!ELEMENT ep_libre (previsions)>
+
+<!ELEMENT previsions (j, s1, s2, s3, m1, m2, m3, m6, m9, m12)>
+<!ELEMENT j (#PCDATA)>
+<!ELEMENT s1 (#PCDATA)>
+<!ELEMENT s2 (#PCDATA)>
+<!ELEMENT s3 (#PCDATA)>
+<!ELEMENT m1 (#PCDATA)>
+<!ELEMENT m2 (#PCDATA)>
+<!ELEMENT m3 (#PCDATA)>
+<!ELEMENT m6 (#PCDATA)>
+<!ELEMENT m9 (#PCDATA)>
+<!ELEMENT m12 (#PCDATA)>

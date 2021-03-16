@@ -1,0 +1,45 @@
+<!-- DTD pour le rapport sur le suivi ligne de credit -->
+
+    <!-- Element root -->
+    <!ELEMENT suivi_ligne_credit (header, infos_synthetique, details_suivi_credit*)>
+
+    <!-- Un en-tete commun a tous -->
+    <!ENTITY % mod_header SYSTEM "header.dtd">
+    %mod_header;
+
+    <!ELEMENT infos_synthetique (montant_octoye_total, cap_debourse_total, cap_restant_du_total, montant_dispo_total, interets_restant_du_total, interets_payes_total, frais_restant_du_total, frais_payes_total)>
+    <!ELEMENT montant_octoye_total (#PCDATA)>
+    <!ELEMENT cap_debourse_total (#PCDATA)>
+    <!ELEMENT cap_restant_du_total (#PCDATA)>
+    <!ELEMENT montant_dispo_total (#PCDATA)>
+    <!ELEMENT interets_restant_du_total (#PCDATA)>
+    <!ELEMENT interets_payes_total (#PCDATA)>
+    <!ELEMENT frais_restant_du_total (#PCDATA)>
+    <!ELEMENT frais_payes_total (#PCDATA)>
+
+    <!ELEMENT details_suivi_credit (lib_prod, ligne_suivi_credit*, xml_total)>
+    <!ELEMENT lib_prod (#PCDATA)>
+
+    <!ELEMENT ligne_suivi_credit (id_doss, libel_prod, num_client, nom_client, libel_gestionnaire, montant_octroye, devise, date_octroi, duree, etat, montant_dispo, cap_restant_du, interets_restant_du, interets_payes, frais_restant_du, frais_payes, date_dernier_deb, date_dernier_remb, date_fin_echeance)>
+    <!ELEMENT id_doss (#PCDATA)>
+    <!ELEMENT libel_prod (#PCDATA)>
+    <!ELEMENT num_client (#PCDATA)>
+    <!ELEMENT nom_client (#PCDATA)>
+    <!ELEMENT libel_gestionnaire (#PCDATA)>
+    <!ELEMENT montant_octroye (#PCDATA)>
+    <!ELEMENT cap_restant_du (#PCDATA)>
+    <!ELEMENT devise (#PCDATA)>
+    <!ELEMENT date_octroi (#PCDATA)>
+    <!ELEMENT duree (#PCDATA)>
+    <!ELEMENT etat (#PCDATA)>
+    <!ELEMENT montant_dispo (#PCDATA)>
+    <!ELEMENT interets_restant_du (#PCDATA)>
+    <!ELEMENT interets_payes (#PCDATA)>
+    <!ELEMENT frais_restant_du (#PCDATA)>
+    <!ELEMENT frais_payes (#PCDATA)>
+    <!ELEMENT date_dernier_deb (#PCDATA)>
+    <!ELEMENT date_dernier_remb (#PCDATA)>
+    <!ELEMENT date_fin_echeance (#PCDATA)>
+
+    <!ELEMENT xml_total (tot_mnt_octr)>
+    <!ELEMENT tot_mnt_octr (#PCDATA)>

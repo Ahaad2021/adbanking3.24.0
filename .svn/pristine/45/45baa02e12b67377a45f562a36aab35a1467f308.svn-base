@@ -1,0 +1,36 @@
+# Revisor base config file
+# This file will be updated, so make sure to watch .rpmnew stuff
+
+[revisor]
+# Some revisor options to eliminate the need for CLI parameters,
+# or save clicks in the GUI
+
+# Types of Installation Media to build
+media_installation_dvd=0
+media_installation_cd=1
+# Types of Live Media to build
+media_live_optical=0
+media_live_thumb=0
+
+repos_enabledevelopment=0
+repos_enabletesting=0
+repos_enablesource=0
+repos_enabledebuginfo=0
+
+# These are more advanced options
+dependency_resolve_allow_conflicts=0
+mode_respin=0
+
+##
+## Models
+##
+
+[f7-i386]
+main = revisor-f7-i386.conf
+product_name = Fedora
+product_path = Fedora
+iso_basename = F
+comps = /usr/share/revisor/comps/comps-f7.xml
+architecture = i386
+version = 7
+getsource = 0

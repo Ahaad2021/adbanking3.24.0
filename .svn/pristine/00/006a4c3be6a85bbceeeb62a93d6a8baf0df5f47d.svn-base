@@ -1,0 +1,30 @@
+<!-- DTD pour le rapport des comptes d'epargne repris -->
+
+<!-- Element root -->
+<!ELEMENT comptes_epargne_repris (header, header_contextuel,produit*)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- En-tete contextuel -->
+<!ELEMENT header_contextuel (criteres_recherche, infos_synthetiques)>
+
+<!-- Criteres de recherche commun -->
+<!ENTITY % mod_criteres SYSTEM "criteres_recherche.dtd">
+%mod_criteres;
+
+<!-- Informations synthetiques -->
+<!ELEMENT infos_synthetiques (nbre_total)>
+<!ELEMENT nbre_total (#PCDATA)>
+
+<!-- Corps -->
+<!ELEMENT produit (libel,compte_repris*)>
+<!ELEMENT libel (#PCDATA)>
+<!ELEMENT compte_repris (num_client,ancien_num_client,nom_client,num_cpte, solde, date_reprise)>
+<!ELEMENT num_client (#PCDATA)>
+<!ELEMENT ancien_num_client (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT num_cpte (#PCDATA)>
+<!ELEMENT solde (#PCDATA)>
+<!ELEMENT date_reprise (#PCDATA)>

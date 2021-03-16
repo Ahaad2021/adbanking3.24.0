@@ -1,0 +1,4 @@
+------------------------------
+Pre-requisites
+------------------------------
+sudo yum install php-bcmath

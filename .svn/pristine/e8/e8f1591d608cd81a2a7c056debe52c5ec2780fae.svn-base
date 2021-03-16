@@ -1,0 +1,17 @@
+<!-- DTD pour les schemas comptables -->
+
+<!-- Element root -->
+<!ELEMENT schemas_comptables (header,schema_compta)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- Schema comptable  -->
+<!ELEMENT schema_compta (detail_schema*)>
+
+<!ELEMENT detail_schema (type_ope, libel_ope, cpte_debit, cpte_credit)>
+<!ELEMENT type_ope (#PCDATA)>
+<!ELEMENT libel_ope (#PCDATA)>
+<!ELEMENT cpte_debit (#PCDATA)>
+<!ELEMENT cpte_credit (#PCDATA)>

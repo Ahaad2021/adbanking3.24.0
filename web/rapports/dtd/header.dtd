@@ -1,0 +1,13 @@
+<!--Donnees en-tete pour chaque document-->
+<!ELEMENT header (logo_existe, logo_ag ,institution ,agence ,telephone ,date ,heure ,heure ,utilisateur ,idrapport ,titre)>
+<!ELEMENT institution (#PCDATA)>
+<!ELEMENT agence (#PCDATA)>
+<!ELEMENT telephone (#PCDATA)>
+<!ELEMENT date (#PCDATA)>
+<!ELEMENT heure (#PCDATA)>
+<!ELEMENT utilisateur (#PCDATA)>
+<!ELEMENT idrapport (#PCDATA)>
+<!ELEMENT logo_ag (#PCDATA)>
+<!ELEMENT logo_existe  (#PCDATA)>
+<!ELEMENT titre (#PCDATA)>
+

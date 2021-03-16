@@ -1,0 +1,22 @@
+<!-- DTD pour le rapport des etats d'execution budgetaire -->
+
+<!-- Element root -->
+<!ELEMENT atm_transaction (header,transaction)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!--<!ELEMENT infos_synthetiques (devise)>-->
+<!--<!ELEMENT devise (#PCDATA)>-->
+
+<!-- Corps -->
+<!ELEMENT transaction (details*)>
+<!ELEMENT details (id_his,date_transaction,no_client,compte,num_carte,type_operation,montant)>
+<!ELEMENT id_his (#PCDATA)>
+<!ELEMENT date_transaction (#PCDATA)>
+<!ELEMENT no_client (#PCDATA)>
+<!ELEMENT compte (#PCDATA)>
+<!ELEMENT num_carte (#PCDATA)>
+<!ELEMENT type_operation (#PCDATA)>
+<!ELEMENT montant (#PCDATA)>

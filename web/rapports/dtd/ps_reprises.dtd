@@ -1,0 +1,29 @@
+<!-- DTD pour le rapport des parts sociales reprises -->
+
+<!-- Element root -->
+<!ELEMENT ps_reprises (header, header_contextuel, liste_ps_reprise)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- En-tete contextuel -->
+<!ELEMENT header_contextuel (criteres_recherche, infos_synthetiques)>
+
+<!-- Criteres de recherche commun -->
+<!ENTITY % mod_criteres SYSTEM "criteres_recherche.dtd">
+%mod_criteres;
+
+<!-- Informations synthetiques -->
+<!ELEMENT infos_synthetiques (nbre_total)>
+<!ELEMENT nbre_total (#PCDATA)>
+<!ELEMENT liste_ps_reprise (ps_reprise*)>
+<!-- Corps -->
+<!ELEMENT ps_reprise (num_client,anc_num_client,nom_client,nbre_ps,mnt_ps_repris,date_reprise)>
+<!ELEMENT num_client (#PCDATA)>
+<!ELEMENT anc_num_client (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT nbre_ps (#PCDATA)>
+<!ELEMENT mnt_ps_repris (#PCDATA)>
+<!ELEMENT date_reprise (#PCDATA)>
+

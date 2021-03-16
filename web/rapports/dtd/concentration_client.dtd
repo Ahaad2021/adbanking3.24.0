@@ -1,0 +1,27 @@
+<!-- DTD pour le rapport concentration des clients -->
+
+<!-- Element root -->
+<!ELEMENT concentration_client (header, header_contextuel, monocritere?, tableau*)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- En-tete contextuel -->
+<!ELEMENT header_contextuel (critere)>
+<!ELEMENT critere (#PCDATA)>
+
+<!-- corps -->
+<!-- monocritere -->
+<!ELEMENT monocritere (libelle*, nbre*)>
+<!ELEMENT libelle (#PCDATA)>
+<!ELEMENT nbre (#PCDATA)>
+
+<!-- multicritere -->
+<!ELEMENT tableau (liblocal, libcolonne+, ligne+)>
+<!ELEMENT liblocal (#PCDATA)>
+<!ELEMENT ligne (libligne?, nbreparcellule+)>
+<!ELEMENT libcolonne (#PCDATA)>
+<!ELEMENT libligne (#PCDATA)>
+<!ELEMENT nbreparcellule (#PCDATA)>
+

@@ -1,0 +1,47 @@
+#!/bin/bash
+# vim: set expandtab softtabstop=2 shiftwidth=2:
+
+cd "`dirname $0`/.."
+echo -ne "\033[1mGénération des fichiers MO après traduction.\033[0m"
+for langue in `/bin/ls web/locale` ; do	
+  if [[ -d web/locale/$langue ]] ; then
+    fichier_pot="web/locale/$langue/LC_MESSAGES/adbanking.po";
+    if [[ ! -f $fichier_pot ]] ; then
+      echo -e "\033[1mErreur\033[0m : impossible de traiter la langue $langue car le fichier $fichier_pot est introuvable."
+    else
+      echo -e "Traitement de la langue \033[1m${langue}\033[0m :"
+                      
+      # Compilation des fichiers PO (=création des fichiers MO)	
+      echo -n "   - compilation du fichier po...  "
+      msgfmt -v --check-format --check-header $fichier_pot --statistics -o web/locale/$langue/LC_MESSAGES/adbanking.mo
+      
+      # Traduction des fichiers XSLT
+      #echo -n "   - traduction des fichiers XSLT."
+      #find web/rapports/xslt/$langue -name "*.xslt" -exec rm -f {} \;
+      #for xslt in `/bin/ls web/rapports/xslt` ; do
+      #  if [[ -f web/rapports/xslt/${xslt} ]] ; then
+      #    # A optimiser car pour chaque fichier XSLT, on fait un appel à pottoxslt et chaque appel à pottoxslt relit tout le fichier POT.(très lourd !)
+      #    multilingue/pottoxslt $langue < web/rapports/xslt/$xslt | xmllint --format --output web/rapports/xslt/$langue/$xslt -
+      #    echo -n .
+      #  fi
+      #done
+      echo
+      echo -n "   - extraction des chaînes non traduites"
+      UNTRANS="web/locale/${langue}/LC_MESSAGES/adbanking-untranslated.po"
+      rm -f $UNTRANS
+      msgattrib --untranslated --no-wrap $fichier_pot -o $UNTRANS
+      if [[ -f $UNTRANS ]] ; then
+        echo -e ", \033[1mvérifiez les chaînes non traduites\033[0m dans \033[1m$UNTRANS\033[0m"
+      else
+        echo " : aucune"
+      fi
+      echo -e "\033[1mfait !\033[0m"
+    fi
+  fi
+echo
+done 
+
+##########
+# Fini !
+echo "Le traitement MO après traduction est terminé."
+echo

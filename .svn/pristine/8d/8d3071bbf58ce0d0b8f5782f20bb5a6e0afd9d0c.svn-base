@@ -1,0 +1,4 @@
+#Script pour valider un document XML; 
+#param 1 : nom du fichier contenant le DTD
+#param 2 : nom du fichier contenant le code XML
+/usr/bin/xmllint --noout --dtdvalid $1 $2

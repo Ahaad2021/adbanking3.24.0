@@ -1,0 +1,88 @@
+<!-- DTD pour les recus (retrait, depot et depot cheque) -->
+
+<!-- Element root -->
+<!ELEMENT recu (header, body)>
+<!ATTLIST recu type CDATA #REQUIRED>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- Corps -->
+<!ELEMENT body (nom_client, nom_agence_remote, donneur_ordre, num_cpte, num_carte_ferlo?, montant, tranche_frais, num_trans, frais?, frais_attente,commission_od_deplace?, solde?, remarque?, communication?, info_cheque?,
+hasBilletage*, mntEnLettre* , libel_billet_0*, libel_billet_1*, libel_billet_2*, libel_billet_3*, libel_billet_4*, libel_billet_5*, libel_billet_6* ,
+libel_billet_7* ,libel_billet_8* ,libel_billet_9* ,libel_billet_10* ,libel_billet_11* ,libel_billet_12* ,libel_billet_13* ,
+valeur_billet_0* ,valeur_billet_1* ,valeur_billet_2* ,valeur_billet_3* ,valeur_billet_4* ,valeur_billet_5* ,valeur_billet_6* ,
+valeur_billet_7* ,valeur_billet_8* ,valeur_billet_9* ,valeur_billet_10* ,valeur_billet_11* ,valeur_billet_12* ,valeur_billet_13* ,
+total_billet_0* ,total_billet_1* ,total_billet_2* ,total_billet_3* ,total_billet_4* ,total_billet_5* ,total_billet_6* ,
+total_billet_7* ,total_billet_8* ,total_billet_9* ,total_billet_10* ,total_billet_11* ,total_billet_12* ,total_billet_13*)>
+
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT nom_agence_remote (#PCDATA)>
+<!ELEMENT donneur_ordre (#PCDATA)>
+<!ELEMENT num_cpte (#PCDATA)>
+<!ELEMENT num_carte_ferlo (#PCDATA)>
+<!ELEMENT montant (#PCDATA)>
+<!ELEMENT tranche_frais (#PCDATA)>
+<!ELEMENT num_trans (#PCDATA)>
+<!ELEMENT frais (#PCDATA)>
+<!ELEMENT frais_attente (#PCDATA)>
+<!ELEMENT commission_od_deplace (#PCDATA)>
+<!ELEMENT solde (#PCDATA)>
+<!ELEMENT remarque (#PCDATA)>
+<!ELEMENT communication (#PCDATA)>
+
+<!ELEMENT hasBilletage (#PCDATA)>
+
+<!ELEMENT libel_billet_0 (#PCDATA)>
+<!ELEMENT libel_billet_1 (#PCDATA)>
+<!ELEMENT libel_billet_2 (#PCDATA)>
+<!ELEMENT libel_billet_3 (#PCDATA)>
+<!ELEMENT libel_billet_4 (#PCDATA)>
+<!ELEMENT libel_billet_5 (#PCDATA)>
+<!ELEMENT libel_billet_6 (#PCDATA)>
+<!ELEMENT libel_billet_7 (#PCDATA)>
+<!ELEMENT libel_billet_8 (#PCDATA)>
+<!ELEMENT libel_billet_9 (#PCDATA)>
+<!ELEMENT libel_billet_10 (#PCDATA)>
+<!ELEMENT libel_billet_11 (#PCDATA)>
+<!ELEMENT libel_billet_12 (#PCDATA)>
+<!ELEMENT libel_billet_13 (#PCDATA)>
+
+<!ELEMENT valeur_billet_0 (#PCDATA)>
+<!ELEMENT valeur_billet_1 (#PCDATA)>
+<!ELEMENT valeur_billet_2 (#PCDATA)>
+<!ELEMENT valeur_billet_3 (#PCDATA)>
+<!ELEMENT valeur_billet_4 (#PCDATA)>
+<!ELEMENT valeur_billet_5 (#PCDATA)>
+<!ELEMENT valeur_billet_6 (#PCDATA)>
+<!ELEMENT valeur_billet_7 (#PCDATA)>
+<!ELEMENT valeur_billet_8 (#PCDATA)>
+<!ELEMENT valeur_billet_9 (#PCDATA)>
+<!ELEMENT valeur_billet_10 (#PCDATA)>
+<!ELEMENT valeur_billet_11 (#PCDATA)>
+<!ELEMENT valeur_billet_12 (#PCDATA)>
+<!ELEMENT valeur_billet_13 (#PCDATA)>
+
+<!ELEMENT total_billet_0 (#PCDATA)>
+<!ELEMENT total_billet_1 (#PCDATA)>
+<!ELEMENT total_billet_2 (#PCDATA)>
+<!ELEMENT total_billet_3 (#PCDATA)>
+<!ELEMENT total_billet_4 (#PCDATA)>
+<!ELEMENT total_billet_5 (#PCDATA)>
+<!ELEMENT total_billet_6 (#PCDATA)>
+<!ELEMENT total_billet_7 (#PCDATA)>
+<!ELEMENT total_billet_8 (#PCDATA)>
+<!ELEMENT total_billet_9 (#PCDATA)>
+<!ELEMENT total_billet_10 (#PCDATA)>
+<!ELEMENT total_billet_11 (#PCDATA)>
+<!ELEMENT total_billet_12 (#PCDATA)>
+<!ELEMENT total_billet_13 (#PCDATA)>
+
+<!ELEMENT mntEnLettre (#PCDATA)>
+
+<!ELEMENT info_cheque (num_cheque, banque_cheque, date_cheque,beneficiaire?)>
+<!ELEMENT num_cheque (#PCDATA)>
+<!ELEMENT banque_cheque (#PCDATA)>
+<!ELEMENT date_cheque (#PCDATA)>
+<!ELEMENT beneficiaire (#PCDATA)>

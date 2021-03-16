@@ -1,0 +1,34 @@
+<!-- DTD pour le grand livre  -->
+
+<!-- Element root -->
+<!ELEMENT grandlivre (header, compte*)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- En-tete contextuel -->
+
+
+<!-- Criteres de recherche commun -->
+<!--ENTITY % mod_criteres SYSTEM "criteres_recherche.dtd"-->
+<!--%mod_criteres;-->
+
+<!ELEMENT compte (libel_cpte,ligne*, etat*)>
+
+<!-- Corps -->
+
+<!ELEMENT libel_cpte (#PCDATA)>
+
+<!ELEMENT ligne (piece,histo,client,date,libel,debit,credit)>
+<!ELEMENT piece (#PCDATA)>
+<!ELEMENT histo (#PCDATA)>
+<!ELEMENT client (#PCDATA)>
+<!ELEMENT date (#PCDATA)>
+<!ELEMENT libel (#PCDATA)>
+<!ELEMENT debit (#PCDATA)>
+<!ELEMENT credit (#PCDATA)>
+
+<!ELEMENT etat (solde_debiteur?,solde_crediteur?)>
+<!ELEMENT solde_debiteur (#PCDATA)>
+<!ELEMENT solde_crediteur (#PCDATA)>

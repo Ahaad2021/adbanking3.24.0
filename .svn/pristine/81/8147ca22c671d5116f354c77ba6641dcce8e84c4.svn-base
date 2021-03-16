@@ -1,0 +1,28 @@
+# Kickstart file for ADbanking
+
+install
+cdrom
+network --bootproto=dhcp --device=eth0 --onboot=on
+firewall --enabled --port=22:tcp --port=80:tcp --port=443:tcp --port=137:udp --port=138:udp --port=139:tcp --port=445:tcp
+authconfig --enableshadow --enablemd5
+selinux --enforcing
+bootloader --location=mbr --append="rhgb quiet"
+
+%packages
+# Base and Core
+@base
+@core
+# ADbanking dependencies
+dialog
+httpd
+mod_ssl
+perl-gettext
+php
+php-mbstring
+php-pear-DB
+php-pgsql
+php-xml
+postgresql-server
+samba
+php-pear-Numbers-Words
+php-bcmath

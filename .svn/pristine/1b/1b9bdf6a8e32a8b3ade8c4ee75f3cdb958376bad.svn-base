@@ -1,0 +1,80 @@
+#!/usr/bin/perl
+# Traduction d'un fichier source.xslt vers une autre langue.
+# Utilisation: pottoxslt < fichier_source_en_francais.xslt code_langue > output.xslt
+#
+# 03/08/2005 - antoine.delvaux@adfinance.org
+# 	v1.1.0 : vérification de l'existence de Locale::gettext
+# 24/08/2004 - olivier.luyckx@aquadev.org
+#	v1.0.0 : création
+#
+# Le module perl Locale::gettext doit être installé sur le système afin d'utilsier ce script
+# Ce script doit être lancé à partir du répertoire de développement racine
+########################
+
+use POSIX;
+
+$CODE_LANGUE=$ARGV[0];
+
+#ETAPE 1: Initialisation de Locale::gettext
+#------------------------------------------
+
+sub is_installed {
+  my($module) = @_;
+  return eval "require $module";
+}
+
+is_installed('Locale::gettext') or die "Le module perl Locale::gettext doit être installé.";
+import Locale::gettext;
+
+$domain = "adbanking";
+bindtextdomain($domain, "web/locale");
+textdomain($domain);
+
+setlocale (LC_ALL, $CODE_LANGUE);
+setlocale (LC_CTYPE, "$CODE_LANGUE.utf-8"); # Afin que le charset des strings générés par gettext soit UTF8
+#$ENV{'LC_MESSAGES'} = $CODE_LANGUE;
+setlocale(LC_MESSAGES, "$CODE_LANGUE.utf-8");
+
+#ETAPE 2: Lecture du fichier XSLT + traduction
+#---------------------------------------------
+
+#Lecture de stdin
+#TODO: Il faudrait créer l'output au fur et à mesure qu'on lit l'entrée, ligne par ligne
+#      cela éviterait de placer tout le contenu du fichier en mémoire, ce qui peut être limitatif si nous avons de gros fichiers XSLT
+#      cela rendrait aussi la recherche des chaînes à extraire plus aisée
+#      cela permettrait aussi de créer un output plus lisible, avec la même mise en page que l'input et pas tout sur une seule ligne
+open (XSLT,'-');
+@stdin = <XSLT>;
+close(XSLT);
+
+#Suppression des sauts de lignes
+$input = join ("" , @stdin);
+$input =~ s/\n//g;              #supression des sauts de ligne
+$input =~ s/\t/ /g;             #supression des tabulations
+$input =~ s/<!--.*?-->//g;      #suppression des commentaires
+
+while (length ($input)>0) 
+{
+			#On traite les balises qui sont de la forme <xsl:with-param name="titre" select="'Titre à traduire'"/>
+		if ($input =~ /^ *< *xsl *: *with-param *name *= *"titre" *select *= *".*?'(.*?)'.*?" *\/ *>/i)
+			{
+	        	$input =~ s/^( *< *xsl *: *with-param *name *= *"titre" *select *= *".*?')(.*?)('.*?" *\/ *>)//i;
+				print $1.gettext($2).$3;
+			}else
+			{
+				#On passe les autres balises
+				if ($input =~ /^ *:{0,1} *<.*?> */) 
+				{
+					$input =~ s/(^ *:{0,1} *<.*?> *)//i;
+					print "$1";
+				}
+				else
+				{
+					#On traite ce qui est entre les balises
+					if ($input =~ s/^(.*?)( *:{0,1} *<.*?> *)/$2/) 
+					{ 	#On recherche le string à traduire
+						print gettext($1);
+					};
+				};
+			}
+};

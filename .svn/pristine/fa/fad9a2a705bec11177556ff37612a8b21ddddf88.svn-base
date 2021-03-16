@@ -1,0 +1,20 @@
+<!-- DTD pour la liste des dépôts initiaux à l'ouverture de comptes d'éoargnes -->
+<!-- Element root -->
+<!ELEMENT listedepots (header, details)>
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!ELEMENT details (ladevise, total, devise*)>
+<!ELEMENT ladevise (#PCDATA)>
+<!ELEMENT total (#PCDATA)>
+
+<!ELEMENT devise (num_client, nom_client, num_compte, date_ouvert, montant_initial, devise, etat_cpte, libel_prod_ep)>
+<!ELEMENT num_client (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT num_compte (#PCDATA)>
+<!ELEMENT montant_initial (#PCDATA)>
+<!ELEMENT date_ouvert (#PCDATA)>
+<!ELEMENT devise (#PCDATA)>
+<!ELEMENT etat_cpte (#PCDATA)>
+<!ELEMENT libel_prod_ep (#PCDATA)>

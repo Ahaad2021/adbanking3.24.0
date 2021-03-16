@@ -1,0 +1,48 @@
+#!/bin/bash
+# Olivier Luyckx <olivier.luyckx@aquadev.org>
+
+# Ce script est a lancer juste après une installation avec base de données VIDE.
+# Il extrait les strings présents dans la base de données dans stringsdb.php
+
+INSTALL_DIR="/usr/share/adbanking"
+STRINGSDB="$INSTALL_DIR/web/stringsdb.php"
+
+touch $STRINGSDB 2> /dev/null
+if [ $? -ne 0 ]; then
+	echo "ERREUR: impossible d'écrire dans $STRINGSDB"
+	exit 1
+fi
+
+###############################################
+get_nom_langue()
+{       # Prend en parametre un code langue et renvoie dans la variable nom_langue le nom de la langue en francais
+        if [ ! -e $INSTALL_DIR/web/locale/$1/nom_langue ] ; then
+                dialog --clear --title "Erreur" --msgbox "ERREUR: le fichier $INSTALL_DIR/web/locale/$1/nom_langue n'existe
+ pas !" 0 0
+                terminer
+        fi
+
+        nom_langue="`cat $INSTALL_DIR/web/locale/$1/nom_langue`"
+}
+
+# Récupération des strings dans la DB
+echo "	\t
+	\o '$STRINGSDB'
+	\qecho '<?php'
+        SELECT 'echo _(\"' || traduction || '\");' from ad_traductions where langue='fr_BE';
+     " | psql $USER 
+
+# Insertion des noms des langues (je ne suis pas sûr que tous les noms des langues soit à tout les coups dans la DB)
+for langue in `ls -l $INSTALL_DIR/web/locale | awk '/^d/ {print $9}'` #pr chaque sous-répertoire de $INSTALL_DIR/web/locale
+do
+	if [ $langue != 'CVS' ]
+	then
+	        get_nom_langue $langue
+		echo "echo _(\"$nom_langue\");" >> $STRINGSDB
+	fi
+done
+
+echo "?>" >> $STRINGSDB
+
+echo "--- Le fichier $STRINGSDB a été mis à jour ---"
+

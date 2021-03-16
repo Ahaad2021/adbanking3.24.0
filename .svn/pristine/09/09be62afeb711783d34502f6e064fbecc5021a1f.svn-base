@@ -1,0 +1,9 @@
+<!--Donnees Pied de page pour chaque document-->
+<!ELEMENT footer (adresse,fax,telephone,email,code_swift_banque,num_agrement, num_tva)> 
+<!ELEMENT adresse (#PCDATA)>
+<!ELEMENT fax (#PCDATA)>
+<!ELEMENT telephone (#PCDATA)>
+<!ELEMENT email (#PCDATA)> 
+<!ELEMENT code_swift_banque (#PCDATA)> 
+<!ELEMENT num_agrement (#PCDATA)> 
+<!ELEMENT num_tva (#PCDATA)> 

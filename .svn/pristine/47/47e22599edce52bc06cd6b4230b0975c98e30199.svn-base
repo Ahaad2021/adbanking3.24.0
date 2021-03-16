@@ -1,0 +1,24 @@
+#this is context properties
+#Wed Mar 28 15:38:46 MUT 2018
+
+#Context variables from repository context:APP_BDD_SOURCE
+app_db_bdd=mbeni
+app_db_host=192.168.17.33
+app_db_login=adbanking
+app_db_port=5432
+app_db_pwd=public
+app_db_schema=public
+
+#Context variables from repository context:BDD_SIEGE
+DB_port=
+DB_name=null
+DB_user=null
+DB_pass=null
+DB_host=null
+DB_schema=null
+
+#Build-in context variables
+max_audit_id=
+id_agence=
+desc_agence=
+id_log_parent=

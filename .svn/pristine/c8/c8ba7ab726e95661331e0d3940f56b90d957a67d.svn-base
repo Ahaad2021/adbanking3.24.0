@@ -1,0 +1,4 @@
+AuthUserFile /usr/share/adbanking/web/services/.htpasswd
+AuthType Basic
+AuthName "Restricted Area"
+Require valid-user

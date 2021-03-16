@@ -1,0 +1,36 @@
+<!-- DTD pour le rapport engrais chimiques sur la liste des repartition des quantites selon les zones -->
+
+<!-- Element root -->
+<!ELEMENT engraischimiques_repartition_qtite_zone (header, nbre_colonne,list_quantite)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!ELEMENT list_quantite (province*,nbre_colonne)>
+<!--
+<!ELEMENT details_beneficiaires (province)>
+-->
+<!ELEMENT province (nom_province, commune*)>
+<!ELEMENT nom_province (#PCDATA)>
+
+<!ELEMENT commune (nom_commune, coopec*)>
+<!ELEMENT nom_commune (#PCDATA)>
+
+<!ELEMENT coopec (nom_coopec, zone*)>
+<!ELEMENT nom_coopec (#PCDATA)>
+
+
+<!ELEMENT zone (nom_zone,agriculteur,montant, detail_produit*)>
+<!ELEMENT nom_zone (#PCDATA)>
+<!ELEMENT agriculteur (#PCDATA)>
+<!ELEMENT montant (#PCDATA)>
+
+<!ELEMENT nbre_colonne (colonne*)>
+<!ELEMENT colonne (#PCDATA)>
+
+<!ELEMENT detail_produit (id_produit,qty_produit)>
+<!ELEMENT id_produit (#PCDATA)>
+<!ELEMENT qty_produit (#PCDATA)>
+
+

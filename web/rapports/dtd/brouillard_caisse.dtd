@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- DTD pour le rapport (les operations de guichet -->
+
+<!-- Element root -->
+<!ELEMENT brouillard_caisse (header, brouillard_devise*)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!ELEMENT brouillard_devise (infos_globales, detail?)>
+<!ATTLIST brouillard_devise total CDATA #REQUIRED>
+
+<!ELEMENT infos_globales (libel_gui, nom_uti, encaisse_deb, encaisse_fin, resume_transactions)>
+
+<!ELEMENT resume_transactions (ligne_resume_transactions*)>
+
+<!ELEMENT ligne_resume_transactions (libel_operation, nombre, montant_debit, montant_credit)>
+<!ATTLIST ligne_resume_transactions total  CDATA #REQUIRED>
+
+<!ELEMENT detail (ligne_detail*)>
+
+<!ELEMENT ligne_detail (num_trans, heure, libel_operation, num_piece, id_client, nom_client, montant_debit, montant_credit, encaisse)>
+
+<!ELEMENT libel_gui (#PCDATA)>
+<!ELEMENT nom_uti (#PCDATA)>
+<!ELEMENT encaisse_deb (#PCDATA)>
+<!ELEMENT encaisse_fin (#PCDATA)>
+<!ELEMENT libel_operation (#PCDATA)>
+<!ELEMENT nombre (#PCDATA)>
+<!ELEMENT montant_debit (#PCDATA)>
+<!ELEMENT montant_credit (#PCDATA)>
+<!ELEMENT heure (#PCDATA)>
+<!ELEMENT id_client (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT num_trans (#PCDATA)>
+<!ELEMENT num_piece (#PCDATA)>
+<!ELEMENT encaisse (#PCDATA)>
+

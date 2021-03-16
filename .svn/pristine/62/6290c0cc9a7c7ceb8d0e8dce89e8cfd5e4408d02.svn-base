@@ -1,0 +1,66 @@
+<!-- DTD pour le rapport generaliste sur les credits en retard (classes par produits) -->
+
+<!-- Element root -->
+<!ELEMENT credits_retard (header, header_contextuel, produit*)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- En-tete contextuel -->
+<!ELEMENT header_contextuel (nbre_credits, nbre_credits_retard, prc_credits_retard, portefeuille, total_solde_cap, prc_portefeuille_retard, total_solde_int, total_solde_pen, total_retard_cap, total_retard_int, total_epargne_nantie)>
+<!ELEMENT nbre_credits (#PCDATA)>
+<!ELEMENT nbre_credits_retard (#PCDATA)>
+<!ELEMENT prc_credits_retard (#PCDATA)>
+<!ELEMENT portefeuille (#PCDATA)>
+<!ELEMENT prc_portefeuille_retard (#PCDATA)>
+<!ELEMENT total_solde_cap (#PCDATA)>
+<!ELEMENT total_solde_int (#PCDATA)>
+<!ELEMENT total_solde_pen (#PCDATA)>
+<!ELEMENT total_retard_cap (#PCDATA)>
+<!ELEMENT total_retard_int (#PCDATA)>
+<!ELEMENT total_epargne_nantie (#PCDATA)>
+
+<!-- Corps -->
+<!ELEMENT produit (lib_prod, credit_retard*,xml_total)>
+<!ELEMENT lib_prod (#PCDATA)>
+
+<!-- Pour chaque credit en retard -->
+<!ELEMENT credit_retard (num_doss, num_client, nom_client, gestionnaire, mnt_debloc, date_debloc, solde_cap, solde_int, solde_pen, retard_cap, retard_int, nbre_ech_retard, nbre_jours_retard, epargne_nantie, groupe_gs, membre_gs)>
+<!ELEMENT num_doss (#PCDATA)>
+<!ELEMENT num_client (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT gestionnaire (#PCDATA)>
+<!ELEMENT mnt_debloc (#PCDATA)>
+<!ELEMENT date_debloc (#PCDATA)>
+<!ELEMENT solde_cap (#PCDATA)>
+<!ELEMENT solde_int (#PCDATA)>
+<!ELEMENT solde_pen (#PCDATA)>
+<!ELEMENT retard_cap (#PCDATA)>
+<!ELEMENT retard_int (#PCDATA)>
+<!ELEMENT nbre_ech_retard (#PCDATA)>
+<!ELEMENT nbre_jours_retard (#PCDATA)>
+<!ELEMENT epargne_nantie (#PCDATA)>
+<!ELEMENT membre_gs (#PCDATA)>
+<!ELEMENT groupe_gs (#PCDATA)>
+
+
+<!ELEMENT xml_total (tot_mnt_debloc, tot_solde_cap, tot_solde_int, tot_solde_pen, tot_retard_cap, tot_retard_int, tot_nbre_ech_retard, tot_epargne_nantie)>
+
+<!ELEMENT tot_mnt_debloc (#PCDATA)>
+<!ELEMENT tot_solde_cap (#PCDATA)>
+<!ELEMENT tot_solde_int (#PCDATA)>
+<!ELEMENT tot_solde_pen (#PCDATA)>
+<!ELEMENT tot_retard_cap (#PCDATA)>
+<!ELEMENT tot_retard_int (#PCDATA)>
+<!ELEMENT tot_nbre_ech_retard (#PCDATA)>
+<!ELEMENT tot_epargne_nantie (#PCDATA)>
+
+
+
+
+
+
+
+
+

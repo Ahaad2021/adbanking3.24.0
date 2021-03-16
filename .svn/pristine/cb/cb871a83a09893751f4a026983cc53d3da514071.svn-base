@@ -1,0 +1,2645 @@
+<?php
+
+
+/* vim: set expandtab softtabstop=2 shiftwidth=2 foldmethod=marker: */
+
+/**
+ 	 * [330] Rapports épargne
+	 * Ces fonctions appellent les écrans suivants :
+ 	 * - Era-1 : Sélection du rapport à imprimer
+ 	 * - Era-5 : Comptes inactifs : choix du seuil en jours
+ 	 * - Era-6 et Era-27 : Comptes inactifs : impression ou export CSV
+ 	 * - Era-7 : DAT arrivant à échéance : personnalisation
+ 	 * - Era-8 : DAT arrivant à échéance : impression
+ 	 * - Era-9 : Etat général des comptes de base à solde non nul : personnalisation
+ 	 * - Era-10 : Etat général des comptes de base à solde non nul : impression
+ 	 * - Era-11 : Solde des comptes de base mouvementés dans la journée : personnalisation
+ 	 * - Era-12 : Solde des comptes de base mouvementés dans la journée : impression
+ 	 * - Era-13 : Suivi échéances CAT-DAT : personnalisation
+ 	 * - Era-14 : Suivi échéances CAT-DAT : impression
+ 	 * - Era-15 : Concentration de l'épargne : personnalisation
+ 	 * - Era-16 : Concentration de l'épargne : impression
+ 	 * - Era-17 : Créditeurs les plus importants : personnalisation
+ 	 * - Era-18 : Créditeurs les plus importants : impression
+ 	 * - Era-22 : Impression chèquiers : choix chèquiers
+ 	 * - Era-23 : Impression chèquiers : export pour impression
+ 	 * - Era-24 : Confirmation impression chèquiers : choix chèquiers
+ 	 * - Era-25 : Confirmation impression chèquiers : enregistrement
+ 	 * - Era-35 : Impression des frais en attente : choix des critères de sélection
+ 	 * - Era-36 : Impression des frais en attente : Confirmation impression
+ 	 * - Era-43 : Personnalisation du rapposte liste des épargnes
+ 	 * - Era-46 : Personnalisation du rapport liste des dépôts initiaux à l'ouverture de comptes d'épârgne
+ 	 * - Era-47 ou Era-48 : Impression ou export CSV du rapport liste des dépôts initiaux à l'ouverture de comptes d'épârgne
+ 	 * - Era-49 : Personnalisation rapport Extrait de comptes pour Netbank
+ 	 * - Era-50 : Export extrait de comptes netbank
+ 	 * - Era-51 : Personnalisation rapport Historique des comptes d'épargne cloturés
+ 	 * - Era-52 et  Era-53 : SLD - Impression ou export csv historique comptes d'épargnes cloturés
+ 	 * - Era-54 : Rapport INVENTAIRE DE DEPOT
+ 	 * - Era-55 et  Era-56 : SLD - Impression ou export Rapport INVENTAIRE DE DEPOT
+ 	 * - Era-57 : Rapport des comptes dormants
+ 	 * - Era-58 et  Era-59 : Impression ou export csv rapport comptes dormants
+ 	 * @package Rapports
+ 	 **/
+
+ 	require_once 'lib/html/HTML_GEN2.php';
+ 	require_once 'lib/dbProcedures/epargne.php';
+ 	require_once 'lib/dbProcedures/agence.php';
+ 	require_once 'lib/dbProcedures/historique.php';
+ 	require_once 'lib/dbProcedures/client.php';
+ 	require_once 'lib/misc/csv.php';
+ 	require_once 'lib/misc/divers.php';
+ 	require_once "modules/rapports/csv_epargne.php";
+ 	require_once "modules/rapports/xml_epargne.php";
+ 	require_once 'modules/rapports/xslt.php';
+	require_once 'lib/misc/excel.php';
+
+ 	global $global_multidevise;
+ 	global $global_id_agence;
+
+ 	$liste_agences = getAllIdNomAgence();
+
+ 	/*{{{ Era-1 : Sélection du rapport à imprimer */
+ 	if ($global_nom_ecran == "Era-1") {
+ 	    // Recherche de tous les rapports à afficher
+ 	    foreach ($adsys["adsys_rapport"] as $key => $name) {
+ 	        if (substr($key, 0, 3) == 'EPA' && substr($key, 0, 7) != 'EPA-EXT' && substr($key, 0, 7) != 'EPA-EXC')
+ 	            $rapports[$key] = _($name);
+ 	    }
+
+ 	    $html = new HTML_GEN2(_("Sélection type rapport épargne"));
+
+ 	    $html->addField("type", _("Type de rapport épargne"), TYPC_LSB);
+ 	    $html->setFieldProperties("type", FIELDP_IS_REQUIRED, true);
+ 	    $html->setFieldProperties("type", FIELDP_ADD_CHOICES, $rapports);
+
+ 	    //Boutons
+ 	    $html->addFormButton(1, 1, "valider", _("Sélectionner"), TYPB_SUBMIT);
+ 	    $html->setFormButtonProperties("valider", BUTP_PROCHAIN_ECRAN, "Gen-13");
+ 	    $html->addFormButton(1, 2, "annuler", _("Annuler"), TYPB_SUBMIT);
+ 	    $html->setFormButtonProperties("annuler", BUTP_PROCHAIN_ECRAN, "Gen-13");
+ 	    $html->setFormButtonProperties("annuler", BUTP_CHECK_FORM, false);
+
+ 	    // Tableau indiquant le prochain écran en fonction du code rapport
+ 	    $prochEc = array (
+ 	        "INA" => 5,
+ 	        "DAT" => 7,
+ 	        "BAS" => 9,
+ 	        "BAJ" => 11,
+ 	        "CAT" => 13,
+ 	        "CON" => 15,
+ 	        "MAX" => 17,
+ 	        "CHQ" => 22,
+ 	        "CHI" => 24,
+ 	        "CER" => 40,
+ 	        "ATT" => 35,
+ 	        "LST" => 43,
+ 	        "LDI" => 46,
+ 	        "EXN" => 49,
+ 	        "CEC" => 51,
+			"IDP" =>54,
+			"CDT" =>57
+ 	    );
+
+ 	    foreach ($prochEc as $code => $ecran)
+ 	        $js .= "if (document.ADForm.HTML_GEN_LSB_type.value == 'EPA-$code')
+ 	                 assign('Era-$ecran');";
+ 	    $html->addJS(JSP_BEGIN_CHECK, "js1", $js);
+ 	    $html->show();
+ 	}
+ 	/*}}}*/
+
+ 	/*{{{ Era-5 : Comptes inactifs : choix du seuil en jours */
+ 	else
+ 	    if ($global_nom_ecran == "Era-5") {
+
+ 	        $html = new HTML_GEN2(_("Personnalisation du rapport"));
+            $jquery_src = "<script src=\"/lib/misc/js/lib/jquery.min.js\" type=\"text/javascript\"></script>";
+            $html->addHTMLExtraCode("xtHTML", $jquery_src);
+
+ 	        if (isSiege()) {
+ 	            //Agence- Tri par agence
+ 	            resetGlobalIdAgence();
+ 	            $html->addField("agence", _("Agence"), TYPC_LSB);
+ 	            $html->setFieldProperties("agence", FIELDP_IS_REQUIRED, true);
+ 	            unset ($liste_agences[$global_id_agence]);
+ 	            $html->setFieldProperties("agence", FIELDP_ADD_CHOICES, $liste_agences);
+ 	        }
+ 	        $html->addField("nbre_jours", _("Comptes inactifs depuis (en jours)"), TYPC_INT);
+ 	        $html->setFieldProperties("nbre_jours", FIELDP_DEFAULT, "90");
+ 	        $html->setFieldProperties("nbre_jours", FIELDP_IS_REQUIRED, true);
+
+
+            $html->addField("date_rapport", _("Date du rapport"), TYPC_DTE);
+            $html->setFieldProperties("date_rapport", FIELDP_DEFAULT, date('d/m/Y'));
+            $html->setFieldProperties("date_rapport", FIELDP_IS_REQUIRED, true);
+
+            $html->addField("etat", _("Etat"), TYPC_LSB);
+            $html->setFieldProperties("etat", FIELDP_HAS_CHOICE_AUCUN, FALSE);
+            $html->setFieldProperties("etat", FIELDP_ADD_CHOICES, array('1' => 'En jours', '2' => 'Inactif', '3' => 'Dormant'));
+
+ 	        //Gestionnaire- Tri par agent gestionnaire
+ 	        //$html->addTableRefField("gest", _("Gestionnaire"), "ad_uti");
+			$gestionnaire = getLibelUtilisateur();
+			$html->addField("gest", _("Gestionnaire"), TYPC_LSB);
+			$html->setFieldProperties("gest", FIELDP_ADD_CHOICES, $gestionnaire);
+ 	        $html->setFieldProperties("gest", FIELDP_HAS_CHOICE_AUCUN, false);
+ 	        $html->setFieldProperties("gest", FIELDP_HAS_CHOICE_TOUS, true);
+
+			$prod_epargnes = getListProdEpargne();
+			$choix_ep = array();
+			foreach($prod_epargnes as $key => $value){
+				$choix_ep[$value["id"]] = $value["libel"];
+			}
+			$html->addField("prodEpargne", _("Produit d'épargne"), TYPC_LSB);
+			$html->setFieldProperties("prodEpargne", FIELDP_ADD_CHOICES, $choix_ep);
+			$html->setFieldProperties("prodEpargne", FIELDP_HAS_CHOICE_AUCUN, false);
+			$html->setFieldProperties("prodEpargne", FIELDP_HAS_CHOICE_TOUS, true);
+
+ 	        $html->addFormButton(1, 1, "valider", _("Rapport PDF"), TYPB_SUBMIT);
+ 	        $html->setFormButtonProperties("valider", BUTP_PROCHAIN_ECRAN, "Era-6");
+			  $html->addFormButton(1, 2, "excel", _("Export EXCEL"), TYPB_SUBMIT);
+			  $html->setFormButtonProperties("excel", BUTP_PROCHAIN_ECRAN, "Era-27");
+ 	        $html->addFormButton(1, 3, "csv", _("Export CSV"), TYPB_SUBMIT);
+ 	        $html->setFormButtonProperties("csv", BUTP_PROCHAIN_ECRAN, "Era-27");
+ 	        $html->addFormButton(1, 4, "annuler", _("Annuler"), TYPB_SUBMIT);
+ 	        $html->setFormButtonProperties("annuler", BUTP_PROCHAIN_ECRAN, "Gen-13");
+
+ 	        $param_epargne = getParametrageEpargne();
+
+ 	        $js = "
+ 	        	$('[name=HTML_GEN_LSB_etat]').change(function(){
+ 	        		if($(this).val() == 2){
+ 	        			$('[name=nbre_jours]').prop('disabled', true);
+ 	        		}else{
+ 	        			$('[name=nbre_jours]').prop('disabled', false);
+ 	        		}
+ 	        	});
+ 	        ";
+
+            $html->addJS(JSP_FORM, "js_disabled", $js);
+ 	        $html->buildHTML();
+ 	        echo $html->getHTML();
+ 	    }
+ 	/*}}}*/
+
+ 	/*{{{ Era-6 et Era-27 : Comptes inactifs : impression ou export CSV */
+ 	else
+ 	    if ($global_nom_ecran == "Era-6" || $global_nom_ecran == "Era-27") {
+ 	        setGlobalIdAgence($agence);
+ 	        if ($gest == "")
+ 	            $gest = 0;
+ 	        //if ($gest > 0)
+ 	        // $gest = getLibel("ad_uti", $gest);
+			$produit = null;
+			if($prodEpargne != 0) { //produit epargne pas egale a "TOUS"
+				$produit = getProdEpargne($prodEpargne);
+			}
+
+
+ 	        $lignesCptesInactifs = getLignesCptesInactifs($nbre_jours, $produit, $gest, $etat, $date_rapport);
+ 	        if ($lignesCptesInactifs == NULL) { // Aucun compte sélectionné
+ 	            $erreur = new HTML_erreur(_("Comptes  inexistants"));
+ 	            $erreur->setMessage(_("Il n y a pas de compte d'épargne inactif répondant à ces critères."));
+ 	            $erreur->addButton(BUTTON_OK, "Era-5");
+ 	            $erreur->buildHTML();
+ 	            echo $erreur->HTML_code;
+ 	        } else {
+ 	            if ($global_nom_ecran == "Era-6") {
+                    $lignesCptesInactifs['date_rapport'] = $date_rapport;
+                    $lignesCptesInactifs['etat'] = $etat;
+ 	                //Génération du XSL-FO (grâce au XSLT) et du PDF (grâce à FOP)
+ 	                $xml = xml_comptes_inactifs($lignesCptesInactifs, $nbre_jours, $produit);
+
+ 	                $fichier = xml_2_xslfo_2_pdf($xml, 'comptes_inactifs.xslt');
+ 	                //Message de confirmation + affichage du rapport dans une nouvelle fenêtre
+ 	                echo get_show_pdf_html("Gen-13", $fichier);
+ 	            } else
+ 	                if ($global_nom_ecran == "Era-27") {
+                        $lignesCptesInactifs['date_rapport'] = $date_rapport;
+                        $lignesCptesInactifs['etat'] = $etat;
+ 	                    //Generation du csv grâce à XALAN
+ 	                    $xml = xml_comptes_inactifs($lignesCptesInactifs, $nbre_jours, $produit, true);
+ 	                    $fichier = xml_2_csv($xml, 'comptes_inactifs.xslt');
+ 	                    //Message de confirmation + affichage du rapport dans une nouvelle fenêtre
+											if (isset($excel) && $excel == 'Export EXCEL'){
+												echo getShowEXCELHTML("Gen-13", $fichier);
+											}
+											else{
+												echo getShowCSVHTML("Gen-13", $fichier);
+											}
+ 	                }
+ 	        }
+ 	        ajout_historique(330, NULL, NULL, $global_nom_login, date("r"), NULL);
+ 	    }
+ 	/*}}}*/
+
+ 	/*{{{ Era-7 : DAT arrivant à échéance : personnalisation */
+ 	else
+ 	    if ($global_nom_ecran == "Era-7") {
+ 	        $html = new HTML_GEN2(_("Personnalisation du rapport"));
+
+ 	        if (isSiege()) {
+ 	            //Agence- Tri par agence
+ 	            resetGlobalIdAgence();
+ 	            $html->addField("agence", _("Agence"), TYPC_LSB);
+ 	            $html->setFieldProperties("agence", FIELDP_IS_REQUIRED, true);
+ 	            unset ($liste_agences[$global_id_agence]);
+ 	            $html->setFieldProperties("agence", FIELDP_ADD_CHOICES, $liste_agences);
+ 	        }
+ 	        $choix_periode_DAT_echeance = array (
+ 	            1 => _("Aujourd'hui"),
+ 	            2 => _("Sur une semaine"),
+ 	            3 => _("Sur deux semaines"),
+ 	            4 => _("Sur trois semaines"),
+ 	            5 => _("Sur 1 mois"),
+ 	            6 => _("Sur 3 mois"),
+ 	            7 => _("Sur 6 mois"),
+ 	            8 => _("Sur 12 mois")
+ 	        );
+ 	        $SESSION_VARS["periode_rapport_DAT_echeance"] = $choix_periode_DAT_echeance;
+
+ 	        $html->addField("periode", _("Choix de la période"), TYPC_LSB);
+ 	        //$html->setFieldProperties("periode", FIELDP_IS_REQUIRED, true);
+ 	        $html->setFieldProperties("periode", FIELDP_ADD_CHOICES, $choix_periode_DAT_echeance);
+			$html->setFieldProperties("periode", FIELDP_JS_EVENT, array ("onchange" => "dateParams();"));
+
+ 	        $html->addField("exclusif", _("Sélectionner exclusivement la période"), TYPC_BOL);
+ 	        //Gestionnaire- Tri par agent gestionnaire
+ 	        //$html->addTableRefField("gest", _("Gestionnaire"), "ad_uti");
+			$gestionnaire = getLibelUtilisateur();
+			$html->addField("gest", _("Gestionnaire"), TYPC_LSB);
+			$html->setFieldProperties("gest", FIELDP_ADD_CHOICES, $gestionnaire);
+ 	        $html->setFieldProperties("gest", FIELDP_HAS_CHOICE_AUCUN, false);
+ 	        $html->setFieldProperties("gest", FIELDP_HAS_CHOICE_TOUS, true);
+
+            //niveau Agence et Guichet
+            $nivArrayFenacobu = getNivFenacobuArray("type_niveau > 1");
+            // --> Sélection des champs à afficher dans id_loc
+            reset($nivArrayFenacobu);
+            $includeChoicesFenacobu = array();
+            while (list (, $value_fenacobu) = each($nivArrayFenacobu)) {
+                if ($value_fenacobu['type_niveau'] == 2)
+                    //array_push($includeChoicesFenacobu, $value_fenacobu['id'] =>$value_fenacobu['libelle_localisation']);
+                    $arrayDisplay[$value_fenacobu['id'] ] =$value_fenacobu['libelle_niveau'];
+
+            }
+
+            //$array_test = array(1=> 'test1', 2=> 'test2');print_rn($array_test);
+            $html->addField("n_agence", _("Niveau agence"), TYPC_LSB);
+            $html->addField("n_guichet", _("Niveau guichet"), TYPC_LSB);
+            $html->setFieldProperties("n_agence", FIELDP_ADD_CHOICES, $arrayDisplay);
+            $html->setFieldProperties("n_agence", FIELDP_HAS_CHOICE_TOUS, true);
+            $html->setFieldProperties("n_agence", FIELDP_HAS_CHOICE_AUCUN, false);
+            //$html->setFieldProperties("n_agence", FIELDP_IS_REQUIRED, true);
+
+            $jsCodeNivFenacobu = "function displayNivFenacobu() {\n";
+            $jsCodeNivFenacobu .= "for (i=0; i < document.ADForm.HTML_GEN_LSB_n_guichet.length; ++i) document.ADForm.HTML_GEN_LSB_n_guichet.options[i] = null;\n"; //Vide les choix
+            $jsCodeNivFenacobu .= "document.ADForm.HTML_GEN_LSB_n_guichet.length = 0;";
+            $jsCodeNivFenacobu .= "document.ADForm.HTML_GEN_LSB_n_guichet.options[document.ADForm.HTML_GEN_LSB_n_guichet.length] = new Option('[Tous]', 0, true, true);\n"; //[Aucun]
+            $jsCodeNivFenacobu .= "document.ADForm.HTML_GEN_LSB_n_guichet.selectedIndex = 0; document.ADForm.HTML_GEN_LSB_n_guichet.length = 1; \n";
+            reset($nivArrayFenacobu);
+            while (list (, $value_fenacobu) = each($nivArrayFenacobu)) {
+                if ($value_fenacobu['parent'] != '') {
+                    $jsCodeNivFenacobu .= "\tif (document.ADForm.HTML_GEN_LSB_n_agence.value == " . $value_fenacobu['parent'] . ")\n";
+                    $jsCodeNivFenacobu .= "\t\tdocument.ADForm.HTML_GEN_LSB_n_guichet.options[document.ADForm.HTML_GEN_LSB_n_guichet.length] = new Option('" . $value_fenacobu['libelle_niveau'] . "', '" . $value_fenacobu['id'] . "', false, false);\n";
+                }
+            }
+            $jsCodeNivFenacobu .= "\n}";
+            // --> Ajout de la fonction dans le formulaire
+            $html->addJS(JSP_FORM, "jsCodeNivFenacobu", $jsCodeNivFenacobu);
+            // --> ajout des champs
+
+            //AT-150
+            // --> Page reloaded Constrution des choix disponibles pour le district
+            if (isset($n_agence) && isset($n_guichet)){
+                $choices = array();
+                reset($nivArrayFenacobu);
+                while (list(, $value) = each($nivArrayFenacobu)) {
+                    if ($value['parent'] == $n_agence)
+                        $choices[$value['id']] = $value['libelle_niveau'];
+                }
+                $html->setFieldProperties("n_guichet", FIELDP_ADD_CHOICES, $choices);
+                $html->setFieldProperties("n_guichet", FIELDP_DEFAULT, $n_guichet);
+            }
+            else{
+//        $html->setFieldProperties("n_guichet", FIELDP_INCLUDE_CHOICES, array(
+//            "0" => "[Tous]"
+//        ));
+                $html->setFieldProperties("n_guichet", FIELDP_HAS_CHOICE_TOUS, true);
+                $html->setFieldProperties("n_guichet", FIELDP_HAS_CHOICE_AUCUN, false);
+            }
+            //$html->setFieldProperties("n_guichet", FIELDP_IS_REQUIRED, true);
+            $html->setFieldProperties("n_agence", FIELDP_JS_EVENT, array("onchange" => "displayNivFenacobu()"));
+
+
+
+            $html->addField("date_debut", _("Date de début"), TYPC_DTG);
+			//$html->setFieldProperties("date_debut", FIELDP_DEFAULT, date("d/m/Y"));
+
+			$html->addField("date_fin", _("Date de fin"), TYPC_DTG);
+			//$html->setFieldProperties("date_fin", FIELDP_DEFAULT, date("d/m/Y"));
+
+			$JS = "";
+			//java script en fonction du champ choisi
+			$JS .= "\n function dateParams()
+					{
+						if(document.ADForm.HTML_GEN_LSB_periode.value != 0)
+						{
+							document.ADForm.HTML_GEN_date_date_debut.value = '';
+							document.ADForm.HTML_GEN_date_date_fin.value ='';
+							document.ADForm.HTML_GEN_date_date_debut.disabled = true;
+							document.ADForm.HTML_GEN_date_date_fin.disabled = true;
+						}
+						else
+						{
+							document.ADForm.HTML_GEN_date_date_debut.disabled = false;
+							document.ADForm.HTML_GEN_date_date_fin.disabled = false;
+						}
+					}";
+			//executer la fonction au chargement de la page.
+			$JS .= "\n document.onload = dateParams();";
+
+			$JS2 = " ";
+			//validation pour forcer l'utilisateur a choisir un paramètre
+			$JS2 .= " 	var Form = document.ADForm;
+
+						if (Form.HTML_GEN_LSB_periode.value == 0 )
+						 {
+						 	if(Form.HTML_GEN_date_date_debut.value=='' && Form.HTML_GEN_date_date_fin.value =='')
+						 	{
+						 		alert('Veuillez saisir au moins un paramètre!');
+						 		ADFormValid = false;
+						 	}
+						 	else if(Form.HTML_GEN_date_date_debut.value=='')
+						 	{
+						 		alert('Veuillez saisir la date de début!');
+						 		ADFormValid = false;
+						 	}
+						 	else if(Form.HTML_GEN_date_date_fin.value=='')
+						 	{
+						 		alert('Veuillez saisir la date de fin!');
+						 		ADFormValid = false;
+						 	}
+						 }
+
+						 if((Form.HTML_GEN_date_date_debut.value!='' && Form.HTML_GEN_date_date_fin.value!='')&&(!isBefore(Form.HTML_GEN_date_date_debut.value,Form.HTML_GEN_date_date_fin.value)))
+						 {
+						 	alert('La Date de fin doit être supérieure ou égale à la Date de début.');
+						 	ADFormValid = false;
+						 }
+						 ";
+
+			$html->addJS(JSP_FORM, "JSActivate", $JS);
+			$html->addJS(JSP_BEGIN_CHECK,"JSCHEK",$JS2);
+
+ 	        $html->addFormButton(1, 1, "valider", _("Rapport PDF"), TYPB_SUBMIT);
+ 	        $html->setFormButtonProperties("valider", BUTP_PROCHAIN_ECRAN, "Era-8");
+					$html->addFormButton(1, 2, "excel", _("Export EXCEL"), TYPB_SUBMIT);
+					$html->setFormButtonProperties("excel", BUTP_PROCHAIN_ECRAN, "Era-28");
+ 	        $html->addFormButton(1, 3, "csv", _("Export CSV"), TYPB_SUBMIT);
+ 	        $html->setFormButtonProperties("csv", BUTP_PROCHAIN_ECRAN, "Era-28");
+ 	        $html->addFormButton(1, 4, "annuler", _("Annuler"), TYPB_SUBMIT);
+ 	        $html->setFormButtonProperties("annuler", BUTP_PROCHAIN_ECRAN, "Gen-13");
+	        $html->setFormButtonProperties("annuler", BUTP_CHECK_FORM, false);
+ 	        $html->buildHTML();
+ 	        echo $html->getHTML();
+ 	    }
+ 	/*}}}*/
+
+ 	/*{{{ Era-8 et Era-28 : DAT arriant à échéance : impression ou export csv */
+ 	else
+ 	    if ($global_nom_ecran == 'Era-8' || $global_nom_ecran == "Era-28") {
+ 	        setGlobalIdAgence($agence);
+ 	        if ($gest == "")
+ 	            $gest = 0;
+ 	        if (isFusion()){
+                $lignesDATEcheance = getLignesDATEcheance($periode, $exclusif, $gest,$date_debut,$date_fin,$n_agence,$n_guichet);
+			}else{
+                $lignesDATEcheance = getLignesDATEcheance($periode, $exclusif, $gest,$date_debut,$date_fin);
+			}
+
+ 	        if ($global_nom_ecran == "Era-28") {
+ 	            //Génération du csv grâce à XALAN
+ 	            if ($lignesDATEcheance != NULL)
+ 	                $xml = xml_DAT_echeance($lignesDATEcheance, array (_("Periode") => $SESSION_VARS["periode_rapport_DAT_echeance"][$periode]==null?_("Tous"):$SESSION_VARS["periode_rapport_DAT_echeance"][$periode], _("Gestionnaire") => (getLibel("ad_uti", $gest) == "") ? _("Tous") : getLibel("ad_uti", $gest)), true);
+
+ 	            $csv_file = xml_2_csv($xml, 'DAT_echeance.xslt');
+
+ 	            //Message de confirmation + affichage du rapport dans une nouvelle fenêtre
+							if (isset($excel) && $excel == 'Export EXCEL'){
+								echo getShowEXCELHTML("Gen-13", $csv_file);
+							}
+							else{
+								echo getShowCSVHTML("Gen-13", $csv_file);
+							}
+ 	        } else
+ 	            if ($global_nom_ecran == "Era-8") {
+ 	                //Génération du XSL-FO (grâce au XSLT) et du PDF (grâce à FOP)
+ 	                if ($lignesDATEcheance != NULL)
+ 	                    $xml = xml_DAT_echeance($lignesDATEcheance, array (_("Periode") => $SESSION_VARS["periode_rapport_DAT_echeance"][$periode]==null?_("Tous"):$SESSION_VARS["periode_rapport_DAT_echeance"][$periode], _("Gestionnaire") => (getLibel("ad_uti", $gest) == "") ? _("Tous") : getLibel("ad_uti", $gest)));
+
+ 	                $fichier_pdf = xml_2_xslfo_2_pdf($xml, 'DAT_echeance.xslt');
+
+ 	                //Message de confirmation + affichage du rapport dans une nouvelle fenêtre
+ 	                echo get_show_pdf_html("Gen-13", $fichier_pdf);
+ 	            }
+ 	        ajout_historique(330, NULL, NULL, $global_nom_login, date("r"), NULL);
+
+ 	    }
+ 	/*}}}*/
+
+ 	/*{{{ Era-9 : Etat général des comptes de base à solde non nul : personnalisation */
+ 	else
+ 	    if ($global_nom_ecran == 'Era-9') {
+ 	        global $global_id_agence;
+
+ 	        $myForm = new HTML_GEN2(_("Personnalisation du rapport"));
+
+ 	        if (isSiege()) {
+ 	            //Agence- Tri par agence
+ 	            resetGlobalIdAgence();
+ 	            $myForm->addField("agence", _("Agence"), TYPC_LSB);
+ 	            $myForm->setFieldProperties("agence", FIELDP_IS_REQUIRED, true);
+ 	            unset ($liste_agences[$global_id_agence]);
+ 	            $myForm->setFieldProperties("agence", FIELDP_ADD_CHOICES, $liste_agences);
+ 	        }
+
+ 	        $exclude = array ();
+ 	        if ($global_id_agence == "")
+ 	            $global_id_agence = 0;
+ 	        {
+ 	            array_push($exclude, getPSProductID($global_id_agence));
+ 	        }
+ 	        $myForm->addTableRefField("prodEpargne", _("Produit d'épargne"), 'adsys_produit_epargne');
+ 	        $myForm->setFieldProperties("prodEpargne", FIELDP_EXCLUDE_CHOICES, $exclude);
+ 	        $myForm->setFieldProperties("prodEpargne", FIELDP_IS_REQUIRED, true);
+
+
+            //niveau Agence et Guichet
+            $nivArrayFenacobu = getNivFenacobuArray("type_niveau > 1");
+            // --> Sélection des champs à afficher dans id_loc
+            reset($nivArrayFenacobu);
+            $includeChoicesFenacobu = array();
+            while (list (, $value_fenacobu) = each($nivArrayFenacobu)) {
+                if ($value_fenacobu['type_niveau'] == 2)
+                    //array_push($includeChoicesFenacobu, $value_fenacobu['id'] =>$value_fenacobu['libelle_localisation']);
+                    $arrayDisplay[$value_fenacobu['id'] ] =$value_fenacobu['libelle_niveau'];
+
+            }
+
+            //$array_test = array(1=> 'test1', 2=> 'test2');print_rn($array_test);
+            $myForm->addField("n_agence", _("Niveau agence"), TYPC_LSB);
+            $myForm->addField("n_guichet", _("Niveau guichet"), TYPC_LSB);
+            $myForm->setFieldProperties("n_agence", FIELDP_ADD_CHOICES, $arrayDisplay);
+            $myForm->setFieldProperties("n_agence", FIELDP_HAS_CHOICE_TOUS, true);
+            $myForm->setFieldProperties("n_agence", FIELDP_HAS_CHOICE_AUCUN, false);
+            //$myForm->setFieldProperties("n_agence", FIELDP_IS_REQUIRED, true);
+
+            $jsCodeNivFenacobu = "function displayNivFenacobu() {\n";
+            $jsCodeNivFenacobu .= "for (i=0; i < document.ADForm.HTML_GEN_LSB_n_guichet.length; ++i) document.ADForm.HTML_GEN_LSB_n_guichet.options[i] = null;\n"; //Vide les choix
+            $jsCodeNivFenacobu .= "document.ADForm.HTML_GEN_LSB_n_guichet.length = 0;";
+            $jsCodeNivFenacobu .= "document.ADForm.HTML_GEN_LSB_n_guichet.options[document.ADForm.HTML_GEN_LSB_n_guichet.length] = new Option('[Tous]', 0, true, true);\n"; //[Aucun]
+            $jsCodeNivFenacobu .= "document.ADForm.HTML_GEN_LSB_n_guichet.selectedIndex = 0; document.ADForm.HTML_GEN_LSB_n_guichet.length = 1; \n";
+            reset($nivArrayFenacobu);
+            while (list (, $value_fenacobu) = each($nivArrayFenacobu)) {
+                if ($value_fenacobu['parent'] != '') {
+                    $jsCodeNivFenacobu .= "\tif (document.ADForm.HTML_GEN_LSB_n_agence.value == " . $value_fenacobu['parent'] . ")\n";
+                    $jsCodeNivFenacobu .= "\t\tdocument.ADForm.HTML_GEN_LSB_n_guichet.options[document.ADForm.HTML_GEN_LSB_n_guichet.length] = new Option('" . $value_fenacobu['libelle_niveau'] . "', '" . $value_fenacobu['id'] . "', false, false);\n";
+                }
+            }
+            $jsCodeNivFenacobu .= "\n}";
+            // --> Ajout de la fonction dans le formulaire
+            $myForm->addJS(JSP_FORM, "jsCodeNivFenacobu", $jsCodeNivFenacobu);
+            // --> ajout des champs
+
+            //AT-150
+            // --> Page reloaded Constrution des choix disponibles pour le district
+            if (isset($n_agence) && isset($n_guichet)){
+                $choices = array();
+                reset($nivArrayFenacobu);
+                while (list(, $value) = each($nivArrayFenacobu)) {
+                    if ($value['parent'] == $n_agence)
+                        $choices[$value['id']] = $value['libelle_niveau'];
+                }
+                $myForm->setFieldProperties("n_guichet", FIELDP_ADD_CHOICES, $choices);
+                $myForm->setFieldProperties("n_guichet", FIELDP_DEFAULT, $n_guichet);
+            }
+            else{
+//        $myForm->setFieldProperties("n_guichet", FIELDP_INCLUDE_CHOICES, array(
+//            "0" => "[Tous]"
+//        ));
+                $myForm->setFieldProperties("n_guichet", FIELDP_HAS_CHOICE_TOUS, true);
+                $myForm->setFieldProperties("n_guichet", FIELDP_HAS_CHOICE_AUCUN, false);
+            }
+            //$myForm->setFieldProperties("n_guichet", FIELDP_IS_REQUIRED, true);
+            $myForm->setFieldProperties("n_agence", FIELDP_JS_EVENT, array("onchange" => "displayNivFenacobu()"));
+
+
+
+            $myForm->addField("idmin", _("N° de client minimum"), TYPC_INT);
+ 	        $myForm->addField("idmax", _("N° de client maximum"), TYPC_INT);
+
+			//#525 Ajout filtre Date
+			$myForm->addField("date_deb", _("Date rapport"), TYPC_DTE);
+			$myForm->setFieldProperties("date_deb", FIELDP_IS_REQUIRED, false);
+
+ 	        $myForm->addFormButton(1, 1, "valider", _("Rapport PDF"), TYPB_SUBMIT);
+ 	        $myForm->setFormButtonProperties("valider", BUTP_CHECK_FORM, true);
+ 	        $myForm->setFormButtonProperties("valider", BUTP_PROCHAIN_ECRAN, "Era-10");
+				  $myForm->addFormButton(1, 2, "excel", _("Export EXCEL"), TYPB_SUBMIT);
+				  $myForm->setFormButtonProperties("excel", BUTP_PROCHAIN_ECRAN, "Era-29");
+ 	        $myForm->addFormButton(1, 3, "csv", _("Export CSV"), TYPB_SUBMIT);
+ 	        $myForm->setFormButtonProperties("csv", BUTP_PROCHAIN_ECRAN, "Era-29");
+ 	        $myForm->addFormButton(1, 4, "annuler", _("Annuler"), TYPB_SUBMIT);
+ 	        $myForm->setFormButtonProperties("annuler", BUTP_PROCHAIN_ECRAN, "Gen-13");
+ 	        $myForm->setFormButtonProperties("annuler", BUTP_CHECK_FORM, false);
+
+ 	        $myForm->buildHTML();
+ 	        echo $myForm->getHTML();
+ 	    }
+ 	/*}}}*/
+
+ 	/*{{{ Era-10 et Era-29 : Etat général des comptes de base à solde non nul : impression ou export CSV */
+ 	else
+ 	    if ($global_nom_ecran == 'Era-10' || $global_nom_ecran == 'Era-29') {
+ 	        setGlobalIdAgence($agence);
+
+ 	        if (isFusion()){
+                $DATA = getSoldeCpteEpargne($prodEpargne, $idmin, $idmax,$date_deb,$n_agence, $n_guichet);
+			}else{
+                $DATA = getSoldeCpteEpargne($prodEpargne, $idmin, $idmax,$date_deb);
+			}
+ 	        $produit = getProdEpargne($prodEpargne);
+ 	        $CRITERE = array (_("Produit d'épargne ") => $produit['libel'], _("ID client minimum") => $idmin, _("ID client maximum") => $idmax);
+
+ 	        if ($global_nom_ecran == 'Era-10') {
+ 	            //Génération du XSL-FO (grâce au XSLT) et du PDF (grâce à FOP)
+
+ 	            $xml = xml_etat_general_comptes_clients($DATA, $CRITERE,false,$date_deb);
+ 	            $fichier_pdf = xml_2_xslfo_2_pdf($xml, 'etat_general_comptes_clients.xslt');
+
+ 	            //Message de confirmation + affichage du rapport dans une nouvelle fenêtre
+ 	            echo get_show_pdf_html("Gen-13", $fichier_pdf);
+ 	        } else
+           if ($global_nom_ecran == 'Era-29') {
+ 	                //Génération du csv grâce à XALAN
+ 	                $xml = xml_etat_general_comptes_clients($DATA, $CRITERE, true,$date_deb);
+ 	                $csv_file = xml_2_csv($xml, 'etat_general_comptes_clients.xslt');
+
+                  //Message de confirmation + affichage du rapport dans une nouvelle fenêtre
+						 			if (isset($excel) && $excel == 'Export EXCEL'){
+										echo getShowEXCELHTML("Gen-13", $csv_file);
+									}
+								  else{
+										echo getShowCSVHTML("Gen-13", $csv_file);
+								  }
+ 	            }
+ 	        ajout_historique(330, NULL, NULL, $global_nom_login, date("r"), NULL);
+ 	    }
+ 	/*}}}*/
+
+ 	/*{{{ Era-11 : Solde des comptes de base mouvementés dans la journée : personnalisation */
+ 	else
+ 	    if ($global_nom_ecran == 'Era-11') {
+ 	        $myForm = new HTML_GEN2(_("Choix de la date"));
+
+ 	        if (isSiege()) {
+ 	            //Agence- Tri par agence
+ 	            resetGlobalIdAgence();
+ 	            $myForm->addField("agence", _("Agence"), TYPC_LSB);
+ 	            $myForm->setFieldProperties("agence", FIELDP_IS_REQUIRED, true);
+ 	            unset ($liste_agences[$global_id_agence]);
+ 	            $myForm->setFieldProperties("agence", FIELDP_ADD_CHOICES, $liste_agences);
+ 	        }
+ 	        $myForm->addField("date", _("Date du rapport"), TYPC_DTE);
+ 	        $myForm->setFieldProperties("date", FIELDP_IS_REQUIRED, true);
+ 	        $myForm->setFieldProperties("date", FIELDP_DEFAULT, date("d/m/Y"));
+ 	        //Gestionnaire- Tri par agent gestionnaire
+ 	        //$myForm->addTableRefField("gest", _("Gestionnaire"), "ad_uti");
+			$gestionnaire = getLibelUtilisateur();
+			$myForm->addField("gest", _("Gestionnaire"), TYPC_LSB);
+			$myForm->setFieldProperties("gest", FIELDP_ADD_CHOICES, $gestionnaire);
+ 	        $myForm->setFieldProperties("gest", FIELDP_HAS_CHOICE_AUCUN, false);
+ 	        $myForm->setFieldProperties("gest", FIELDP_HAS_CHOICE_TOUS, true);
+ 	        $myForm->addFormButton(1, 1, "valider", _("Rapport PDF"), TYPB_SUBMIT);
+ 	        $myForm->setFormButtonProperties("valider", BUTP_PROCHAIN_ECRAN, "Era-12");
+					$myForm->addFormButton(1, 2, "excel", _("Export EXCEL"), TYPB_SUBMIT);
+					$myForm->setFormButtonProperties("excel", BUTP_PROCHAIN_ECRAN, "Era-30");
+ 	        $myForm->addFormButton(1, 3, "csv", _("Export CSV"), TYPB_SUBMIT);
+ 	        $myForm->setFormButtonProperties("csv", BUTP_PROCHAIN_ECRAN, "Era-30");
+ 	        $myForm->addFormButton(1, 4, "annuler", _("Annuler"), TYPB_SUBMIT);
+ 	        $myForm->setFormButtonProperties("annuler", BUTP_PROCHAIN_ECRAN, "Gen-13");
+ 	        $myForm->setFormButtonProperties("annuler", BUTP_CHECK_FORM, false);
+ 	        $myForm->buildHTML();
+	        echo $myForm->getHTML();
+ 	    }
+ 	/*}}}*/
+
+ 	/*{{{ Era-12 et Era-30 : Solde des comptes de base mouvementés dans la journée : impression ou export csv */
+ 	else
+ 	    if ($global_nom_ecran == 'Era-12' || $global_nom_ecran == 'Era-30') {
+ 	        if ($gest == "") {
+ 	            $gest = 0;
+ 	            $list_criteres = array (_("Date") => $date, _("Gestionnaire") => _("Tous"));
+ 	        } else {
+ 	            if ($gest > 0) {
+ 	                $list_criteres = array (_("Date") => $date, _("Gestionnaire") => $gest = getLibel("ad_uti", $gest));
+ 	            }
+ 	        }
+
+ 	        if (isSiege()) {
+ 	        	setGlobalIdAgence($agence);
+ 	        }
+
+ 	        $DATA = getSoldescptbasedatebis($date, $gest);
+
+ 	        //$xml = xml_etat_general_comptes_clients($DATA, $list_criteres);
+
+ 	        if ($global_nom_ecran == 'Era-12') {
+ 	            //Génération du XSL-FO (grâce au XSLT) et du PDF (grâce à FOP)
+							$xml = xml_etat_general_comptes_clients($DATA, $list_criteres);
+ 	            $fichier_pdf = xml_2_xslfo_2_pdf($xml, 'etat_general_comptes_clients.xslt');
+
+ 	            //Message de confirmation + affichage du rapport dans une nouvelle fenêtre
+ 	            echo get_show_pdf_html("Gen-13", $fichier_pdf);
+ 	        } else
+ 	            if ($global_nom_ecran == 'Era-30') {
+ 	                //Génération du csv grâce à XALAN
+									$xml = xml_etat_general_comptes_clients($DATA, $list_criteres, true);
+ 	                $csv_file = xml_2_csv($xml, 'etat_general_comptes_clients.xslt');
+
+ 	                //Message de confirmation + affichage du rapport dans une nouvelle fenêtre
+									if (isset($excel) && $excel == 'Export EXCEL'){
+										echo getShowEXCELHTML("Gen-13", $csv_file);
+									}
+									else{
+										echo getShowCSVHTML("Gen-13", $csv_file);
+									}
+ 	            }
+
+ 	        ajout_historique(330, NULL, NULL, $global_nom_login, date("r"), NULL);
+ 	    }
+ 	/*}}}*/
+
+ 	/*{{{ Era-13 : Suivi échéances CAT-DAT : personnalisation */
+ 	else
+ 	    if ($global_nom_ecran == "Era-13") {
+ 	        $myForm = new HTML_GEN2(_("Personnalisation du rapport"));
+ 	        if (isSiege()) {
+ 	            //Agence- Tri par agence
+             resetGlobalIdAgence();
+ 	            $myForm->addField("agence", _("Agence"), TYPC_LSB);
+ 	            $myForm->setFieldProperties("agence", FIELDP_IS_REQUIRED, true);
+ 	            unset ($liste_agences[$global_id_agence]);
+ 	            $myForm->setFieldProperties("agence", FIELDP_ADD_CHOICES, $liste_agences);
+ 	        }
+ 	        $myForm->addField("nbre_mois", _("Nombre de mois à couvrir"), TYPC_INT);
+ 	        $myForm->setFieldProperties("nbre_mois", FIELDP_DEFAULT, "6");
+ 	        $myForm->setFieldProperties("nbre_mois", FIELDP_IS_REQUIRED, true);
+ 	        //Gestionnaire- Tri par agent gestionnaire
+ 	        //$myForm->addTableRefField("gest", _("Gestionnaire"), "ad_uti");
+			$gestionnaire = getLibelUtilisateur();
+			$myForm->addField("gest", _("Gestionnaire"), TYPC_LSB);
+			$myForm->setFieldProperties("gest", FIELDP_ADD_CHOICES, $gestionnaire);
+ 	        $myForm->setFieldProperties("gest", FIELDP_HAS_CHOICE_AUCUN, false);
+ 	        $myForm->setFieldProperties("gest", FIELDP_HAS_CHOICE_TOUS, true);
+
+ 	        $myForm->addJS(JSP_BEGIN_CHECK, "jsCheck", "if (document.ADForm.nbre_mois.value > 6) {alert('"._("Le nombre de mois ne doit pas excéder 6")."');ADFormValid = false;}");
+
+ 	        $myForm->addFormButton(1, 1, "valider", _("Rapport PDF"), TYPB_SUBMIT);
+ 	        $myForm->setFormButtonProperties("valider", BUTP_PROCHAIN_ECRAN, "Era-14");
+				  $myForm->addFormButton(1, 2, "excel", _("Export EXCEL"), TYPB_SUBMIT);
+				  $myForm->setFormButtonProperties("excel", BUTP_PROCHAIN_ECRAN, "Era-31");
+ 	        $myForm->addFormButton(1, 3, "csv", _("Export CSV"), TYPB_SUBMIT);
+ 	        $myForm->setFormButtonProperties("csv", BUTP_PROCHAIN_ECRAN, "Era-31");
+ 	        $myForm->addFormButton(1, 4, "annuler", _("Annuler"), TYPB_SUBMIT);
+ 	        $myForm->setFormButtonProperties("annuler", BUTP_PROCHAIN_ECRAN, "Gen-13");
+ 	        $myForm->setFormButtonProperties("annuler", BUTP_CHECK_FORM, false);
+ 	        $myForm->buildHTML();
+ 	        echo $myForm->getHTML();
+	    }
+ 	/*}}}*/
+
+ 	/*{{{ Era-14 et Era-31 : Suivi échéances CAT-DAT : impression ou export csv*/
+ 	else
+    if ($global_nom_ecran == 'Era-14' || $global_nom_ecran == 'Era-31') {
+ 	        //génération du xml pour le rapport sur le suivi des échéances des comptes à terme
+ 	        //get cptes d'épargnes
+ 	        //get période à couvrir = nbre de mois à partir d'aujourd'hui
+          //classer les cptes en fonction du mois/an d'échéance
+ 	        //générer le xml
+ 	        setGlobalIdAgence($agence);
+ 	        if ($gest == "")
+ 	            $gest = 0;
+ 	        $lignesRapport = getRapportEcheancesCAT($nbre_mois, $gest);
+
+ 	        if ($lignesRapport != NULL) {
+
+ 	            $xml = xml_echeances_CAT($lignesRapport, array (
+ 	                	_("Nombre de mois couverts") => $nbre_mois,
+ 	                	_("Gestionnaire") => (getLibel("ad_uti", $gest  ) == "") ? _("Tous") : getLibel("ad_uti", $gest)),
+ 	                $nbre_mois, $gest);
+
+ 	            if ($global_nom_ecran == 'Era-14') {
+ 	                //Génération du XSL-FO (grâce au XSLT) et du PDF (grâce à FOP)
+ 	                $fichier_pdf = xml_2_xslfo_2_pdf($xml, 'echeances_CAT.xslt');
+
+ 	                //Message de confirmation + affichage du rapport dans une nouvelle fenêtre
+ 	                echo get_show_pdf_html("Gen-13", $fichier_pdf);
+ 	            } else
+ 	                if ($global_nom_ecran == 'Era-31') {
+ 	                    //Génération csv grâce à XALAN
+ 	                    $csv_file = xml_2_csv($xml, 'echeances_CAT.xslt');
+
+ 	                    //Message de confirmation + affichage du rapport dans une nouvelle fenêtre
+											if (isset($excel) && $excel == 'Export EXCEL'){
+												echo getShowEXCELHTML("Gen-13", $csv_file);
+											}
+											else{
+												echo getShowCSVHTML("Gen-13", $csv_file);
+											}
+ 	                }
+
+ 	            ajout_historique(330, NULL, NULL, $global_nom_login, date("r"), NULL);
+
+ 	            //FIXME:faire le else
+ 	        }
+ 	    }
+ 	/*}}}*/
+
+ 	/*{{{ Era-15 : Concentration de l'épargne : personnalisation */
+ 	else
+ 	    if ($global_nom_ecran == 'Era-15') {
+ 	    //FIXME : fusion sans les modifs multi-devise : à réintroduire
+	$myForm = new HTML_GEN2(_("Sélection critères"));
+	//Remettre $global_id_agence à l'identifiant de l'agence courante
+	resetGlobalIdAgence();
+	//Agence- Tri par agence
+	$list_agence = getAllIdNomAgence();
+	//$list_agence['-1']="SIEGE";
+	if (isSiege()) {
+		unset ($list_agence[$global_id_agence]);
+		$myForm->addField("agence", _("Agence"), TYPC_LSB);
+		$myForm->setFieldProperties("agence", FIELDP_ADD_CHOICES, $list_agence);
+		$myForm->setFieldProperties("agence", FIELDP_HAS_CHOICE_AUCUN, false);
+		$myForm->setFieldProperties("agence", FIELDP_HAS_CHOICE_TOUS, true);
+	}
+  //ticket 659 : amelioration situation periodic pour le rapport
+	$myForm->addField("date_debut", _("Date Debut"), TYPC_DTE);
+	$myForm->setFieldProperties("date_debut", FIELDP_DEFAULT, '01/01/2000'); //date("d/m/Y",'01/01/2000')
+	$myForm->setFieldProperties("date_debut", FIELDP_IS_REQUIRED, false);
+	$myForm->addField("date_fin", _("Date Fin"), TYPC_DTE);
+	$myForm->setFieldProperties("date_fin", FIELDP_IS_REQUIRED, false);
+	$myForm->addField("date_rapport", _("Date Etat"), TYPC_DTE); //ticket 659 : modification libelle
+	$myForm->setFieldProperties("date_rapport", FIELDP_DEFAULT, date("d/m/Y"));
+	$myForm->setFieldProperties("date_rapport", FIELDP_IS_REQUIRED, true);
+
+	if(isFusion()){
+        //niveau Agence et Guichet
+        $nivArrayFenacobu = getNivFenacobuArray("type_niveau > 1");
+        // --> Sélection des champs à afficher dans id_loc
+        reset($nivArrayFenacobu);
+        $includeChoicesFenacobu = array();
+        while (list (, $value_fenacobu) = each($nivArrayFenacobu)) {
+            if ($value_fenacobu['type_niveau'] == 2)
+                //array_push($includeChoicesFenacobu, $value_fenacobu['id'] =>$value_fenacobu['libelle_localisation']);
+                $arrayDisplay[$value_fenacobu['id'] ] =$value_fenacobu['libelle_niveau'];
+
+        }
+
+        //$array_test = array(1=> 'test1', 2=> 'test2');print_rn($array_test);
+        $myForm->addField("n_agence", _("Niveau agence"), TYPC_LSB);
+        $myForm->addField("n_guichet", _("Niveau guichet"), TYPC_LSB);
+        $myForm->setFieldProperties("n_agence", FIELDP_ADD_CHOICES, $arrayDisplay);
+        $myForm->setFieldProperties("n_agence", FIELDP_HAS_CHOICE_TOUS, true);
+        $myForm->setFieldProperties("n_agence", FIELDP_HAS_CHOICE_AUCUN, false);
+        //$myForm->setFieldProperties("n_agence", FIELDP_IS_REQUIRED, true);
+
+        $jsCodeNivFenacobu = "function displayNivFenacobu() {\n";
+        $jsCodeNivFenacobu .= "for (i=0; i < document.ADForm.HTML_GEN_LSB_n_guichet.length; ++i) document.ADForm.HTML_GEN_LSB_n_guichet.options[i] = null;\n"; //Vide les choix
+        $jsCodeNivFenacobu .= "document.ADForm.HTML_GEN_LSB_n_guichet.length = 0;";
+        $jsCodeNivFenacobu .= "document.ADForm.HTML_GEN_LSB_n_guichet.options[document.ADForm.HTML_GEN_LSB_n_guichet.length] = new Option('[Tous]', 0, true, true);\n"; //[Aucun]
+        $jsCodeNivFenacobu .= "document.ADForm.HTML_GEN_LSB_n_guichet.selectedIndex = 0; document.ADForm.HTML_GEN_LSB_n_guichet.length = 1; \n";
+        reset($nivArrayFenacobu);
+        while (list (, $value_fenacobu) = each($nivArrayFenacobu)) {
+            if ($value_fenacobu['parent'] != '') {
+                $jsCodeNivFenacobu .= "\tif (document.ADForm.HTML_GEN_LSB_n_agence.value == " . $value_fenacobu['parent'] . ")\n";
+                $jsCodeNivFenacobu .= "\t\tdocument.ADForm.HTML_GEN_LSB_n_guichet.options[document.ADForm.HTML_GEN_LSB_n_guichet.length] = new Option('" . $value_fenacobu['libelle_niveau'] . "', '" . $value_fenacobu['id'] . "', false, false);\n";
+            }
+        }
+        $jsCodeNivFenacobu .= "\n}";
+        // --> Ajout de la fonction dans le formulaire
+        $myForm->addJS(JSP_FORM, "jsCodeNivFenacobu", $jsCodeNivFenacobu);
+        // --> ajout des champs
+
+        //AT-150
+        // --> Page reloaded Constrution des choix disponibles pour le district
+        if (isset($n_agence) && isset($n_guichet)){
+            $choices = array();
+            reset($nivArrayFenacobu);
+            while (list(, $value) = each($nivArrayFenacobu)) {
+                if ($value['parent'] == $n_agence)
+                    $choices[$value['id']] = $value['libelle_niveau'];
+            }
+            $myForm->setFieldProperties("n_guichet", FIELDP_ADD_CHOICES, $choices);
+            $myForm->setFieldProperties("n_guichet", FIELDP_DEFAULT, $n_guichet);
+        }
+        else{
+//        $myForm->setFieldProperties("n_guichet", FIELDP_INCLUDE_CHOICES, array(
+//            "0" => "[Tous]"
+//        ));
+            $myForm->setFieldProperties("n_guichet", FIELDP_HAS_CHOICE_TOUS, true);
+            $myForm->setFieldProperties("n_guichet", FIELDP_HAS_CHOICE_AUCUN, false);
+        }
+        //$myForm->setFieldProperties("n_guichet", FIELDP_IS_REQUIRED, true);
+        $myForm->setFieldProperties("n_agence", FIELDP_JS_EVENT, array("onchange" => "displayNivFenacobu()"));
+
+
+    }
+
+	//AT-33/AT-77
+	$Data_agence = getAgenceDatas($global_id_agence);
+
+	//Champs 'Critère de répartition'
+	$myForm->addField("critere", _("Critère de répartition"), TYPC_LSB);
+	$choix = array (
+ 	            "type_ep" => _("Type d'épargne"),
+ 	            "prod_ep" => _("Produit d'épargne"),
+ 	            "stat_jur" => _("Statut juridique"),
+ 	            "qualite" => _("Qualité"),
+ 	            "sect_act" => _("Secteur d'activité"),
+ 	            "loc" => _("Localisation"),
+	            "mnt" => _("Solde compte")
+	            );
+	            $myForm->setFieldProperties("critere", FIELDP_ADD_CHOICES, $choix);
+	            $myForm->setFieldProperties("critere", FIELDP_IS_REQUIRED, true);
+
+	            //AT-33/AT-77 - si identification client est Rwanda dans l'agence
+							if ($Data_agence['identification_client'] == 2){
+								$js_fct = "
+																							function set_disabled(mnt_p1, mnt_p2)
+																						{
+																							document.ADForm.palier1.disabled = mnt_p1;
+																							document.ADForm.palier2.disabled = mnt_p2;
+																						}
+																						function set_disabled_loc(niv_loc, crit_loc)
+																						{
+																							document.ADForm.HTML_GEN_LSB_niveau_localisation.disabled = niv_loc;
+																						}
+																							";//document.getElementById('crit_loc').disabled = crit_loc;$('#crit_loc').attr('disabled',crit_loc);
+
+								$js = "
+																					set_disabled(true, true);
+																					set_disabled_loc(true, true);
+																					if (document.ADForm.HTML_GEN_LSB_critere.value == 'mnt'){
+																						set_disabled(false, false);
+																					}
+																					if (document.ADForm.HTML_GEN_LSB_critere.value == 'loc'){
+																						set_disabled_loc(false, false);
+																					}
+																					";
+							}
+							else{ //si identification client standard
+								$js_fct = "
+																							function set_disabled(mnt_p1, mnt_p2)
+																						{
+																							document.ADForm.palier1.disabled = mnt_p1;
+																							document.ADForm.palier2.disabled = mnt_p2;
+																						}
+																							";
+
+								$js = "
+																					if (document.ADForm.HTML_GEN_LSB_critere.value == 'mnt')
+																					set_disabled(false, false);
+																					else
+																					set_disabled(true, true)
+																					";
+							}
+
+	            $myForm->setFieldProperties("critere", FIELDP_JS_EVENT, array (
+ 	            "onchange" => $js
+	            ));
+	            $myForm->addJS(JSP_FORM, "js0", $js_fct);
+
+	//AT-33/AT-77 - Evolution rapport Concentration de l’épargne après AT-33
+	if ($Data_agence['identification_client'] == 2){
+		$choix_niveau_localisation = array (
+				"1" => _("Province"),
+				"2" => _("District"),
+				"3" => _("Secteur"),
+				"4" => _("Cellule"),
+				"5" => _("Village")
+		);
+		$SESSION_VARS['niveau_localisation'] = $choix_niveau_localisation;
+		$myForm->addField("niveau_localisation", _("Niveau de Localisation"), TYPC_LSB);
+		$myForm->setFieldProperties("niveau_localisation", FIELDP_ADD_CHOICES, $choix_niveau_localisation);
+		$myForm->setFieldProperties("niveau_localisation", FIELDP_HAS_CHOICE_AUCUN, false);
+		$myForm->setFieldProperties("niveau_localisation", FIELDP_IS_LABEL, true);
+		$myForm->setFieldProperties("niveau_localisation", FIELDP_JS_EVENT, array("onChange"=>"assign('Era-15'); this.form.submit();"));
+		$myForm->setFieldProperties("critere", FIELDP_JS_EVENT, array("onChange"=>"assign('Era-15'); this.form.submit();"));//if (document.ADForm.HTML_GEN_LSB_critere.value != 'mnt'){assign('Era-15'); this.form.submit();}
+		/*************************AT-77 - Without JQuery n Search Options**************************************************
+		$myForm->addField("crit_loc", _("Critere de Localisation"), TYPC_LSB);
+		$myForm->setFieldProperties("crit_loc", FIELDP_HAS_CHOICE_AUCUN, false);
+		$myForm->setFieldProperties("crit_loc", FIELDP_HAS_CHOICE_TOUS, true);
+		$myForm->setFieldProperties("crit_loc", FIELDP_IS_LABEL, true);
+		$locArrayRwanda = getLocRwandaSelectedArray();
+		// --> Sélection des champs à afficher dans id_loc
+		reset($locArrayRwanda);
+		$includeChoicesRwanda = array();
+		while (list (, $value_rwanda) = each($locArrayRwanda)) {
+			if ($value_rwanda['parent'] == 0)
+				array_push($includeChoicesRwanda, $value_rwanda['id']);
+		}
+		$jsCodeLocRwanda = "function displayLocsRwanda() {\n";
+		$jsCodeLocRwanda .= "for (i=0; i < document.ADForm.HTML_GEN_LSB_crit_loc.length; ++i) document.ADForm.HTML_GEN_LSB_crit_loc.options[i] = null;\n"; //Vide les choix
+		$jsCodeLocRwanda .= "document.ADForm.HTML_GEN_LSB_crit_loc.length = 0;";
+		$jsCodeLocRwanda .= "document.ADForm.HTML_GEN_LSB_crit_loc.options[document.ADForm.HTML_GEN_LSB_crit_loc.length] = new Option('[Tous]', 0, true, true);\n"; //[Aucun]
+		$jsCodeLocRwanda .= "document.ADForm.HTML_GEN_LSB_crit_loc.selectedIndex = 0; document.ADForm.HTML_GEN_LSB_crit_loc.length = 1; \n";
+		reset($locArrayRwanda);
+		while (list (, $value_rwanda) = each($locArrayRwanda)) {
+			if ($value_rwanda['type_localisation'] != '') {
+				$jsCodeLocRwanda .= "\tif (document.ADForm.HTML_GEN_LSB_niveau_localisation.value == " . $value_rwanda['type_localisation'] . ")\n";
+				$jsCodeLocRwanda .= "\t\tdocument.ADForm.HTML_GEN_LSB_crit_loc.options[document.ADForm.HTML_GEN_LSB_crit_loc.length] = new Option('" . $value_rwanda['libelle_localisation'] . "', '" . $value_rwanda['id'] . "', false, false);\n";
+			}
+		}
+		$jsCodeLocRwanda .= "\n}";
+		// --> Ajout de la fonction dans le formulaire
+		$myForm->addJS(JSP_FORM, "jsCodeLocRwanda", $jsCodeLocRwanda);
+
+		$myForm->setFieldProperties("niveau_localisation", FIELDP_JS_EVENT, array("onchange" => "displayLocsRwanda()"));
+		 ************************AT-77 - Without JQuery n Search Options**************************************************/
+
+		/***************AT-77 - Dynamic JQuery based Drop Down Select field with search option******************/
+		$ExtraHtml = "<link rel=\"stylesheet\" href=\"/lib/misc/js/chosen/css/chosen.css\">";
+		$ExtraHtml .= "<script src=\"/lib/misc/js/lib/jquery.min.js\" type=\"text/javascript\"></script>";
+		$ExtraHtml .= "<script src=\"/lib/misc/js/chosen/chosen.jquery.js\" type=\"text/javascript\"></script>";
+
+		//$ExtraHtml .= "<TABLE align=\"left\" >\n";
+
+		//En-tête du tableau
+		$color = "#FDF2A6";
+		$ExtraHtml .= "<TR bgcolor=\"$color\"  align=\"center\">\n";
+
+		$ExtraHtml .= "<TD align=\"left\">\n";
+		$ExtraHtml .= "<label>Critère de localisation  </label>";
+		$ExtraHtml .= "</TD>\n";
+		$ExtraHtml .= "<TD align=\"left\">\n";
+		if ((isset($niveau_localisation) || isset($critere)) && $critere == 'loc'){
+			$ExtraHtml .= "<select required class=\"chosen-select\" NAME=\"crit_loc\" ID=\"crit_loc\" style=\"width:160px\""  ;
+		}
+		else{
+			$ExtraHtml .= "<select required class=\"chosen-select\" NAME=\"crit_loc\"  ID=\"crit_loc\" style=\"width:160px\" disabled=\"true\" "  ;
+		}
+		$ExtraHtml .= ">\n";
+		$ExtraHtml .= "<option value=\"0\">["._("Tous")."]</option>\n";
+		if (isset($niveau_localisation) && isset($critere) && $critere == 'loc'){//Page Reloaded
+			$locArrayRwanda = getLocRwandaSelectedArray();
+			reset($locArrayRwanda);
+			while (list (, $value_rwanda) = each($locArrayRwanda)) {
+				if ($value_rwanda['type_localisation'] == $niveau_localisation){
+					$ExtraHtml .= "<option value=".$value_rwanda['id'].">".$value_rwanda['libelle_localisation']."</option>\n";
+				}
+			}
+		}
+		else{//Default values
+			$locArrayRwanda = getLocRwandaSelectedArray();
+			reset($locArrayRwanda);
+			while (list (, $value_rwanda) = each($locArrayRwanda)) {
+				if ($value_rwanda['type_localisation'] == 1){
+					$ExtraHtml .= "<option value=".$value_rwanda['id'].">".$value_rwanda['libelle_localisation']."</option>\n";
+				}
+			}
+		}
+		$ExtraHtml .= "</select>\n";
+		$ExtraHtml .= "</TD><TD></TD>";
+
+
+		$ExtraHtml .= "</TR>";
+		//$ExtraHtml .= "</TABLE>\n";
+
+
+		$ExtraHtml .= "<script type=\"text/javascript\">\n";
+		$ExtraHtml .= "var config = { '.chosen-select' : {} }\n";
+		$ExtraHtml .= "for (var selector in config) {\n";
+		$ExtraHtml .= "$(selector).chosen(config[selector]); }\n";
+
+		$ExtraHtml .= "</script>\n";
+
+		$myForm->addHTMLExtraCode("html2",$ExtraHtml);
+		$myForm->setHTMLExtraCodeProperties("html2", HTMP_IN_TABLE, true);
+		/***************AT-77 - Dynamic JQuery based Drop Down Select field with search option******************/
+	}
+
+	            $myForm->addField("palier1", _("Premier palier"), TYPC_MNT);
+	            $myForm->addField("palier2", _("Second palier"), TYPC_MNT);
+
+	            $myForm->setFieldProperties("palier1", FIELDP_IS_REQUIRED, true);
+	            $myForm->setFieldProperties("palier1", FIELDP_IS_LABEL, true);
+	            $myForm->setFieldProperties("palier2", FIELDP_IS_REQUIRED, true);
+	            $myForm->setFieldProperties("palier2", FIELDP_IS_LABEL, true);
+
+							//AT-33/AT-77 - Reload page with pre-selected data
+							if ($Data_agence['identification_client'] == 2 && (isset($niveau_localisation) || isset($critere))) {// && $critere == 'loc'
+								$myForm->setFieldProperties("critere", FIELDP_DEFAULT, $critere);
+								if (isset($niveau_localisation)){
+									$myForm->setFieldProperties("niveau_localisation", FIELDP_DEFAULT, $niveau_localisation);
+									$myForm->setFieldProperties("niveau_localisation", FIELDP_IS_LABEL, false);
+								}
+								if (isset($date_rapport) && $date_etat != null){
+									$myForm->setFieldProperties("date_etat", FIELDP_DEFAULT, $date_rapport);
+								}
+								if (isset($crit_loc)){
+									$setValCritLoc = "document.ADForm.crit_loc.value = ".$crit_loc.";";
+									$myForm->addJS(JSP_FORM, "setValCritLoc", $setValCritLoc);
+								}
+								if (isset($palier1)){
+									$myForm->setFieldProperties("palier1", FIELDP_DEFAULT, $palier1);
+									if ($critere == 'mnt'){
+										$myForm->setFieldProperties("palier1", FIELDP_IS_LABEL, false);
+									}
+								}
+								if (isset($palier2)){
+									$myForm->setFieldProperties("palier2", FIELDP_DEFAULT, $palier2);
+									if ($critere == 'mnt'){
+										$myForm->setFieldProperties("palier2", FIELDP_IS_LABEL, false);
+									}
+								}
+								if (isset($date_debut) && $date_debut != null){
+									$myForm->setFieldProperties("date_debut", FIELDP_DEFAULT, $date_debut);
+								}
+								if (isset($date_fin) && $date_fin != null){
+									$myForm->setFieldProperties("date_fin", FIELDP_DEFAULT, $date_fin);
+								}
+							}
+
+	            // Javascript de contrôle
+	            $js = " msg = ''; ADFormValid = true;
+
+ 	                                      if (((document.ADForm.palier1.value == '')
+ 	                                      || (document.ADForm.palier2.value == ''))
+ 	                                      && (document.ADForm.HTML_GEN_LSB_critere.value == 'mnt'))
+ 	                                    {
+ 	                                      msg += '"._("Les champs paliers pour les soldes doivent être renseignés !")."\\n';
+ 	                                      ADFormValid = false;
+ 	                                    }
+
+ 	                                      if (document.ADForm.HTML_GEN_LSB_critere.value =='mnt')
+ 	                                    {
+ 	                                      if (recupMontant(document.ADForm.palier1.value) >= recupMontant(document.ADForm.palier2.value))
+ 	                                    {
+ 	                                      alert('"._("Le palier 1 doit être inférieur au palier 2")."');
+ 	                                      ADFormValid = false;
+ 	                                    }
+ 	                                    }
+ 	                                    if (document.ADForm.HTML_GEN_date_date_debut.value != '' && document.ADForm.HTML_GEN_date_date_fin.value == '')
+ 	                                    {
+ 	                                     alert('"._("La Date Fin doit etre renseignée  !")."');
+ 	                                     ADFormValid = false;
+ 	                                    }
+ 	                                      ";
+
+	            $myForm->addJS(JSP_BEGIN_CHECK, "js1", $js);
+	            $js_check_agence = "\nif ((document.ADForm.HTML_GEN_LSB_agence.value == 0)" .
+ 	        "&&((document.ADForm.HTML_GEN_LSB_critere.value == 'prod_ep')" .
+ 	        "||(document.ADForm.HTML_GEN_LSB_critere.value == 'sect_act')" .
+ 	        "||(document.ADForm.HTML_GEN_LSB_critere.value == 'loc') )) " .
+ 	        "{msg+='- "._("Tous ne peut pas être sélectionné pour ce critère !")."\\n';ADFormValid=false;\n} \n\t";
+	            $myForm->addJS(JSP_BEGIN_CHECK, "JS", $js_check_agence);
+	            $myForm->addFormButton(1, 1, "valider", _("Rapport PDF"), TYPB_SUBMIT);
+	            $myForm->setFormButtonProperties("valider", BUTP_PROCHAIN_ECRAN, "Era-16");
+				      $myForm->addFormButton(1, 2, "excel", _("Export EXCEL"), TYPB_SUBMIT);
+				      $myForm->setFormButtonProperties("excel", BUTP_PROCHAIN_ECRAN, "Era-32");
+	            $myForm->addFormButton(1, 3, "csv", _("Export CSV"), TYPB_SUBMIT);
+	            $myForm->setFormButtonProperties("csv", BUTP_PROCHAIN_ECRAN, "Era-32");
+	            $myForm->addFormButton(1, 4, "annuler", _("Annuler"), TYPB_SUBMIT);
+	            $myForm->setFormButtonProperties("annuler", BUTP_PROCHAIN_ECRAN, "Gen-13");
+	            $myForm->setFormButtonProperties("annuler", BUTP_CHECK_FORM, false);
+	            $myForm->buildHTML();
+	            echo $myForm->getHTML();
+
+}
+ 	/*}}}*/
+
+ 	/*{{{ Era-16 et Era-32 Concentration de l'épargne : impression ou export csv*/
+ 	else
+ 	    if ($global_nom_ecran == 'Era-16' || $global_nom_ecran == 'Era-32') {
+ 	    if ($critere == "prod_ep") {
+		$val = 1;
+		$b1 = -1;
+		$b2 = -1;
+		$xslt_file = 'repartition_epargne_comptes.xslt';
+	} else
+	if ($critere == "stat_jur") {
+		$val = 2;
+		$b1 = -1;
+		$b2 = -1;
+		$xslt_file = 'repartition_epargne_comptes_clients.xslt';
+	} else
+	if ($critere == "qualite") {
+		$val = 3;
+		$b1 = -1;
+		$b2 = -1;
+		$xslt_file = 'repartition_epargne_comptes_clients.xslt';
+	} else
+	if ($critere == "sect_act") {
+		$val = 4;
+		$b1 = -1;
+		$b2 = -1;
+		$xslt_file = 'repartition_epargne_comptes_clients.xslt';
+	} else
+	if ($critere == "loc") {
+		$val = 5;
+		$b1 = $loc;
+		$b2 = -1;
+		$xslt_file = 'repartition_epargne_comptes_clients.xslt';
+	} else
+	if ($critere == "mnt") {
+		$val = 6;
+		$b1 = recupMontant($palier1);
+		$b2 = recupMontant($palier2);
+		$xslt_file = 'repartition_epargne_comptes.xslt';
+	} else
+	if ($critere == "type_ep") {
+		$val = 7;
+		$b1 = -1;
+		$b2 = -1;
+		$xslt_file = 'repartition_epargne_comptes.xslt';
+	}
+
+	if (isSiege()) {
+		if ($agence != '') {
+
+			$list_agence[$agence] = $agence; //Sélection d'une agence au siège
+		} else {
+			$list_agence = getAllIdNomAgence();
+			unset ($list_agence[$global_id_agence]); //Pas d'impression au siège
+		}
+	} else
+	$list_agence[$global_id_agence] = $global_id_agence; //Dans une agence
+
+	//ticket 659
+	if ($date_debut == ""){
+		$date_debut = null;
+	}
+	if ($date_fin == ""){
+		$date_fin = null;
+	}
+	//AT-33/AT-77
+	$Data_agence = getAgenceDatas($global_id_agence);
+
+	if ($critere == "loc" && $Data_agence['identification_client'] == 2){//AT-33/AT-77 - dans le contexte de Rwanda
+		$tranche_data = get_data_repartition_epargne_rwanda($list_agence, $val, $b1, $b2,$date_rapport,$date_debut,$date_fin,$niveau_localisation,$crit_loc);
+	}
+	else{
+		if (isFusion()){
+            $tranche_data = get_data_repartition_epargne($list_agence, $val, $b1, $b2,$date_rapport,$date_debut,$date_fin,$n_agence,$n_guichet);
+		}else{
+            $tranche_data = get_data_repartition_epargne($list_agence, $val, $b1, $b2,$date_rapport,$date_debut,$date_fin);
+		}
+	}
+
+			// génération du XML
+	if ($global_nom_ecran == 'Era-16') {
+		//Génération du XSL-FO (grâce au XSLT) et du PDF (grâce à FOP)
+		if ($critere == "loc" && $Data_agence['identification_client'] == 2){//AT-33/AT-77 - dans le contexte de Rwanda
+			$xml = xml_repartition_epargne_rwanda($tranche_data,FALSE,$date_rapport,$date_debut,$date_fin,$niveau_localisation);
+		}
+		else{
+			$xml = xml_repartition_epargne($tranche_data,FALSE,$date_rapport,$date_debut,$date_fin);
+		}
+
+		$fichier_pdf = xml_2_xslfo_2_pdf($xml, $xslt_file);
+
+		//Message de confirmation + affichage du rapport dans une nouvelle fenêtre
+		echo get_show_pdf_html("Gen-13", $fichier_pdf);
+	} else
+	if ($global_nom_ecran == 'Era-32') {
+		//Génération du csv grâce à XALAN
+		//$xml = xml_concentration_epargne($donnes, $critere, true,$date_rapport,$date_debut,$date_fin);
+		//$csv_file = xml_2_csv($xml, "concentration_epargne1.xslt");
+		if ($critere == "loc" && $Data_agence['identification_client'] == 2){//AT-33/AT-77 - dans le contexte de Rwanda
+			$xml = xml_repartition_epargne_rwanda($tranche_data,TRUE,$date_rapport,$date_debut,$date_fin,$niveau_localisation);
+		}
+		else{
+			$xml = xml_repartition_epargne($tranche_data,TRUE,$date_rapport,$date_debut,$date_fin);
+		}
+		$csv_file = xml_2_csv($xml, $xslt_file);
+
+		//Message de confirmation + affichage du rapport dans une nouvelle fenêtre
+		if (isset($excel) && $excel == 'Export EXCEL'){
+			echo getShowEXCELHTML("Gen-13", $csv_file);
+		}
+		else{
+			echo getShowCSVHTML("Gen-13", $csv_file);
+		}
+	}
+
+	ajout_historique(330, NULL, NULL, $global_nom_login, date("r"), NULL);
+}
+ 	/*}}}*/
+
+ 	/*{{{ Era-17 : Créditeurs les plus importants : personnalisation */
+ 	else
+ 	    if ($global_nom_ecran == 'Era-17') {
+ 	        if ($global_multidevise)
+ 	            setMonnaieCourante("");
+ 	        $myForm = new HTML_GEN2(_("Choix d'un montant"));
+
+ 	        if (isSiege()) {
+ 	            //Agence- Tri par agence
+ 	            resetGlobalIdAgence();
+ 	            $myForm->addField("agence", _("Agence"), TYPC_LSB);
+ 	            $myForm->setFieldProperties("agence", FIELDP_IS_REQUIRED, true);
+ 	            unset ($liste_agences[$global_id_agence]);
+ 	            $myForm->setFieldProperties("agence", FIELDP_ADD_CHOICES, $liste_agences);
+ 	        }
+ 	        $myForm->addField("montantmin", _("Solde minimum"), TYPC_MNT);
+ 	        $myForm->setFieldProperties("montantmin", FIELDP_IS_REQUIRED, true);
+			if(isFusion()) {
+                //niveau Agence et Guichet
+                $nivArrayFenacobu = getNivFenacobuArray("type_niveau > 1");
+                // --> Sélection des champs à afficher dans id_loc
+                reset($nivArrayFenacobu);
+                $includeChoicesFenacobu = array();
+                while (list (, $value_fenacobu) = each($nivArrayFenacobu)) {
+                    if ($value_fenacobu['type_niveau'] == 2)
+                        //array_push($includeChoicesFenacobu, $value_fenacobu['id'] =>$value_fenacobu['libelle_localisation']);
+                        $arrayDisplay[$value_fenacobu['id']] = $value_fenacobu['libelle_niveau'];
+
+                }
+
+                //$array_test = array(1=> 'test1', 2=> 'test2');print_rn($array_test);
+                $myForm->addField("n_agence", _("Niveau agence"), TYPC_LSB);
+                $myForm->addField("n_guichet", _("Niveau guichet"), TYPC_LSB);
+                $myForm->setFieldProperties("n_agence", FIELDP_ADD_CHOICES, $arrayDisplay);
+                $myForm->setFieldProperties("n_agence", FIELDP_HAS_CHOICE_TOUS, true);
+                $myForm->setFieldProperties("n_agence", FIELDP_HAS_CHOICE_AUCUN, false);
+                //$myForm->setFieldProperties("n_agence", FIELDP_IS_REQUIRED, true);
+
+                $jsCodeNivFenacobu = "function displayNivFenacobu() {\n";
+                $jsCodeNivFenacobu .= "for (i=0; i < document.ADForm.HTML_GEN_LSB_n_guichet.length; ++i) document.ADForm.HTML_GEN_LSB_n_guichet.options[i] = null;\n"; //Vide les choix
+                $jsCodeNivFenacobu .= "document.ADForm.HTML_GEN_LSB_n_guichet.length = 0;";
+                $jsCodeNivFenacobu .= "document.ADForm.HTML_GEN_LSB_n_guichet.options[document.ADForm.HTML_GEN_LSB_n_guichet.length] = new Option('[Tous]', 0, true, true);\n"; //[Aucun]
+                $jsCodeNivFenacobu .= "document.ADForm.HTML_GEN_LSB_n_guichet.selectedIndex = 0; document.ADForm.HTML_GEN_LSB_n_guichet.length = 1; \n";
+                reset($nivArrayFenacobu);
+                while (list (, $value_fenacobu) = each($nivArrayFenacobu)) {
+                    if ($value_fenacobu['parent'] != '') {
+                        $jsCodeNivFenacobu .= "\tif (document.ADForm.HTML_GEN_LSB_n_agence.value == " . $value_fenacobu['parent'] . ")\n";
+                        $jsCodeNivFenacobu .= "\t\tdocument.ADForm.HTML_GEN_LSB_n_guichet.options[document.ADForm.HTML_GEN_LSB_n_guichet.length] = new Option('" . $value_fenacobu['libelle_niveau'] . "', '" . $value_fenacobu['id'] . "', false, false);\n";
+                    }
+                }
+                $jsCodeNivFenacobu .= "\n}";
+                // --> Ajout de la fonction dans le formulaire
+                $myForm->addJS(JSP_FORM, "jsCodeNivFenacobu", $jsCodeNivFenacobu);
+                // --> ajout des champs
+
+                //AT-150
+                // --> Page reloaded Constrution des choix disponibles pour le district
+                if (isset($n_agence) && isset($n_guichet)) {
+                    $choices = array();
+                    reset($nivArrayFenacobu);
+                    while (list(, $value) = each($nivArrayFenacobu)) {
+                        if ($value['parent'] == $n_agence)
+                            $choices[$value['id']] = $value['libelle_niveau'];
+                    }
+                    $myForm->setFieldProperties("n_guichet", FIELDP_ADD_CHOICES, $choices);
+                    $myForm->setFieldProperties("n_guichet", FIELDP_DEFAULT, $n_guichet);
+                } else {
+//        $myForm->setFieldProperties("n_guichet", FIELDP_INCLUDE_CHOICES, array(
+//            "0" => "[Tous]"
+//        ));
+                    $myForm->setFieldProperties("n_guichet", FIELDP_HAS_CHOICE_TOUS, true);
+                    $myForm->setFieldProperties("n_guichet", FIELDP_HAS_CHOICE_AUCUN, false);
+                }
+                //$myForm->setFieldProperties("n_guichet", FIELDP_IS_REQUIRED, true);
+                $myForm->setFieldProperties("n_agence", FIELDP_JS_EVENT, array("onchange" => "displayNivFenacobu()"));
+
+            }
+
+            if ($global_multidevise) {
+ 	            $myForm->addTable("ad_cpt_comptable", OPER_INCLUDE, array ("devise"));
+ 	            $myForm->setFieldProperties("devise", FIELDP_LONG_NAME, "Devise");
+ 	            $myForm->setFieldProperties("devise", FIELDP_IS_REQUIRED, true);
+ 	        }
+ 	        //Gestionnaire- Tri par agent gestionnaire
+ 	        //$myForm->addTableRefField("gest", _("Gestionnaire"), "ad_uti");
+			$gestionnaire = getLibelUtilisateur();
+			$myForm->addField("gest", _("Gestionnaire"), TYPC_LSB);
+			$myForm->setFieldProperties("gest", FIELDP_ADD_CHOICES, $gestionnaire);
+ 	        $myForm->setFieldProperties("gest", FIELDP_HAS_CHOICE_AUCUN, false);
+ 	        $myForm->setFieldProperties("gest", FIELDP_HAS_CHOICE_TOUS, true);
+
+ 	        $myForm->addFormButton(1, 1, "valider", _("Rapport PDF"), TYPB_SUBMIT);
+ 	        $myForm->setFormButtonProperties("valider", BUTP_PROCHAIN_ECRAN, "Era-18");
+					$myForm->addFormButton(1, 2, "excel", _("Export EXCEL"), TYPB_SUBMIT);
+					$myForm->setFormButtonProperties("excel", BUTP_PROCHAIN_ECRAN, "Era-33");
+ 	        $myForm->addFormButton(1, 3, "csv", _("Export CSV"), TYPB_SUBMIT);
+ 	        $myForm->setFormButtonProperties("csv", BUTP_PROCHAIN_ECRAN, "Era-33");
+ 	        $myForm->addFormButton(1, 4, "annuler", _("Annuler"), TYPB_SUBMIT);
+ 	        $myForm->setFormButtonProperties("annuler", BUTP_PROCHAIN_ECRAN, "Gen-13");
+ 	        $myForm->setFormButtonProperties("annuler", BUTP_CHECK_FORM, false);
+ 	        $myForm->buildHTML();
+ 	        echo $myForm->getHTML();
+
+ 	    }
+ 	/*}}}*/
+
+ 	/*{{{ Era-18 et Era-33 : Créditeurs les plus importants : impression ou export csv */
+ 	else
+ 	    if ($global_nom_ecran == 'Era-18' || $global_nom_ecran == 'Era-33') {
+ 	        global $adsys;
+ 	        setGlobalIdAgence($agence);
+ 	        if ($gest == "")
+ 	            $gest = 0;
+
+ 	        if (($global_multidevise) && ($devise != '0')) {
+                if (isFusion()){
+                    $DATA = getListeCompteSupamin($montantmin, $devise, $gest,$n_agence, $n_guichet);
+				}else{
+                    $DATA = getListeCompteSupamin($montantmin, $devise, $gest);
+				}
+            }
+ 	        else {
+                if (isFusion()){
+                    $DATA = getListeCompteSupamin($montantmin, NULL, $gest,$n_agence, $n_guichet);
+                }else{
+                    $DATA = getListeCompteSupamin($montantmin, NULL, $gest);
+				}
+            }
+
+ 	        if ($global_nom_ecran == 'Era-18') {
+ 	            //Génération du XSL-FO (grâce au XSLT) et du PDF (grâce à FOP)
+ 	            $xml = xml_liste_CompteSupamin($DATA, $devise, array (_("Gestionnaire") => $list_criteres = (getLibel("ad_uti", $gest) == "") ? _("Tous") : getLibel("ad_uti", $gest)), $list_criteres);
+ 	            $fichier_pdf = xml_2_xslfo_2_pdf($xml, 'liste_compte_sup_mnt.xslt');
+
+ 	            //Message de confirmation + affichage du rapport dans une nouvelle fenêtre
+ 	            echo get_show_pdf_html("Gen-13", $fichier_pdf);
+	        } else
+ 	            if ($global_nom_ecran == 'Era-33') {
+ 	                //Génération du csv grâce à XALAN
+ 	                $xml = xml_liste_CompteSupamin($DATA, $devise, array (_("Gestionnaire") => $list_criteres = getLibel("ad_uti", $gest)), $list_criteres, true);
+ 	                $csv_file = xml_2_csv($xml, 'liste_compte_sup_mnt.xslt');
+
+ 	                //Message de confirmation + affichage du rapport dans une nouvelle fenêtre
+									if (isset($excel) && $excel == 'Export EXCEL'){
+										echo getShowEXCELHTML("Gen-13", $csv_file);
+									}
+									else{
+										echo getShowCSVHTML("Gen-13", $csv_file);
+									}
+ 	            }
+ 	        ajout_historique(330, NULL, NULL, $global_nom_login, date("r"), NULL);
+ 	    }
+ 	/*}}}*/
+
+ 	/*{{{ Era-22 - Era-24 : Liste chèquiers à imprimer ou à confirmer l'impression */
+ 	else
+ 	    if ($global_nom_ecran == 'Era-22' || $global_nom_ecran == 'Era-24') {
+	switch ($global_nom_ecran) {
+		case 'Era-22' :
+			$title = _("Impression de chèquiers");
+			$ecran_suivant = "Era-23";
+			$checked = true;
+			break;
+		case 'Era-24' :
+			$title = _("Confirmation de l'impression de chèquiers");
+			$ecran_suivant = "Era-25";
+			$checked = false;
+			break;
+	}
+
+	// On construit la liste des comptes pour lesquels un chèquier est en attente d'impression (etat = 1)
+	$result = getListChequiersPrint($agence);
+	if ($result->errCode == NO_ERR) {
+		$liste_comptes = $result->param;debug($liste_comptes);
+		if (count($liste_comptes) > 0) {
+			// Nous avons des chèquiers à imprimer
+			$my_page = new HTML_GEN2($title);
+
+			$liste_cptes = "";
+			foreach ($liste_comptes as $id => $chequier) {
+				$id_cpte=$chequier["id_cpte"];
+				$id_comde_chequier=$chequier["id"];
+				$nom_cli = getClientName($chequier["id_titulaire"]);
+				$nbre_chequiers=$chequier["nbre_carnets"] ;
+				$num_complet_cpte = $chequier["num_complet_cpte"];
+				$libelle = sprintf(_(" %s - %s - %s chéquier(s)"),$num_complet_cpte,$nom_cli,$nbre_chequiers);
+				$liste_commande_chequiers [$id_comde_chequier]['id'] = $id_comde_chequier;
+				$liste_commande_chequiers [$id_comde_chequier]['nom'] = $nom_cli;
+				$liste_commande_chequiers [$id_comde_chequier]['nbre_carnets'] = $nbre_chequiers;
+				$liste_commande_chequiers [$id_comde_chequier]['num_complet_cpte'] = $num_complet_cpte;
+				
+				$my_page->addField("check_" . $id_comde_chequier, _("$libelle"), TYPC_BOL);
+				$my_page->setFieldProperties("check_" . $id_comde_chequier, FIELDP_DEFAULT, $checked);
+			}
+			// Ce champ contiendra la liste des tous les comptes pour lesquels on pourrait imprimer/confirmer un chèquier
+			//$liste_commande_chequiers = urlencode(serialize($liste_commande_chequiers));
+			//$my_page->addHiddenType("liste_chequiers", $liste_commande_chequiers);
+			$SESSION_VARS['liste_chequiers'] = $liste_commande_chequiers;
+
+			$my_page->addFormButton(1, 1, "valid", _("Valider"), TYPB_SUBMIT);
+			$my_page->setFormButtonProperties("valid", BUTP_PROCHAIN_ECRAN, $ecran_suivant);
+			$my_page->addFormButton(1, 2, "annul", _("Annuler"), TYPB_SUBMIT);
+			$my_page->setFormButtonProperties("annul", BUTP_PROCHAIN_ECRAN, "Era-1");
+			$my_page->setFormButtonProperties("annul", BUTP_CHECK_FORM, false);
+		} else {
+			// Aucun chèquier ne doit être imprimé
+			$my_page = new HTML_message(_("Aucun chèquier"));
+			$my_page->setMessage(_("Aucun chèquier ne doit être imprimé ni confirmé."), true);
+			$my_page->addButton("BUTTON_OK", 'Gen-13');
+		}
+	} else {
+		// Erreur d'exécution
+		$my_page = new HTML_erreur(_("Echec lors de la visualisation des chèquiers à imprimer ou confirmer."));
+		$my_page->setMessage(_("Erreur : ") . $error[$result->errCode] . "<br />"._("Paramètre : ") . $result->param);
+		$my_page->addButton("BUTTON_OK", 'Era-1');
+	}
+	$my_page->show();
+}
+/*}}}*/
+
+/*{{{ Era-23 : Export pour impression chèquiers */
+else
+if ($global_nom_ecran == 'Era-23') {
+	// Récupérer les identifiants des compte pours lesquels ont doit imprimer un chèquier
+	$tous_commande_chequiers = $SESSION_VARS['liste_chequiers'];
+	debug($tous_commande_chequiers);
+	$chequiers_print = array ();
+	foreach ($tous_commande_chequiers as $id_comde_chequier => $comde_chequier) {
+		$var = "check_" . $id_comde_chequier;
+		if (isset ($$var)) {
+		$chequiers_print[$id_comde_chequier] = $comde_chequier;
+		}
+	}
+	debug($chequiers_print);
+	if (count($chequiers_print) > 0) {
+		// Nous avons des chèquiers à imprimer
+		$result = csvChequiers($chequiers_print);
+		$datacsv = $result->param;
+		$result = setAttenteImpressionChequier(array_keys($chequiers_print));
+		if ($result->errCode == NO_ERR) {
+			$result = doWriteCSV($datacsv);
+			if ($result->errCode == NO_ERR) {
+				echo getShowCSVHTML("Era-1", $result->param);
+				ajout_historique(430, NULL, NULL, $global_nom_login, date("r"), NULL);
+			}
+		}
+		if ($result->errCode != NO_ERR) {
+			$my_page = new HTML_erreur(_("Echec lors de l'export des chèquiers"));
+			$my_page->setMessage(_("Erreur : ") . $error[$result->errCode] . "<br />"._("Paramètre : ") . $result->param);
+			$my_page->addButton("BUTTON_OK", 'Gen-13');
+			$my_page->show();
+		}
+	} else {
+		// Aucun chèquier ne doit être imprimé
+		$my_page = new HTML_message(_("Aucun chèquier"));
+		$my_page->setMessage(_("Aucun chèquier n'a été choisi pour l'impression."), true);
+		$my_page->addButton("BUTTON_OK", 'Gen-13');
+		$my_page->show();
+	}
+}
+/*}}}*/
+
+/*{{{ Era-25 : Enregistrement de la bonne impression des chèquiers */
+else
+if ($global_nom_ecran == 'Era-25') {
+	// Récupérer les identifiants des compte pours lesquels ont doit confirmer l'impression d'un chèquier
+	$tous_chequiers = split(" ", $liste_chequiers);
+	$chequiers_confirm = array ();
+	foreach ($tous_chequiers as $id => $id_chequier) {
+		$var = "check_" . $id_chequier;
+		if (isset ($$var))
+		array_push($chequiers_confirm, $id_chequier);
+	}
+	if (count($chequiers_confirm) > 0) {
+		// Nous avons des chèquiers à confirmer
+		$result = setChequiersPrinted($chequiers_confirm);
+		if ($result->errCode == NO_ERR) {
+			$my_page = new HTML_message(_("Chèquiers disponibles"));
+			$my_page->setMessage(_("Les chèquiers que vous venez de confirmer sont maintenant disponibles pour les clients."));
+		} else {
+			$my_page = new HTML_erreur(_("Echec lors de la confirmation de l'impression"));debug($result->param);
+			$my_page->setMessage(_("Erreur : ") . $error[$result->errCode] . "<br />"._("Paramètre : ") . print_r($result->param));
+		}
+	} else {
+		// Aucun chèquier ne doit être confirmé
+		$my_page = new HTML_message(_("Aucun chèquier"));
+		$my_page->setMessage(_("Aucun chèquier n'a été choisi pour la confirmation de l'impression."), true);
+	}
+	$my_page->addButton("BUTTON_OK", 'Gen-13');
+	$my_page->show();
+}
+/*}}}*/
+ 	
+ 	/*{{{ Era-35 : Liste des frais en attente : choix des critères */
+ 	else
+ 	    if ($global_nom_ecran == "Era-35") {
+
+ 	        $html = new HTML_GEN2(_("Sélection des critères"));
+
+ 	        if (isSiege()) {
+ 	            //Agence- Tri par agence
+ 	            resetGlobalIdAgence();
+ 	            $html->addField("agence", _("Agence"), TYPC_LSB);
+ 	            $html->setFieldProperties("agence", FIELDP_IS_REQUIRED, true);
+ 	            unset ($liste_agences[$global_id_agence]);
+ 	            $html->setFieldProperties("agence", FIELDP_ADD_CHOICES, $liste_agences);
+ 	        }
+ 	        //choix client
+ 	        $html->addField("client", _("Client"), TYPC_INT);
+ 	        $html->addLink("client", "rechercher", _("Rechercher"), "#");
+ 	        $html->setLinkProperties("rechercher", LINKP_JS_EVENT, array (
+ 	            "onclick" => "OpenBrw('../modules/clients/rech_client.php?m_agc=".$_REQUEST['m_agc']."&field_name=client', '"._("Recherche")."');"
+ 	        ));
+ 	        //$html->setFieldProperties("client", FIELDP_IS_REQUIRED, true);
+
+ 	        //date de mise en attente
+ 	        $html->addField("date_frais", _("Date de mise en attente :"), TYPC_DTE);
+ 	        $html->setFieldProperties("date_frais", FIELDP_IS_REQUIRED, false);
+ 	        $html->setFieldProperties("date_frais", FIELDP_DEFAULT, date("d/m/Y", mktime(0, 0, 0, 1, 1, date("Y"))));
+
+ 	        //fonction de mise en attente
+ 	        $schemas = getOperations();
+ 	        foreach ($schemas->param as $key => $value){
+ 	        	$trad_ope = new Trad($value['libel_ope']);
+ 	        	$liste_operations[$value['type_operation']] = $trad_ope->traduction();
+ 	        }
+ 	        $html->addField("type_ope", _("Type opération"), TYPC_LSB);
+ 	        $html->setFieldProperties("type_ope", FIELDP_ADD_CHOICES, $liste_operations);
+ 	        $html->setFieldProperties("type_ope", FIELDP_HAS_CHOICE_TOUS, true);
+ 	        $html->setFieldProperties("type_ope", FIELDP_HAS_CHOICE_AUCUN, false);
+ 	        $html->setFieldProperties("type_ope", FIELDP_IS_REQUIRED, false);
+
+ 	        //émission en format pdf
+ 	        $html->addFormButton(1, 1, "pdf", _("Rapport PDF"), TYPB_SUBMIT);
+ 	        $html->setFormButtonProperties("pdf", BUTP_PROCHAIN_ECRAN, "Era-36");
+
+ 	        //émission en format csv/excel
+					$html->addFormButton(1, 2, "excel", _("Export EXCEL"), TYPB_SUBMIT);
+					$html->setFormButtonProperties("excel", BUTP_PROCHAIN_ECRAN, "Era-37");
+ 	        $html->addFormButton(1, 3, "csv", _("Export CSV"), TYPB_SUBMIT);
+ 	        $html->setFormButtonProperties("csv", BUTP_PROCHAIN_ECRAN, "Era-37");
+
+ 	        $html->addFormButton(1, 4, "retour", _("Précédent"), TYPB_SUBMIT);
+ 	        $html->setFormButtonProperties("retour", BUTP_PROCHAIN_ECRAN, 'Era-1');
+ 	        $html->setFormButtonProperties("retour", BUTP_CHECK_FORM, false);
+ 	        $html->addFormButton(1, 5, "annuler", _("Annuler"), TYPB_SUBMIT);
+ 	        $html->setFormButtonProperties("annuler", BUTP_PROCHAIN_ECRAN, "Gen-13");
+ 	        $html->setFormButtonProperties("annuler", BUTP_CHECK_FORM, false);
+
+ 	        //HTML
+ 	        $html->buildHTML();
+ 	        echo $html->getHTML();
+ 	    }
+ 	/*}}}*/
+
+ 	/*{{{ Era-36 et Era-37 : Liste des frais en attente : impression pdf ou export CSV */
+ 	else
+ 	    if ($global_nom_ecran == "Era-36" || $global_nom_ecran == "Era-37") {
+ 	        if (isSiege()) {
+ 	            setGlobalIdAgence($agence);
+ 	        }
+ 	        // récupération des frais en attente
+ 	        if ($client == '')
+ 	            $client = NULL;
+ 	        if ($date_frais == '')
+ 	            $date_frais = NULL;
+ 	        if ($type_ope == 0)
+ 	            $type_ope = NULL;
+ 	        $result = getFraisAttente(NULL, $client, $type_ope, $date_frais);
+ 	        if ($result->errCode != NO_ERR) {
+ 	            $my_page = new HTML_erreur(_("Echec lors de la confirmation de l'impression"));
+ 	            $my_page->setMessage(_("Erreur : ") . $error[$result->errCode] . "<br />"._("Paramètre : ") . $result->param);
+ 	            $my_page->buildHTML();
+ 	            echo $my_page->HTML_code;
+ 	        } else {
+ 	            $liste_frais_attente = $result->param;
+
+ 	            //pour que le rapport soit dans la même langue
+ 	            basculer_langue_rpt();
+ 	            $list_criteres = array ();
+ 	            if($client != NULL)
+ 	            $list_criteres = array_merge($list_criteres, array (_("ID client") => makeNumClient($client)));
+ 	            if($date_frais != NULL)
+    	            $list_criteres = array_merge($list_criteres, array (_("Date mise en attente") => $date_frais));
+ 	            if($type_ope == NULL)
+ 	              $list_criteres = array_merge($list_criteres, array (_("Type opération") => "Tous"));
+ 	            else
+ 	                $list_criteres = array_merge($list_criteres, array (_("Type opération") => $type_ope));
+	            reset_langue();
+
+ 	            //Génération du code XML
+ 	            $xml = xml_frais_attente($liste_frais_attente, $list_criteres);
+ 	           if ($global_nom_ecran == "Era-37") {
+ 	                //Génération du CSV grâce à XALAN
+ 	                $csv_file = xml_2_csv($xml, 'frais_attente.xslt');
+
+ 	                //Message de confirmation + affichage du rapport dans une nouvelle fenêtre
+							 		if (isset($excel) && $excel == 'Export EXCEL'){
+										echo getShowEXCELHTML("Gen-13", $csv_file);
+									}
+								  else{
+										echo getShowCSVHTML("Gen-13", $csv_file);
+								  }
+ 	            } else
+ 	                if ($global_nom_ecran == "Era-36") {
+ 	                    //Génération du XSL-FO (grâce au XSLT) et du PDF (grâce à FOP)
+ 	                    $fichier_pdf = xml_2_xslfo_2_pdf($xml, 'frais_attente.xslt');
+
+ 	                    //Message de confirmation + affichage du rapport dans une nouvelle fenêtre
+ 	                    echo get_show_pdf_html("Gen-13", $fichier_pdf);
+ 	                }
+ 	        }
+ 	    }
+ 	/*}}}*/
+ 	/*{{{ Era-40 : CER - Personnalisation du rapport comptes d'epargne repris' */
+ 	else
+ 	    if ($global_nom_ecran == 'Era-40') {
+ 	        $html = new HTML_GEN2(_("Personnalisation du rapport"));
+ 	        //Remettre $global_id_agence à l'identifiant de l'agence courante
+ 	        resetGlobalIdAgence();
+ 	        //Agence- Tri par agence
+ 	        $list_agence = getAllIdNomAgence();
+ 	        if (isSiege()) {
+ 	            unset ($list_agence[$global_id_agence]);
+ 	            $html->addField("agence", _("Agence"), TYPC_LSB);
+ 	            $html->setFieldProperties("agence", FIELDP_ADD_CHOICES, $list_agence);
+ 	            $html->setFieldProperties("agence", FIELDP_HAS_CHOICE_AUCUN, true);
+ 	            $html->setFieldProperties("agence", FIELDP_IS_REQUIRED, true);
+ 	        }
+
+ 	        $html->addField("date_deb", _("Date de début"), TYPC_DTE);
+ 	        $html->setFieldProperties("date_deb", FIELDP_DEFAULT, date("01/01/Y"));
+ 	        $html->setFieldProperties("date_deb", FIELDP_IS_REQUIRED, true);
+
+ 	        $html->addField("date_fin", _("Date de fin"), TYPC_DTE);
+ 	        $html->setFieldProperties("date_fin", FIELDP_DEFAULT, date("d/m/Y"));
+ 	        $html->setFieldProperties("date_fin", FIELDP_IS_REQUIRED, true);
+
+ 	        $html->addFormButton(1, 1, "valider", _("Rapport PDF"), TYPB_SUBMIT);
+ 	        $html->setFormButtonProperties("valider", BUTP_PROCHAIN_ECRAN, "Era-41");
+					$html->addFormButton(1, 2, "excel", _("Export EXCEL"), TYPB_SUBMIT);
+					$html->setFormButtonProperties("excel", BUTP_PROCHAIN_ECRAN, "Era-42");
+ 	        $html->addFormButton(1, 3, "csv", _("Export CSV"), TYPB_SUBMIT);
+ 	        $html->setFormButtonProperties("csv", BUTP_PROCHAIN_ECRAN, "Era-42");
+
+ 	        $html->addFormButton(1, 4, "annuler", _("Annuler"), TYPB_SUBMIT);
+ 	        $html->setFormButtonProperties("annuler", BUTP_PROCHAIN_ECRAN, "Gen-13");
+ 	        $html->setFormButtonProperties("annuler", BUTP_CHECK_FORM, false);
+ 	        $html->buildHTML();
+ 	        echo $html->getHTML();
+
+ 	    }
+ 	/*{{{ Era-41 : CER - Impression ou export csv comptes d'epargne repris' */
+ 	else
+ 	    if ($global_nom_ecran == 'Era-41' || $global_nom_ecran == 'Era-42') {
+ 	        if (isSiege()) {
+ 	            setGlobalIdAgence($agence);
+
+ 	        }
+ 	        $myErr = getComptesEpargneRepris($date_deb, $date_fin);
+ 	        $list_criteres = array (_("Date du ") => $date_deb, _("Au ") => $date_fin
+ 	        );
+ 	        if ($global_nom_ecran == 'Era-41') {
+ 	            $xml = xml_comptes_epargne_repris($myErr->param, $list_criteres, false);
+ 	            $fichier_pdf = xml_2_xslfo_2_pdf($xml, 'comptes_epargne_repris.xslt');
+ 	            //Message de confirmation + affichage du rapport dans une nouvelle fenêtre
+ 	            echo get_show_pdf_html("Gen-13", $fichier_pdf);
+
+ 	        }
+ 	        elseif ($global_nom_ecran == 'Era-42') {
+ 	            //Génération du fichier CSV
+ 	            $xml = xml_comptes_epargne_repris($myErr->param, $list_criteres, true);
+ 	            $csv_file = xml_2_csv($xml, 'comptes_epargne_repris.xslt');
+
+ 	            //Message de confirmation + affichage du rapport dans une nouvelle fenêtre
+							if (isset($excel) && $excel == 'Export EXCEL'){
+								echo getShowEXCELHTML("Gen-13", $csv_file);
+							}
+							else{
+ 	            	echo getShowCSVHTML("Gen-13", $csv_file);
+							}
+
+ 	        }
+
+ 	    }
+ 	/*{{{ Era-43 : LEP - Rapport liste des épargnes */
+ 	else
+ 	    if ($global_nom_ecran == 'Era-43') {
+ 	    global $global_multidevise;
+
+	if ($global_nom_ecran_prec == "Era-1"){
+		//FIXME : fusion sans les modifs multi-devise : à réintroduire
+    unset($SESSION_VARS['list_choix_ep']);
+    unset($SESSION_VARS['type_epargne']);
+    unset($SESSION_VARS['date_rapport']);
+    unset($SESSION_VARS['agence']);
+    unset($SESSION_VARS['critere_ep']);
+		unset($SESSION_VARS['sequence']);
+		unset($SESSION_VARS['nombre_lignes']);
+		unset($SESSION_VARS['nbre_ligne_rapport']);
+		unset($SESSION_VARS['nbre_rapport']);
+
+        $html = "<script src=\"/lib/misc/js/lib/jquery.min.js\" type=\"text/javascript\"></script>";
+		$myForm = new HTML_GEN2(_("Sélection critères"));
+        $myForm->addHTMLExtraCode("html", $html);
+
+		//Remettre $global_id_agence à l'identifiant de l'agence courante
+		resetGlobalIdAgence();
+		//Agence- Tri par agence
+		$list_agence = getAllIdNomAgence();
+		//$list_agence['-1']="SIEGE";
+		if (isSiege()) {
+			unset ($list_agence[$global_id_agence]);
+			$myForm->addField("agence", _("Agence"), TYPC_LSB);
+			$myForm->setFieldProperties("agence", FIELDP_ADD_CHOICES, $list_agence);
+			$myForm->setFieldProperties("agence", FIELDP_HAS_CHOICE_AUCUN, false);
+			$myForm->setFieldProperties("agence", FIELDP_HAS_CHOICE_TOUS, true);
+		}
+		$myForm->addField("date_rapport", _("Date "), TYPC_DTE);
+		$myForm->setFieldProperties("date_rapport", FIELDP_DEFAULT, date("d/m/Y"));
+		$myForm->setFieldProperties("date_rapport", FIELDP_IS_REQUIRED, true);
+
+        //AT-222
+        $zone_dataset = getZone();
+        $normalized_dataset = array();
+
+        foreach($zone_dataset as $key => $value)
+            $normalized_dataset[$value["id"]] = $value["libelle_zone"];
+
+        $myForm->addField("zone", _("Zone"), TYPC_LSB);
+        $myForm->setFieldProperties("zone", FIELDP_IS_REQUIRED, false);
+        $myForm->setFieldProperties("zone", FIELDP_ADD_CHOICES, $normalized_dataset);
+        $myForm->setFieldProperties("zone", FIELDP_HAS_CHOICE_AUCUN, true);
+        $myForm->setFieldProperties("zone", FIELDP_HAS_CHOICE_TOUS, true);
+
+		$SESSION_VARS['agence'] = $agence;
+		// Champs Produit d'epargne
+		$prod_epargnes = getListProdEpargne();
+//		$choix_ep = array();
+//		foreach($prod_epargnes as $key => $value){
+//			$choix_ep[$value["id"]] = $value["libel"];
+//		}
+		$choix_ep = "";
+		foreach($prod_epargnes as $key => $value){
+			if($choix_ep != "") {
+				$choix_ep .= "|";
+			}
+			$choix_ep .= $value["classe_comptable"] . "#" . $value["id"] . "#" . $value["libel"];
+		}
+
+		$SESSION_VARS["list_choix_ep"] = $choix_ep;
+
+		$choix_classes_comptables = array (
+			1 => adb_gettext($adsys["adsys_type_cpte_comptable"][1]),
+			2 => adb_gettext($adsys["adsys_type_cpte_comptable"][2]),
+			5 => adb_gettext($adsys["adsys_type_cpte_comptable"][5]),
+			6 => adb_gettext($adsys["adsys_type_cpte_comptable"][6])
+		);
+
+		$myForm->addField("type_epargne", _("Type d'épargne"), TYPC_LSB);
+		$myForm->setFieldProperties("type_epargne", FIELDP_IS_REQUIRED, false);
+		$myForm->setFieldProperties("type_epargne", FIELDP_ADD_CHOICES, $choix_classes_comptables);
+		$myForm->setFieldProperties("type_epargne", FIELDP_HAS_CHOICE_TOUS, true);
+		$myForm->setFieldProperties("type_epargne", FIELDP_HAS_CHOICE_AUCUN, false);
+		$myForm->setFieldProperties("type_epargne", FIELDP_JS_EVENT, array ( "onchange" => "getProduitsEpargnesByType(this,document.getElementsByName('HTML_GEN_LSB_critere_ep')[0]);" ) );
+
+		$JS = "\n function createOption(dropdown, text, value) {
+					var opt = document.createElement('option');
+					opt.value = value;
+					opt.text = text;
+					dropdown.options.add(opt);
+				  }
+
+				function getProduitsEpargnesByType(type_epargne, produit_epargne)
+					{
+						var s_produit_epargne = '".addslashes($choix_ep)."';
+
+						var arr_produit_epargne = s_produit_epargne.split('|');
+
+						var array_1 = [];
+						var array_2 = [];
+						var array_5 = [];
+						var array_6 = [];
+
+						for(var i=0; i < arr_produit_epargne.length; i++) {
+							var item = (arr_produit_epargne[i]).split('#');
+							if(item[0] == 1) {
+								array_1[item[1]] = item[2];
+							} else if(item[0] == 2) {
+								array_2[item[1]] = item[2];
+							} else if(item[0] == 5) {
+								array_5[item[1]] = item[2];
+							} else if(item[0] == 6) {
+								array_6[item[1]] = item[2];
+							}
+						}
+
+						switch (type_epargne.value) {
+							case '1':
+								produit_epargne.options.length = 0;
+								createOption(produit_epargne, '[Tous]', 0);
+								for (var key in array_1) {
+									createOption(produit_epargne, array_1[key], key);
+								}
+								break;
+							case '2':
+								produit_epargne.options.length = 0;
+								createOption(produit_epargne, '[Tous]', 0);
+								for (var key in array_2) {
+									createOption(produit_epargne, array_2[key], key);
+								}
+								break;
+							case '5':
+								produit_epargne.options.length = 0;
+								createOption(produit_epargne, '[Tous]', 0);
+								for (var key in array_5) {
+									createOption(produit_epargne, array_5[key], key);
+								}
+								break;
+							case '6':
+								produit_epargne.options.length = 0;
+								if(array_6.length == 0) {
+									createOption(produit_epargne, '[Tous]', 0);
+								} else {
+									for (var key in array_6) {
+										createOption(produit_epargne, array_6[key], key);
+									}
+								}
+								break;
+							default:
+								produit_epargne.options.length = 0;
+								createOption(produit_epargne, '[Tous]', 0);
+								break;
+						}
+					}
+					
+					$('[name = HTML_GEN_LSB_zone] option:selected').prop('selected', false);
+					$('[name = HTML_GEN_LSB_zone] option').each(function(index, node){
+						if($(node).text() == '[Aucun]'){
+							//value of this option is overwitten to due to a deeply nested bug
+							$(node).attr('value', -1);
+							$(node).prop('selected', true);
+						}
+					});
+					";
+		$myForm->addJS(JSP_FORM,"js0",$JS);
+		$myForm->addField("critere_ep", _("Produit d'épargne"), TYPC_LSB);
+		if( $global_multidevise ) {
+			$myForm->setFieldProperties("critere_ep", FIELDP_HAS_CHOICE_TOUS, true);
+			$myForm->setFieldProperties("critere_ep", FIELDP_HAS_CHOICE_AUCUN, false);
+			$myForm->setFieldProperties("critere_ep", FIELDP_IS_REQUIRED, false);
+
+		} else {
+			$myForm->setFieldProperties("critere_ep", FIELDP_HAS_CHOICE_TOUS, true);
+			$myForm->setFieldProperties("critere_ep", FIELDP_HAS_CHOICE_AUCUN, false);
+		}
+
+//		$myForm->setFieldProperties("critere_ep", FIELDP_ADD_CHOICES, $choix_ep);
+		$SESSION_VARS['critere_ep'] = $critere_ep;
+			
+		$myForm->addField("limite", _("Limite "), TYPC_INT);
+		$myForm->setFieldProperties("limite", FIELDP_DEFAULT,5000);
+		//$myForm->setFieldProperties("limite", FIELDP_IS_REQUIRED, true);
+
+		$myForm->addFormButton(1, 1, "valider", _("Rapport PDF"), TYPB_SUBMIT);
+		$myForm->setFormButtonProperties("valider", BUTP_PROCHAIN_ECRAN, "Era-44");
+		$myForm->addFormButton(1, 2, "excel", _("Export EXCEL"), TYPB_SUBMIT);
+		$myForm->setFormButtonProperties("excel", BUTP_PROCHAIN_ECRAN, "Era-45");
+		$myForm->addFormButton(1, 3, "csv", _("Export CSV"), TYPB_SUBMIT);
+		$myForm->setFormButtonProperties("csv", BUTP_PROCHAIN_ECRAN, "Era-45");
+		$myForm->addFormButton(1, 4, "annuler", _("Annuler"), TYPB_SUBMIT);
+		$myForm->setFormButtonProperties("annuler", BUTP_PROCHAIN_ECRAN, "Gen-13");
+		$myForm->setFormButtonProperties("annuler", BUTP_CHECK_FORM, false);
+		$myForm->buildHTML();
+		echo $myForm->getHTML();
+	} else { 
+	//FIXME : fusion sans les modifs multi-devise : à réintroduire
+	$myForm = new HTML_GEN2(_("Rapport suivant"));
+	//Remettre $global_id_agence à l'identifiant de l'agence courante
+	resetGlobalIdAgence();
+	//Agence- Tri par agence
+	$list_agence = getAllIdNomAgence();
+	//$list_agence['-1']="SIEGE";
+	if (isSiege()) {
+		unset ($list_agence[$global_id_agence]);
+		$myForm->addField("agence", _("Agence"), TYPC_LSB);
+		$myForm->setFieldProperties("agence", FIELDP_ADD_CHOICES, $list_agence);
+		$myForm->setFieldProperties("agence", FIELDP_HAS_CHOICE_AUCUN, false);
+		$myForm->setFieldProperties("agence", FIELDP_HAS_CHOICE_TOUS, true);
+	}
+
+	$myForm->addFormButton(1, 1, "valider", _("Rapport PDF Suivant"), TYPB_SUBMIT);
+	$myForm->setFormButtonProperties("valider", BUTP_PROCHAIN_ECRAN, "Era-44");
+	$myForm->addFormButton(1, 2, "excel", _("Export EXCEL suivant"), TYPB_SUBMIT);
+	$myForm->setFormButtonProperties("excel", BUTP_PROCHAIN_ECRAN, "Era-45");
+	$myForm->addFormButton(1, 3, "csv", _("Export CSV suivant"), TYPB_SUBMIT);
+	$myForm->setFormButtonProperties("csv", BUTP_PROCHAIN_ECRAN, "Era-45");
+	$myForm->addFormButton(1, 4, "annuler", _("Annuler"), TYPB_SUBMIT);
+	$myForm->setFormButtonProperties("annuler", BUTP_PROCHAIN_ECRAN, "Gen-13");
+	$myForm->setFormButtonProperties("annuler", BUTP_CHECK_FORM, false);
+	$myForm->buildHTML();
+	echo $myForm->getHTML();
+	}
+
+	}
+ 	/*}}}*/
+ 	/*{{{ Era-44 et Era-45 Rapport liste des épargnes : impression ou export csv*/
+ 	else
+ 	    if ($global_nom_ecran == 'Era-44' || $global_nom_ecran == 'Era-45') {
+ 	    if (isSiege()) {
+		if ($agence != '') {
+
+			$list_agence[$agence] = $agence; //Sélection d'une agence au siège
+		} else {
+			$list_agence = getAllIdNomAgence();
+			unset ($list_agence[$global_id_agence]); //Pas d'impression au siège
+		}
+	} else {
+		$list_agence[$global_id_agence] = $global_id_agence; //Dans une agence
+	}
+
+	if(!isset($SESSION_VARS['date_rapport'])) {
+		$SESSION_VARS['date_rapport'] = $date_rapport;
+	}
+	//on recupère l'id_prod sélectionné
+	if(!isset($SESSION_VARS['critere_ep'])){
+		$SESSION_VARS['critere_ep'] = $critere_ep;
+	}
+
+	//Ticket #651
+	if(!isset($SESSION_VARS['type_epargne'])){
+		$SESSION_VARS['type_epargne'] = $type_epargne;
+	}
+
+	if(!isset($SESSION_VARS['zone'])){
+		$SESSION_VARS['zone'] = $zone;
+	}
+
+            //Recupération du nombre de lignes générés par la requête
+	if( !isset($SESSION_VARS['nombre_lignes'])) {
+		$SESSION_VARS['nombre_lignes'] = getNbreComptesEpargne($SESSION_VARS['critere_ep'], $SESSION_VARS['type_epargne'],$date_rapport);
+	}
+	
+	// Récupérer le nombre d'enregistrement par rapport
+	if(!isset($SESSION_VARS['nbre_ligne_rapport'])){
+		if(intval($limite)>0) {
+			$SESSION_VARS['nbre_ligne_rapport'] = $limite;
+		} else {
+			$SESSION_VARS['nbre_ligne_rapport'] = $SESSION_VARS['nombre_lignes'];
+		}
+	}
+
+
+	if(!isset($SESSION_VARS['nbre_rapport'])){
+		$SESSION_VARS['nbre_rapport'] = ceil($SESSION_VARS['nombre_lignes']/$SESSION_VARS['nbre_ligne_rapport']);
+	}
+
+
+
+	$SESSION_VARS['sequence'] =intval($SESSION_VARS['sequence']) +1 ;
+
+	//$nbre_rapport =ceil ($SESSION_VARS['nombre_ligne']/$limit);
+	$offset = ($SESSION_VARS['sequence']-1)* intval($SESSION_VARS['nbre_ligne_rapport']);
+	//Formation du tableau contenant les données à afficher
+	$tranche_data = get_data_liste_epargne($list_agence, $SESSION_VARS['critere_ep'], $SESSION_VARS['type_epargne'], $SESSION_VARS['nbre_ligne_rapport'],$offset,$SESSION_VARS['date_rapport'], $SESSION_VARS['zone']);
+	//On recupère le nombre de lignes générées par la requête pour la condition d'arret
+	//$xml = xml_liste_epargne($tranche_data, $SESSION_VARS['critere_ep'],FALSE,$SESSION_VARS['date_rapport']);
+
+	$arreter = ($SESSION_VARS['sequence'] >=$SESSION_VARS['nbre_rapport']);
+	if ($global_nom_ecran == 'Era-44') {
+		//Génération du XSL-FO (grâce au XSLT) et du PDF (grâce à FOP)
+		if(!empty($SESSION_VARS['zone'])){
+            $xml = xml_liste_epargne($tranche_data, $SESSION_VARS['critere_ep'],FALSE,$SESSION_VARS['date_rapport']);
+            $fichier_pdf = xml_2_xslfo_2_pdf($xml, "liste_epargne.xslt");
+		}else{
+            $xml = xml_liste_epargne_zone($tranche_data, $SESSION_VARS['critere_ep'],FALSE,$SESSION_VARS['date_rapport']);
+            $fichier_pdf = xml_2_xslfo_2_pdf($xml, "liste_epargne_zone.xslt");
+		}
+
+		if ($arreter){
+			echo get_show_pdf_html("Gen-13", $fichier_pdf);
+		} else {
+			echo get_show_pdf_html("Era-43", $fichier_pdf);
+				
+		}
+	} else if ($global_nom_ecran == 'Era-45') {
+		//Génération du csv grâce à XALAN
+		//				$xml = xml_liste_epargne($tranche_data, true);
+            
+                // CSV fix Remove <num_compte> & <solde_compte> - Ticket #287
+        if(!empty($SESSION_VARS['zone'])) {
+            $xml = xml_liste_epargne($tranche_data, $SESSION_VARS['critere_ep'], TRUE, $SESSION_VARS['date_rapport']);
+            $new_xml = str_replace("<compte_numeros>", "", $xml);
+            $new_xml = str_replace("</compte_numeros>", "", $new_xml);
+            $new_xml = str_replace("<compte_soldes>", "", $new_xml);
+            $new_xml = str_replace("</compte_soldes>", "", $new_xml);
+
+            $csv_file = xml_2_csv($new_xml, "liste_epargne_csv.xslt");
+        }else{
+            $xml = xml_liste_epargne_zone($tranche_data, $SESSION_VARS['critere_ep'], TRUE, $SESSION_VARS['date_rapport']);
+            $new_xml = str_replace("<compte_numeros>", "", $xml);
+            $new_xml = str_replace("</compte_numeros>", "", $new_xml);
+            $new_xml = str_replace("<compte_soldes>", "", $new_xml);
+            $new_xml = str_replace("</compte_soldes>", "", $new_xml);
+
+            $csv_file = xml_2_csv($new_xml, "liste_epargne_csv_zone.xslt");
+		}
+//		if ($arreter){
+			if (isset($excel) && ($excel == 'Export EXCEL'||$excel == 'Export EXCEL suivant')){
+				echo getShowEXCELHTML("Gen-13", $csv_file);
+			}
+		  else{
+			  echo getShowCSVHTML("Gen-13", $csv_file);
+		  }
+//		} else {
+//			echo get_show_pdf_html("Era-43", $fichier_pdf);
+//		}
+	}
+	ajout_historique(330, NULL, NULL, $global_nom_login, date("r"), NULL);
+
+}
+ 	/*}}}*/
+ 	/*{{{ Era-46 : Personnalisation rapport Liste des dépôts initiaux à l'ouverture de comptes d'épargne */
+ 	else
+ 	    if ($global_nom_ecran == 'Era-46') {
+
+ 	        $htmlForm = new HTML_GEN2(_("Personnalisation du rapport"));
+ 	        //Remettre $global_id_agence à l'identifiant de l'agence courante
+ 	        resetGlobalIdAgence();
+ 	        //Agence- Tri par agence
+ 	        $list_agence = getAllIdNomAgence();
+ 	        if (isSiege()) {
+ 	            unset ($list_agence[$global_id_agence]);
+ 	            $htmlForm->addField("agence", _("Agence"), TYPC_LSB);
+ 	            $htmlForm->setFieldProperties("agence", FIELDP_ADD_CHOICES, $list_agence);
+ 	            $htmlForm->setFieldProperties("agence", FIELDP_HAS_CHOICE_AUCUN, true);
+ 	            $htmlForm->setFieldProperties("agence", FIELDP_IS_REQUIRED, true);
+ 	        }
+
+ 	        $htmlForm->addField("date", _("Date édition"), TYPC_DTE);
+ 	        $htmlForm->setFieldProperties("date", FIELDP_DEFAULT, date("d/m/Y"));
+ 	        $htmlForm->setFieldProperties("date", FIELDP_IS_REQUIRED, true);
+
+ 	        $htmlForm->addFormButton(1, 1, "valider", _("Rapport PDF"), TYPB_SUBMIT);
+ 	        $htmlForm->setFormButtonProperties("valider", BUTP_PROCHAIN_ECRAN, "Era-47");
+					$htmlForm->addFormButton(1, 2, "excel", _("Export EXCEL"), TYPB_SUBMIT);
+					$htmlForm->setFormButtonProperties("excel", BUTP_PROCHAIN_ECRAN, "Era-48");
+ 	        $htmlForm->addFormButton(1, 3, "csv", _("Export CSV"), TYPB_SUBMIT);
+ 	        $htmlForm->setFormButtonProperties("csv", BUTP_PROCHAIN_ECRAN, "Era-48");
+ 	        $htmlForm->addFormButton(1, 4, "annuler", _("Annuler"), TYPB_SUBMIT);
+ 	        $htmlForm->setFormButtonProperties("annuler", BUTP_PROCHAIN_ECRAN, "Gen-13");
+
+ 	        //HTML
+ 	        $htmlForm->buildHTML();
+ 	        echo $htmlForm->getHTML();
+ 	    }
+ 	/*}}}*/
+
+ 	/*{{{ Era-47 ou Era-48: CER - Impression ou export csv des dépôts initiaux sur comptes d'épargne à l'ouverture */
+ 	else
+ 	    if ($global_nom_ecran == 'Era-47' || $global_nom_ecran == 'Era-48') {
+ 	        if (isSiege()) {
+ 	            if ($agence != '') {
+
+ 	                $list_agence[$agence] = $agence; //Sélection d'une agence au siège
+ 	            } else {
+ 	                $list_agence = getAllIdNomAgence();
+ 	                unset ($list_agence[$global_id_agence]); //Pas d'impression au siège
+ 	            }
+ 	        } else
+ 	            $list_agence[$global_id_agence] = $global_id_agence; //Dans une agence
+
+ 	      $critere = array (_("Date édition ") => $date);
+
+ 	        //recupération des données à afficher
+ 	        $DATA = getInfosTransactionFonction(53, $date, $list_agence);
+
+ 	        if ($global_nom_ecran == 'Era-47') {
+ 	            //Génération du XSL-FO (grâce au XSLT) et du PDF (grâce à FOP)
+ 	            $xml = xml_liste_depots_initiaux($DATA, $critere);
+ 	            //Génération du fichier pdf
+ 	            $fichier_pdf = xml_2_xslfo_2_pdf($xml, "liste_depots_initiaux.xslt");
+
+ 	            //Message de confirmation + affichage du rapport dans une nouvelle fenêtre
+ 	            echo get_show_pdf_html("Gen-13", $fichier_pdf);
+ 	        } else
+ 	            if ($global_nom_ecran == 'Era-48') {
+ 	                //Génération du csv grâce à XALAN
+ 	                $xml = xml_liste_depots_initiaux($DATA, $critere);
+ 	                $csv_file = xml_2_csv($xml, "liste_depots_initiaux.xslt");
+
+ 	                //Message de confirmation + affichage du rapport dans une nouvelle fenêtre
+									if (isset($excel) && $excel == 'Export EXCEL'){
+										echo getShowEXCELHTML("Gen-13", $csv_file);
+									}
+									else{
+										echo getShowCSVHTML("Gen-13", $csv_file);
+									}
+ 	            }
+
+ 	        ajout_historique(330, NULL, NULL, $global_nom_login, date("r"), NULL);
+
+
+ 	    }
+ 	/*}}}*/
+ 	/*{{{ Era-49 : Personnalisation rapport Extrait de comptes pour Netbank */
+ 	else
+ 	    if ($global_nom_ecran == 'Era-49') {
+ 	        $htmlForm = new HTML_GEN2(_("Personnalisation du rapport"));
+ 	        //Remettre $global_id_agence à l'identifiant de l'agence courante
+ 	        resetGlobalIdAgence();
+ 	        //Agence- Tri par agence
+ 	        $list_agence = getAllIdNomAgence();
+ 	        if (isSiege()) {
+ 	            unset ($list_agence[$global_id_agence]);
+ 	            $htmlForm->addField("agence", _("Agence"), TYPC_LSB);
+ 	            $htmlForm->setFieldProperties("agence", FIELDP_ADD_CHOICES, $list_agence);
+ 	            $htmlForm->setFieldProperties("agence", FIELDP_HAS_CHOICE_AUCUN, true);
+ 	            $htmlForm->setFieldProperties("agence", FIELDP_IS_REQUIRED, true);
+ 	        }
+
+ 	        $htmlForm->addField("date_debut", _("Date de début :"), TYPC_DTE);
+ 	        $htmlForm->setFieldProperties("date_debut", FIELDP_IS_REQUIRED, false);
+ 	        $htmlForm->setFieldProperties("date_debut", FIELDP_DEFAULT, date("d/m/Y", mktime(0,0,0,1,1,date("Y"))));
+
+ 	        $htmlForm->addField("date_fin", _("Date de fin :"), TYPC_DTE);
+ 	        $htmlForm->setFieldProperties("date_fin", FIELDP_IS_REQUIRED, false);
+ 	        $htmlForm->setFieldProperties("date_fin", FIELDP_DEFAULT, date("d/m/Y"));
+
+					$htmlForm->addFormButton(1, 1, "excel", _("Export Netbank EXCEL"), TYPB_SUBMIT);
+					$htmlForm->setFormButtonProperties("excel", BUTP_PROCHAIN_ECRAN, "Era-50");
+					$htmlForm->addFormButton(1, 2, "csv", _("Export Netbank CSV"), TYPB_SUBMIT);
+ 	        $htmlForm->setFormButtonProperties("csv", BUTP_PROCHAIN_ECRAN, "Era-50");
+ 	        $htmlForm->addFormButton(1, 3, "annuler", _("Annuler"), TYPB_SUBMIT);
+ 	        $htmlForm->setFormButtonProperties("annuler", BUTP_PROCHAIN_ECRAN, "Gen-13");
+
+ 	        //HTML
+ 	        $htmlForm->buildHTML();
+ 	        echo $htmlForm->getHTML();
+ 	    }
+ 	/*}}}*/
+ 	/*{{{ Era-50 : EXN - Export csv des Extrait de comptes pour Netbank */
+ 	else
+ 	    if ($global_nom_ecran == 'Era-50') {
+ 	        if (isSiege()) {
+ 	            if ($agence != '') {
+
+ 	                $list_agence[$agence] = $agence; //Sélection d'une agence au siège
+ 	            } else {
+ 	                $list_agence = getAllIdNomAgence();
+ 	                unset ($list_agence[$global_id_agence]); //Pas d'impression au siège
+ 	            }
+ 	        } else {
+ 	            $list_agence[$global_id_agence] = $global_id_agence; //Dans une agence
+ 	        }
+
+ 	      $critere = array (_("Date début ") => $date_debut, _("Date fin ") => $date_fin);
+
+        //recupération des données à afficher
+        $DATA = getExtraitsCpteNetbank($date_debut, $date_fin);
+        //ajout csv pour netbank
+        $xml = xml_extrait_cpte_netbank($DATA, $liste_criteres, true);
+        $csv_file = xml_2_csv($xml, 'extrait_cpte_netbank.xslt');
+        //Message de confirmation + affichage du rapport dans une nouvelle fenêtre
+				if (isset($excel) && $excel == 'Export Netbank EXCEL'){
+					echo getShowEXCELHTML("Gen-13", $csv_file);
+				}
+				else{
+        	echo getShowCSVHTML("Gen-13", $csv_file);
+				}
+ 	        //fin ajout csv
+
+ 	        ajout_historique(330, NULL, NULL, $global_nom_login, date("r"), NULL);
+
+
+ 	    }
+ 	/*}}}*/
+ 	 else /* Era-51 : Personnalisation rapport Historique des comptes d'épargne cloturés */
+ 	 if ($global_nom_ecran == "Era-51") {
+ 	                    $html = new HTML_GEN2(_("Personnalisation du rapport"));
+
+ 	                    //Remettre $global_id_agence à l'identifiant de l'agence courante
+ 	                    resetGlobalIdAgence();
+ 	                    //Agence- Tri par agence
+ 	                    $list_agence = getAllIdNomAgence();
+ 	                    if (isSiege()) {
+ 	                      unset ($list_agence[$global_id_agence]);
+ 	                      $html->addField("agence", _("Agence"), TYPC_LSB);
+ 	                      $html->setFieldProperties("agence", FIELDP_ADD_CHOICES, $list_agence);
+ 	                      $html->setFieldProperties("agence", FIELDP_HAS_CHOICE_AUCUN, true);
+ 	                      $html->setFieldProperties("agence", FIELDP_IS_REQUIRED, true);
+ 	                    }
+
+ 	                    $html->addField("date_deb", _("Date de début"), TYPC_DTE);
+ 	                    $html->setFieldProperties("date_deb", FIELDP_DEFAULT, date("d/m/Y", mktime(0, 0, 0, date("m") - 1, date("d"), date("Y"))));
+
+ 	                    $html->addField("date_fin", _("Date de fin"), TYPC_DTE);
+ 	                    $html->setFieldProperties("date_fin", FIELDP_DEFAULT, date("d/m/Y"));
+
+ 	                    $html->addField("num_client", _("Client"), TYPC_INT);
+ 	                    $html->addLink("num_client", "rechercher", _("Rechercher"), "#");
+ 	                    $html->setLinkProperties("rechercher", LINKP_JS_EVENT, array (
+ 	                                               "onclick" => "OpenBrw('../modules/clients/rech_client.php?m_agc=".$_REQUEST['m_agc']."&field_name=num_client', '"._("Recherche")."');"
+ 	                                             ));
+
+ 	                                    $html->addField("classe_compte_epargne", _("Classe comptes d'épargne"), TYPC_LSB);
+ 	                                      $html->setFieldProperties("classe_compte_epargne", FIELDP_IS_REQUIRED, false);
+ 	                                      $html->setFieldProperties("classe_compte_epargne", FIELDP_ADD_CHOICES, $adsys["adsys_type_cpte_comptable"]);
+ 	                                      $html->setFieldProperties("classe_compte_epargne", FIELDP_HAS_CHOICE_AUCUN, false);
+ 	                                      $html->setFieldProperties("classe_compte_epargne", FIELDP_HAS_CHOICE_TOUS, true);
+
+ 	                    $tabProdEpa=get_produits_epargne();
+ 	                    foreach($tabProdEpa as $key=> $valeur ){
+ 	                        $SESSION_VARS['prodEpa'][$key]=$valeur['libel'];
+ 	                    }
+ 	                    $html->addField("prd", _("Produit d'épargne"), TYPC_LSB);
+ 	                    $html->setFieldProperties("prd",FIELDP_ADD_CHOICES,$SESSION_VARS['prodEpa']);
+ 	                    $html->setFieldProperties("prd", FIELDP_HAS_CHOICE_AUCUN, false);
+ 	                    $html->setFieldProperties("prd", FIELDP_HAS_CHOICE_TOUS, true);
+
+ 	                    $html->addFormButton(1, 1, "valider", _("Rapport PDF"), TYPB_SUBMIT);
+ 	                    $html->setFormButtonProperties("valider", BUTP_PROCHAIN_ECRAN, "Era-52");
+										  $html->addFormButton(1, 2, "excel", _("Export EXCEL"), TYPB_SUBMIT);
+										  $html->setFormButtonProperties("excel", BUTP_PROCHAIN_ECRAN, "Era-53");
+ 	                    $html->addFormButton(1, 3, "csv", _("Export CSV"), TYPB_SUBMIT);
+ 	                    $html->setFormButtonProperties("csv", BUTP_PROCHAIN_ECRAN, "Era-53");
+
+ 	                    $html->addFormButton(1, 4, "annuler", _("Annuler"), TYPB_SUBMIT);
+ 	                    $html->setFormButtonProperties("annuler", BUTP_PROCHAIN_ECRAN, "Gen-13");
+ 	                    $html->setFormButtonProperties("annuler", BUTP_CHECK_FORM, false);
+ 	                    $html->buildHTML();
+ 	                    echo $html->getHTML();
+ 	                  }
+ 	/*}}}*/
+
+ 	/*{{{ Era-52 et  Era-53 : SLD - Impression ou export csv historique comptes d'épargnes cloturés */
+ 	else
+ 	 if ($global_nom_ecran == 'Era-52' || $global_nom_ecran == 'Era-53') {
+ 	        if (isSiege()) {
+ 	            if ($agence != '') {
+
+ 	                $list_agence[$agence] = $agence; //Sélection d'une agence au siège
+ 	            } else {
+ 	                $list_agence = getAllIdNomAgence();
+ 	                unset ($list_agence[$global_id_agence]); //Pas d'impression au siège
+ 	            }
+ 	        } else {
+ 	            $list_agence[$global_id_agence] = $global_id_agence; //Dans une agence
+ 	        }
+
+ 	      $critere = array (_("Date début ") => $date_deb, _("Date fin ") => $date_fin);
+ 	      if(isset($num_client) && $num_client!=''){
+ 	          $where['id_titulaire']=$num_client;
+ 	          $critere[_('ID Client')]=$num_client;
+ 	      }
+ 	      if(isset($classe_compte_epargne)){
+ 	          $where['classe_comptable']=$classe_compte_epargne;
+ 	          $critere[_('Classe comptable')]= adb_gettext($adsys["adsys_type_cpte_comptable"][$classe_compte_epargne]);
+ 	      }
+ 	      if(isset($prd)){
+ 	          $where['id']=$prd;
+ 	          $critere[_("Produit d'épargne")]=$SESSION_VARS['prodEpa'][$prd];
+ 	      }
+ 	    unset($SESSION_VARS['prodEpa']);
+
+ 	        //recupération des données à afficher
+ 	        $DATA = getCpteEpargneCloture($list_agence, $date_deb, $date_fin, $where);
+ 	        if($global_nom_ecran == 'Era-52' ) {
+ 	            //xml pr la génération du pdf
+ 	            $xml = xml_CpteEpargneCloture($DATA, $critere, false);
+ 	            //Génération du fichier pdf
+ 	            $fichier_pdf = xml_2_xslfo_2_pdf($xml, "cptes_epargne_cloture.xslt");
+ 	            //Message de confirmation + affichage du rapport dans une nouvelle fenêtre
+ 	                echo get_show_pdf_html("Gen-13", $fichier_pdf);
+ 	        }elseif($global_nom_ecran == 'Era-53') {
+ 	            //xml pr la génération du pdf
+ 	            $xml = xml_CpteEpargneCloture($DATA, $critere, true);
+ 	            $csv_file = xml_2_csv($xml, 'cptes_epargne_cloture.xslt');
+ 	          //Message de confirmation + affichage du rapport dans une nouvelle fenêtre
+						if (isset($excel) && $excel == 'Export EXCEL'){
+							echo getShowEXCELHTML("Gen-13", $csv_file);
+						}
+						else{
+ 	          	echo getShowCSVHTML("Gen-13", $csv_file);
+						}
+ 	        }
+
+ 	      ajout_historique(330, NULL, NULL, $global_nom_login, date("r"), NULL);
+ 	    }
+
+
+
+     else /* Era-54 : Rapport INVENTAIRE DE DEPOT */
+         if ($global_nom_ecran == "Era-54") {
+             $html = new HTML_GEN2(_("Personnalisation du rapport"));
+
+             //Remettre $global_id_agence à l'identifiant de l'agence courante
+             resetGlobalIdAgence();
+             //Agence- Tri par agence
+             $list_agence = getAllIdNomAgence();
+             if (isSiege()) {
+                 unset ($list_agence[$global_id_agence]);
+                 $html->addField("agence", _("Agence"), TYPC_LSB);
+                 $html->setFieldProperties("agence", FIELDP_ADD_CHOICES, $list_agence);
+                 $html->setFieldProperties("agence", FIELDP_HAS_CHOICE_AUCUN, true);
+                 $html->setFieldProperties("agence", FIELDP_IS_REQUIRED, true);
+             }
+
+             $dateDebut=getDateExerciseComptable();
+             $html->addField("date_deb", _("Date de début"), TYPC_DTE);
+             $html->setFieldProperties("date_deb", FIELDP_DEFAULT, date($dateDebut));
+
+             $html->addField("date_fin", _("Date de fin"), TYPC_DTE);
+             $html->setFieldProperties("date_fin", FIELDP_DEFAULT, date("d/m/Y"));
+
+          $js="
+                function parseDate(str) {
+                    var mdy = str.split('/');
+                    return new Date(mdy[2], mdy[1]-1, mdy[0]);
+                                        };
+
+                function daydiff(deb, fin) {
+                    return Math.round((fin-deb)/(1000*60*60*24));
+                    };
+
+                var deb = parseDate(document.ADForm.HTML_GEN_date_date_deb.value);
+                var fin = parseDate(document.ADForm.HTML_GEN_date_date_fin.value);
+
+               var diff= daydiff(deb,fin);
+
+                if (diff > 366){
+                alert('La période du rapport ne doit pas dépasser 366 jours.');
+                ADFormValid=false;
+                };
+               ";
+
+             $tabProdEpa=get_produits_epargne();
+             foreach($tabProdEpa as $key=> $valeur ){
+                 if(($valeur["id"]==1) or ($valeur["id"] >5)) {
+                     $SESSION_VARS['prodEpa'][$valeur["id"]] = $valeur['libel'];
+                 }
+             }
+
+             $html->addField("prd", _("Produit d'épargne"), TYPC_LSB);
+             $html->setFieldProperties("prd",FIELDP_ADD_CHOICES,$SESSION_VARS['prodEpa']);
+             $html->setFieldProperties("prd", FIELDP_HAS_CHOICE_AUCUN, false);
+             $html->setFieldProperties("prd", FIELDP_HAS_CHOICE_TOUS, true);
+
+             $html->addJS(JSP_BEGIN_CHECK, "js1", $js);
+             $html->addFormButton(1, 1, "valider", _("Rapport PDF"), TYPB_SUBMIT);
+             $html->setFormButtonProperties("valider", BUTP_PROCHAIN_ECRAN, "Era-55");
+						 $html->addFormButton(1, 2, "excel", _("Export EXCEL"), TYPB_SUBMIT);
+						 $html->setFormButtonProperties("excel", BUTP_PROCHAIN_ECRAN, "Era-56");
+             $html->addFormButton(1, 3, "csv", _("Export CSV"), TYPB_SUBMIT);
+             $html->setFormButtonProperties("csv", BUTP_PROCHAIN_ECRAN, "Era-56");
+
+             $html->addFormButton(1, 4, "annuler", _("Annuler"), TYPB_SUBMIT);
+             $html->setFormButtonProperties("annuler", BUTP_PROCHAIN_ECRAN, "Gen-13");
+             $html->setFormButtonProperties("annuler", BUTP_CHECK_FORM, false);
+             $html->buildHTML();
+             echo $html->getHTML();
+         }
+         /*}}}*/
+
+         /*{{{ Era-55 et  Era-56 : SLD - Impression ou export Rapport INVENTAIRE DE DEPOT */
+         else
+             if ($global_nom_ecran == 'Era-55' || $global_nom_ecran == 'Era-56') {
+                 if (isSiege()) {
+                     if ($agence != '') {
+
+                         //Sélection d'une agence au siège
+                         $list_agence[$agence] = $agence;
+                     } else {
+                         $list_agence = getAllIdNomAgence();
+                         //Pas d'impression au siège
+                         unset ($list_agence[$global_id_agence]);
+                     }
+                 } else {
+                     //Dans une agence
+                     $list_agence[$global_id_agence] = $global_id_agence;
+                 }
+
+                 $critere = array (_("Date début ") => $date_deb, _("Date fin ") => $date_fin);
+
+                 if(isset($prd)){
+                     $where['id_prod']=$prd;
+                     $critere[_("Produit d'épargne")]=$SESSION_VARS['prodEpa'][$prd];
+                 }
+                 else{
+                     $critere[_("Produit d'épargne")]="Tous";
+                 }
+                 unset($SESSION_VARS['prodEpa']);
+
+							 		$data_agc = getAgenceDatas($global_id_agence);
+
+                 //recupération des données à afficher
+                 $DATA = get_rapport_inventaire_depot($where,$date_deb,$date_fin,$data_agc['identification_client']);
+
+				 if($global_nom_ecran == 'Era-55' ) {
+
+					 $DATA_BIS = array();
+
+					 $prodEpg = getListeProduitEpargne("(id=1 or id > 5) ORDER BY id ASC");
+
+					 $dataCount = 0;
+					 $indexCount = 0;
+					 $linenum=0;
+					 $fichier_pdf_arr = array();
+
+					 $totalSoldeDebut = 0;
+					 $totalMontantDepot = 0;
+					 $totalMontantRetrait = 0;
+					 $totalSoldeFin = 0;
+					 $rowCount = 0;
+					 foreach($prodEpg as $id_prod=>$libel) {
+						 if (isset($DATA[$id_prod])) {
+							 foreach($DATA[$id_prod] as $id_cpte=>$rowData) {
+								 $totalSoldeDebut += floatval($rowData["solde_debut"]);
+								 $totalMontantDepot += floatval($rowData["montant_depot"]);
+								 $totalMontantRetrait += floatval($rowData["montant_retrait"]);
+								 $totalSoldeFin += floatval($rowData["solde_fin"]);
+								 $rowCount ++;
+							 }
+						 }
+					 }
+
+					 $totalPages=0;
+					 foreach($prodEpg as $id_prod=>$libel) {
+						 if (isset($DATA[$id_prod])) {
+							 foreach($DATA[$id_prod] as $id_cpte=>$rowData) {
+								 $DATA_BIS[$id_prod][$id_cpte] = $rowData;
+
+								 $dataCount++;
+
+								 if ($dataCount%10000 == 0 || $rowCount == $dataCount ){
+									 $indexCount++;
+									 //xml pr la génération du pdf
+									 $xml = xml_list_epargne_libre_DAT($DATA_BIS, $critere,$date_deb,$date_fin,$linenum,false,false);
+									 //Génération du XSL-FO (grâce au XSLT) et du PDF (grâce à FOP)
+									 //on garde une liste des données de chaque lot du rapport
+									 $Data_arr[]=$DATA_BIS;
+									 $pdf_out = xml_2_xslfo_2_pdf($xml, 'inventaire_depot_csv.xslt',false,$indexCount);
+									 $fichier_pdf_arr[] = $pdf_out;
+									 $pgNum = getPDFPages("$pdf_out");
+									 $totalPages += $pgNum;
+									 $DATA_BIS = array();
+								 }
+							 }
+						 }
+					 }
+					 $critere[_("Nombre total de page du rapport")] = $totalPages;
+					 $critere[_("Solde début")] = afficheMontant($totalSoldeDebut);
+					 $critere[_("Total Mouvements dépôts")] = afficheMontant($totalMontantDepot);
+					 $critere[_("Total mouvements retraits")] = afficheMontant($totalMontantRetrait);
+					 $critere[_("Solde fin")] = afficheMontant($totalSoldeFin);
+
+					 //régén§ration de la première page du rapport pdf avec les infos-synthetique.
+					 $linenum = 0;
+					 $xml_1  = xml_list_epargne_libre_DAT($Data_arr[0], $critere,$date_deb,$date_fin,$linenum,false,true);
+					 $pdf_1 = xml_2_xslfo_2_pdf($xml_1, 'inventaire_depot_csv.xslt',false,$indexCount+1);
+
+					 $fichier_pdf_arr[0]=$pdf_1;
+
+					 $fileCount = 1;
+					 $js="";
+					 foreach($fichier_pdf_arr as $fichier_pdf) {
+						 // Compilation des rapports pdf générés
+						 $js .= get_show_pdf_html(NULL, $fichier_pdf, NULL, "Rapport inventaire de dépots no. $fileCount", $fileCount,(200+($fileCount*50)));
+						 $fileCount++;
+					 }
+
+					 if ($js!="") {
+						 $MyPage = new HTML_message(_("Génération rapport"));
+						 $MyPage->setMessage(_("Le rapport a été généré avec succès !"));
+						 $MyPage->addButton(BUTTON_OK, "Gen-13");
+						 $MyPage->buildHTML();
+						 echo $MyPage->HTML_code." ".$js;
+					 } else {
+						 $erreur = new HTML_erreur(_("Echec lors de la génération du rapport"));
+						 $erreur->setMessage(_("Aucun rapport n'a été trouvé."));
+						 $erreur->addButton(BUTTON_OK, "Gen-13");
+						 $erreur->buildHTML();
+						 return $erreur->HTML_code;
+					 }
+
+                 }elseif($global_nom_ecran == 'Era-56') {
+					 $linenum=0;
+                     //xml pr la génération du pdf
+                     $xml = xml_list_epargne_libre_DAT($DATA, $critere,$date_deb,$date_fin,$linenum, true,true);
+                     $csv_file = xml_2_csv($xml, 'inventaire_depot_csv.xslt');
+                     //Message de confirmation + affichage du rapport dans une nouvelle fenêtre
+					           if (isset($excel) && $excel == 'Export EXCEL'){
+											 echo getShowEXCELHTML("Gen-13", $csv_file);
+										 }
+					           else{
+											 echo getShowCSVHTML("Gen-13", $csv_file);
+										 }
+                 }
+
+                 ajout_historique(330, NULL, NULL, $global_nom_login, date("r"), NULL);
+             }
+
+		 else /* Era-57 : Rapport des comptes dormants */
+			 if ($global_nom_ecran == "Era-57") {
+				 $html = new HTML_GEN2(_("Personnalisation du rapport"));
+
+				 // Remettre $global_id_agence à l'identifiant de l'agence courante
+				 resetGlobalIdAgence();
+
+				 // Agence- Tri par agence
+				 $list_agence = getAllIdNomAgence();
+				 if (isSiege()) {
+					 unset ($list_agence[$global_id_agence]);
+					 $html->addField("agence", _("Agence"), TYPC_LSB);
+					 $html->setFieldProperties("agence", FIELDP_ADD_CHOICES, $list_agence);
+					 $html->setFieldProperties("agence", FIELDP_HAS_CHOICE_AUCUN, true);
+					 $html->setFieldProperties("agence", FIELDP_IS_REQUIRED, true);
+				 }
+
+				 unset($SESSION_VARS['prodEpa']);
+
+				 $tabProdEpa=get_produits_epargne();
+				 foreach($tabProdEpa as $key=>$valeur){
+					 if(($valeur["id"]==1) or ($valeur["id"] >5)) {
+						 $SESSION_VARS['prodEpa'][$valeur["id"]] = $valeur['libel'];
+					 }
+				 }
+
+				 $html->addField("prd", _("Produit d'épargne"), TYPC_LSB);
+				 $html->setFieldProperties("prd",FIELDP_ADD_CHOICES, $SESSION_VARS['prodEpa']);
+				 $html->setFieldProperties("prd", FIELDP_HAS_CHOICE_AUCUN, false);
+				 $html->setFieldProperties("prd", FIELDP_HAS_CHOICE_TOUS, true);
+
+				 $html->addField("date_rapport", _("Date"), TYPC_DTE);
+				 $html->setFieldProperties("date_rapport", FIELDP_DEFAULT, date("d/m/Y"));
+				 $html->setFieldProperties("date_rapport", FIELDP_IS_REQUIRED, true);
+
+				 $html->addHTMLExtraCode("htm1", "<br/>");
+
+				 $html->addFormButton(1, 1, "valider", _("Rapport PDF"), TYPB_SUBMIT);
+				 $html->setFormButtonProperties("valider", BUTP_PROCHAIN_ECRAN, "Era-58");
+				 $html->addFormButton(1, 2, "excel", _("Export EXCEL"), TYPB_SUBMIT);
+				 $html->setFormButtonProperties("excel", BUTP_PROCHAIN_ECRAN, "Era-59");
+				 $html->addFormButton(1, 3, "csv", _("Export CSV"), TYPB_SUBMIT);
+				 $html->setFormButtonProperties("csv", BUTP_PROCHAIN_ECRAN, "Era-59");
+
+				 $html->addFormButton(1, 4, "annuler", _("Annuler"), TYPB_SUBMIT);
+				 $html->setFormButtonProperties("annuler", BUTP_PROCHAIN_ECRAN, "Gen-13");
+				 $html->setFormButtonProperties("annuler", BUTP_CHECK_FORM, false);
+				 $html->buildHTML();
+				 echo $html->getHTML();
+			 }
+			 /*}}}*/
+
+			 /*{{{ Era-58 et  Era-59 : Impression ou export csv rapport comptes dormants */
+			 else
+				 if ($global_nom_ecran == 'Era-58' || $global_nom_ecran == 'Era-59') {
+					 if (isSiege()) {
+						 if ($agence != '') {
+
+							 $list_agence[$agence] = $agence; //Sélection d'une agence au siège
+						 } else {
+							 $list_agence = getAllIdNomAgence();
+							 unset ($list_agence[$global_id_agence]); //Pas d'impression au siège
+						 }
+					 } else {
+						 $list_agence[$global_id_agence] = $global_id_agence; //Dans une agence
+					 }
+
+					 unset($SESSION_VARS['prodEpa']);
+
+					 if($global_nom_ecran == 'Era-58' ) {
+
+						 // Recupération des données + xml pr la génération du pdf
+						 $xml = xml_rapport_compte_dormant($prd, $date_rapport, false);
+
+						 // Génération du fichier pdf
+						 $fichier_pdf = xml_2_xslfo_2_pdf($xml, "rapport_compte_dormant.xslt");
+
+						 // Message de confirmation + affichage du rapport dans une nouvelle fenêtre
+						 echo get_show_pdf_html("Gen-13", $fichier_pdf);
+					 }elseif($global_nom_ecran == 'Era-59') {
+
+						 //xml pr la génération du pdf
+						 $xml = xml_rapport_compte_dormant($prd, $date_rapport, true);
+
+						 $csv_file = xml_2_csv($xml, 'rapport_compte_dormant.xslt');
+
+						 //Message de confirmation + affichage du rapport dans une nouvelle fenêtre
+						 if (isset($excel) && $excel == 'Export EXCEL'){
+							 echo getShowEXCELHTML("Gen-13", $csv_file);
+						 }
+						 else{
+						 	 echo getShowCSVHTML("Gen-13", $csv_file);
+						 }
+					 }
+
+					 ajout_historique(330, NULL, NULL, $global_nom_login, date("r"), NULL);
+				 }
+
+ 	/*}}}*/
+ 	else
+ 	        signalErreur(__FILE__, __LINE__, __FUNCTION__, sprintf(_("L'écran %s n'a pas pu être trouvé"), $global_nom_ecran));
+?>
+

@@ -1,0 +1,9 @@
+"Libellé du compte";"Compartiment";"Sens";"Devise";"Solde";"Compte de provision";"Classe";"SC1";"SC2";"SC3";"SC4";"SC5";"SC6";"SC7";"SC8";"SC9";"SC10"
+"Exemple 1";"AC";"DE";"EUR";;;2;1;;;;;;;;;
+"Exemple 2";"PA";"CR";"EUR";;;2;2;;;;;;;;;
+"Exemple 3";"CH";"DE";"EUR";;;2;3;;;;;;;;;
+"Exemple 4";"PR";"CR";"EUR";;;2;4;;;;;;;;;
+"Exemple 5";"AC";"MI";"EUR";35;;2;1;1;;;;;;;;
+"Exemple 6";"PA";"MI";"EUR";-35;;2;2;1;;;;;;;;
+"Exemple 7";"CH";"MI";"EUR";55;;2;3;1;;;;;;;;
+"Exemple 8";"PR";"MI";"EUR";-55;;2;4;1;;;;;;;;

@@ -1,0 +1,3959 @@
+<span style='color: #000'>24 frames</span>	<span style='color: #900'>4,096 KB</span>	<span style='color: #090'>577.09 ms</span>	<span style='color: #009' title='Quirksmode'><span style='color: #c00'>ON</span></span><br />
+<div style="border:1px solid #990000;padding-left:20px;margin:0 0 10px 0;">
+
+<h4>A PHP Error was encountered</h4>
+
+<p>Severity: Notice</p>
+<p>Message:  Undefined variable: rootDir</p>
+<p>Filename: fonts/dompdf_font_family_cache.dist.php</p>
+<p>Line Number: 2</p>
+
+
+	<p>Backtrace:</p>
+	
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\lib\fonts\dompdf_font_family_cache.dist.php<br />
+			Line: 2<br />
+			Function: _error_handler			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\font_metrics.cls.php<br />
+			Line: 226<br />
+			Function: require_once			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\font_metrics.cls.php<br />
+			Line: 335<br />
+			Function: load_font_families			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\autoload.inc.php<br />
+			Line: 23<br />
+			Function: require_once			</p>
+
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\dompdf.cls.php<br />
+			Line: 715<br />
+			Function: spl_autoload_call			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\to_pdf_helper.php<br />
+			Line: 29<br />
+			Function: render			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\controllers\Projects.php<br />
+			Line: 475<br />
+			Function: pdf_create1			</p>
+
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\index.php<br />
+			Line: 318<br />
+			Function: require_once			</p>
+
+		
+	
+
+</div>
+<div style="border:1px solid #990000;padding-left:20px;margin:0 0 10px 0;">
+
+<h4>A PHP Error was encountered</h4>
+
+<p>Severity: Notice</p>
+<p>Message:  Undefined index: </p>
+<p>Filename: lib/class.pdf.php</p>
+<p>Line Number: 3098</p>
+
+
+	<p>Backtrace:</p>
+	
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\lib\class.pdf.php<br />
+			Line: 3098<br />
+			Function: _error_handler			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\cpdf_adapter.cls.php<br />
+			Line: 704<br />
+			Function: getFontHeight			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\font_metrics.cls.php<br />
+			Line: 127<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_reflower.cls.php<br />
+			Line: 168<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_reflower.cls.php<br />
+			Line: 333<br />
+			Function: _layout_line			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\block_frame_reflower.cls.php<br />
+			Line: 722<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_reflower.cls.php<br />
+			Line: 138<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\dompdf.cls.php<br />
+			Line: 817<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\to_pdf_helper.php<br />
+			Line: 29<br />
+			Function: render			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\controllers\Projects.php<br />
+			Line: 475<br />
+			Function: pdf_create1			</p>
+
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\index.php<br />
+			Line: 318<br />
+			Function: require_once			</p>
+
+		
+	
+
+</div>
+<div style="border:1px solid #990000;padding-left:20px;margin:0 0 10px 0;">
+
+<h4>A PHP Error was encountered</h4>
+
+<p>Severity: Notice</p>
+<p>Message:  Undefined index: </p>
+<p>Filename: lib/class.pdf.php</p>
+<p>Line Number: 3706</p>
+
+
+	<p>Backtrace:</p>
+	
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\lib\class.pdf.php<br />
+			Line: 3706<br />
+			Function: _error_handler			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\cpdf_adapter.cls.php<br />
+			Line: 693<br />
+			Function: getTextWidth			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\font_metrics.cls.php<br />
+			Line: 110<br />
+			Function: get_text_width			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_reflower.cls.php<br />
+			Line: 65<br />
+			Function: get_text_width			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_reflower.cls.php<br />
+			Line: 192<br />
+			Function: _line_break			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_reflower.cls.php<br />
+			Line: 333<br />
+			Function: _layout_line			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\block_frame_reflower.cls.php<br />
+			Line: 722<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_reflower.cls.php<br />
+			Line: 138<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\dompdf.cls.php<br />
+			Line: 817<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\to_pdf_helper.php<br />
+			Line: 29<br />
+			Function: render			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\controllers\Projects.php<br />
+			Line: 475<br />
+			Function: pdf_create1			</p>
+
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\index.php<br />
+			Line: 318<br />
+			Function: require_once			</p>
+
+		
+	
+
+</div>
+<div style="border:1px solid #990000;padding-left:20px;margin:0 0 10px 0;">
+
+<h4>A PHP Error was encountered</h4>
+
+<p>Severity: Notice</p>
+<p>Message:  Undefined index: </p>
+<p>Filename: lib/class.pdf.php</p>
+<p>Line Number: 2551</p>
+
+
+	<p>Backtrace:</p>
+	
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\lib\class.pdf.php<br />
+			Line: 2551<br />
+			Function: _error_handler			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\lib\class.pdf.php<br />
+			Line: 3778<br />
+			Function: setCurrentFont			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\cpdf_adapter.cls.php<br />
+			Line: 693<br />
+			Function: getTextWidth			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\font_metrics.cls.php<br />
+			Line: 110<br />
+			Function: get_text_width			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_reflower.cls.php<br />
+			Line: 65<br />
+			Function: get_text_width			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_reflower.cls.php<br />
+			Line: 192<br />
+			Function: _line_break			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_reflower.cls.php<br />
+			Line: 333<br />
+			Function: _layout_line			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\block_frame_reflower.cls.php<br />
+			Line: 722<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_reflower.cls.php<br />
+			Line: 138<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\dompdf.cls.php<br />
+			Line: 817<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\to_pdf_helper.php<br />
+			Line: 29<br />
+			Function: render			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\controllers\Projects.php<br />
+			Line: 475<br />
+			Function: pdf_create1			</p>
+
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\index.php<br />
+			Line: 318<br />
+			Function: require_once			</p>
+
+		
+	
+
+</div>
+<div style="border:1px solid #990000;padding-left:20px;margin:0 0 10px 0;">
+
+<h4>A PHP Error was encountered</h4>
+
+<p>Severity: Notice</p>
+<p>Message:  Undefined index: </p>
+<p>Filename: lib/class.pdf.php</p>
+<p>Line Number: 3098</p>
+
+
+	<p>Backtrace:</p>
+	
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\lib\class.pdf.php<br />
+			Line: 3098<br />
+			Function: _error_handler			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\cpdf_adapter.cls.php<br />
+			Line: 704<br />
+			Function: getFontHeight			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\font_metrics.cls.php<br />
+			Line: 127<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_decorator.cls.php<br />
+			Line: 90<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_decorator.cls.php<br />
+			Line: 429<br />
+			Function: get_margin_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\block_frame_reflower.cls.php<br />
+			Line: 725<br />
+			Function: check_page_break			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_reflower.cls.php<br />
+			Line: 138<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\dompdf.cls.php<br />
+			Line: 817<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\to_pdf_helper.php<br />
+			Line: 29<br />
+			Function: render			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\controllers\Projects.php<br />
+			Line: 475<br />
+			Function: pdf_create1			</p>
+
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\index.php<br />
+			Line: 318<br />
+			Function: require_once			</p>
+
+		
+	
+
+</div>
+<div style="border:1px solid #990000;padding-left:20px;margin:0 0 10px 0;">
+
+<h4>A PHP Error was encountered</h4>
+
+<p>Severity: Notice</p>
+<p>Message:  Undefined index: </p>
+<p>Filename: lib/class.pdf.php</p>
+<p>Line Number: 3098</p>
+
+
+	<p>Backtrace:</p>
+	
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\lib\class.pdf.php<br />
+			Line: 3098<br />
+			Function: _error_handler			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\cpdf_adapter.cls.php<br />
+			Line: 704<br />
+			Function: getFontHeight			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\font_metrics.cls.php<br />
+			Line: 127<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_reflower.cls.php<br />
+			Line: 168<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_reflower.cls.php<br />
+			Line: 333<br />
+			Function: _layout_line			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\block_frame_reflower.cls.php<br />
+			Line: 722<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_reflower.cls.php<br />
+			Line: 138<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\dompdf.cls.php<br />
+			Line: 817<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\to_pdf_helper.php<br />
+			Line: 29<br />
+			Function: render			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\controllers\Projects.php<br />
+			Line: 475<br />
+			Function: pdf_create1			</p>
+
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\index.php<br />
+			Line: 318<br />
+			Function: require_once			</p>
+
+		
+	
+
+</div>
+<div style="border:1px solid #990000;padding-left:20px;margin:0 0 10px 0;">
+
+<h4>A PHP Error was encountered</h4>
+
+<p>Severity: Notice</p>
+<p>Message:  Undefined index: </p>
+<p>Filename: lib/class.pdf.php</p>
+<p>Line Number: 3098</p>
+
+
+	<p>Backtrace:</p>
+	
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\lib\class.pdf.php<br />
+			Line: 3098<br />
+			Function: _error_handler			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\cpdf_adapter.cls.php<br />
+			Line: 704<br />
+			Function: getFontHeight			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\font_metrics.cls.php<br />
+			Line: 127<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_decorator.cls.php<br />
+			Line: 90<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_decorator.cls.php<br />
+			Line: 429<br />
+			Function: get_margin_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\block_frame_reflower.cls.php<br />
+			Line: 725<br />
+			Function: check_page_break			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_reflower.cls.php<br />
+			Line: 138<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\dompdf.cls.php<br />
+			Line: 817<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\to_pdf_helper.php<br />
+			Line: 29<br />
+			Function: render			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\controllers\Projects.php<br />
+			Line: 475<br />
+			Function: pdf_create1			</p>
+
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\index.php<br />
+			Line: 318<br />
+			Function: require_once			</p>
+
+		
+	
+
+</div>
+<div style="border:1px solid #990000;padding-left:20px;margin:0 0 10px 0;">
+
+<h4>A PHP Error was encountered</h4>
+
+<p>Severity: Notice</p>
+<p>Message:  Undefined index: </p>
+<p>Filename: lib/class.pdf.php</p>
+<p>Line Number: 3098</p>
+
+
+	<p>Backtrace:</p>
+	
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\lib\class.pdf.php<br />
+			Line: 3098<br />
+			Function: _error_handler			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\cpdf_adapter.cls.php<br />
+			Line: 704<br />
+			Function: getFontHeight			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\font_metrics.cls.php<br />
+			Line: 127<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_reflower.cls.php<br />
+			Line: 168<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_reflower.cls.php<br />
+			Line: 333<br />
+			Function: _layout_line			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\block_frame_reflower.cls.php<br />
+			Line: 722<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_reflower.cls.php<br />
+			Line: 138<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\dompdf.cls.php<br />
+			Line: 817<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\to_pdf_helper.php<br />
+			Line: 29<br />
+			Function: render			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\controllers\Projects.php<br />
+			Line: 475<br />
+			Function: pdf_create1			</p>
+
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\index.php<br />
+			Line: 318<br />
+			Function: require_once			</p>
+
+		
+	
+
+</div>
+<div style="border:1px solid #990000;padding-left:20px;margin:0 0 10px 0;">
+
+<h4>A PHP Error was encountered</h4>
+
+<p>Severity: Notice</p>
+<p>Message:  Undefined index: </p>
+<p>Filename: lib/class.pdf.php</p>
+<p>Line Number: 3098</p>
+
+
+	<p>Backtrace:</p>
+	
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\lib\class.pdf.php<br />
+			Line: 3098<br />
+			Function: _error_handler			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\cpdf_adapter.cls.php<br />
+			Line: 704<br />
+			Function: getFontHeight			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\font_metrics.cls.php<br />
+			Line: 127<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_decorator.cls.php<br />
+			Line: 90<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_decorator.cls.php<br />
+			Line: 429<br />
+			Function: get_margin_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\block_frame_reflower.cls.php<br />
+			Line: 725<br />
+			Function: check_page_break			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_reflower.cls.php<br />
+			Line: 138<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\dompdf.cls.php<br />
+			Line: 817<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\to_pdf_helper.php<br />
+			Line: 29<br />
+			Function: render			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\controllers\Projects.php<br />
+			Line: 475<br />
+			Function: pdf_create1			</p>
+
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\index.php<br />
+			Line: 318<br />
+			Function: require_once			</p>
+
+		
+	
+
+</div>
+<div style="border:1px solid #990000;padding-left:20px;margin:0 0 10px 0;">
+
+<h4>A PHP Error was encountered</h4>
+
+<p>Severity: Notice</p>
+<p>Message:  Undefined index: </p>
+<p>Filename: lib/class.pdf.php</p>
+<p>Line Number: 3098</p>
+
+
+	<p>Backtrace:</p>
+	
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\lib\class.pdf.php<br />
+			Line: 3098<br />
+			Function: _error_handler			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\cpdf_adapter.cls.php<br />
+			Line: 704<br />
+			Function: getFontHeight			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\font_metrics.cls.php<br />
+			Line: 127<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_reflower.cls.php<br />
+			Line: 168<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_reflower.cls.php<br />
+			Line: 333<br />
+			Function: _layout_line			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\block_frame_reflower.cls.php<br />
+			Line: 722<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_reflower.cls.php<br />
+			Line: 138<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\dompdf.cls.php<br />
+			Line: 817<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\to_pdf_helper.php<br />
+			Line: 29<br />
+			Function: render			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\controllers\Projects.php<br />
+			Line: 475<br />
+			Function: pdf_create1			</p>
+
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\index.php<br />
+			Line: 318<br />
+			Function: require_once			</p>
+
+		
+	
+
+</div>
+<div style="border:1px solid #990000;padding-left:20px;margin:0 0 10px 0;">
+
+<h4>A PHP Error was encountered</h4>
+
+<p>Severity: Notice</p>
+<p>Message:  Undefined index: </p>
+<p>Filename: lib/class.pdf.php</p>
+<p>Line Number: 3098</p>
+
+
+	<p>Backtrace:</p>
+	
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\lib\class.pdf.php<br />
+			Line: 3098<br />
+			Function: _error_handler			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\cpdf_adapter.cls.php<br />
+			Line: 704<br />
+			Function: getFontHeight			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\font_metrics.cls.php<br />
+			Line: 127<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_decorator.cls.php<br />
+			Line: 90<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_decorator.cls.php<br />
+			Line: 429<br />
+			Function: get_margin_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\block_frame_reflower.cls.php<br />
+			Line: 725<br />
+			Function: check_page_break			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_reflower.cls.php<br />
+			Line: 138<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\dompdf.cls.php<br />
+			Line: 817<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\to_pdf_helper.php<br />
+			Line: 29<br />
+			Function: render			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\controllers\Projects.php<br />
+			Line: 475<br />
+			Function: pdf_create1			</p>
+
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\index.php<br />
+			Line: 318<br />
+			Function: require_once			</p>
+
+		
+	
+
+</div>
+<div style="border:1px solid #990000;padding-left:20px;margin:0 0 10px 0;">
+
+<h4>A PHP Error was encountered</h4>
+
+<p>Severity: Notice</p>
+<p>Message:  Undefined index: </p>
+<p>Filename: lib/class.pdf.php</p>
+<p>Line Number: 3098</p>
+
+
+	<p>Backtrace:</p>
+	
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\lib\class.pdf.php<br />
+			Line: 3098<br />
+			Function: _error_handler			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\cpdf_adapter.cls.php<br />
+			Line: 704<br />
+			Function: getFontHeight			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\font_metrics.cls.php<br />
+			Line: 127<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_reflower.cls.php<br />
+			Line: 168<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_reflower.cls.php<br />
+			Line: 333<br />
+			Function: _layout_line			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\block_frame_reflower.cls.php<br />
+			Line: 722<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_reflower.cls.php<br />
+			Line: 138<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\dompdf.cls.php<br />
+			Line: 817<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\to_pdf_helper.php<br />
+			Line: 29<br />
+			Function: render			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\controllers\Projects.php<br />
+			Line: 475<br />
+			Function: pdf_create1			</p>
+
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\index.php<br />
+			Line: 318<br />
+			Function: require_once			</p>
+
+		
+	
+
+</div>
+<div style="border:1px solid #990000;padding-left:20px;margin:0 0 10px 0;">
+
+<h4>A PHP Error was encountered</h4>
+
+<p>Severity: Notice</p>
+<p>Message:  Undefined index: </p>
+<p>Filename: lib/class.pdf.php</p>
+<p>Line Number: 3098</p>
+
+
+	<p>Backtrace:</p>
+	
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\lib\class.pdf.php<br />
+			Line: 3098<br />
+			Function: _error_handler			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\cpdf_adapter.cls.php<br />
+			Line: 704<br />
+			Function: getFontHeight			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\font_metrics.cls.php<br />
+			Line: 127<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_decorator.cls.php<br />
+			Line: 90<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_decorator.cls.php<br />
+			Line: 429<br />
+			Function: get_margin_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\block_frame_reflower.cls.php<br />
+			Line: 725<br />
+			Function: check_page_break			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_reflower.cls.php<br />
+			Line: 138<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\dompdf.cls.php<br />
+			Line: 817<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\to_pdf_helper.php<br />
+			Line: 29<br />
+			Function: render			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\controllers\Projects.php<br />
+			Line: 475<br />
+			Function: pdf_create1			</p>
+
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\index.php<br />
+			Line: 318<br />
+			Function: require_once			</p>
+
+		
+	
+
+</div>
+<div style="border:1px solid #990000;padding-left:20px;margin:0 0 10px 0;">
+
+<h4>A PHP Error was encountered</h4>
+
+<p>Severity: Notice</p>
+<p>Message:  Undefined index: </p>
+<p>Filename: lib/class.pdf.php</p>
+<p>Line Number: 3098</p>
+
+
+	<p>Backtrace:</p>
+	
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\lib\class.pdf.php<br />
+			Line: 3098<br />
+			Function: _error_handler			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\cpdf_adapter.cls.php<br />
+			Line: 704<br />
+			Function: getFontHeight			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\font_metrics.cls.php<br />
+			Line: 127<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_reflower.cls.php<br />
+			Line: 168<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_reflower.cls.php<br />
+			Line: 333<br />
+			Function: _layout_line			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\block_frame_reflower.cls.php<br />
+			Line: 722<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_reflower.cls.php<br />
+			Line: 138<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\dompdf.cls.php<br />
+			Line: 817<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\to_pdf_helper.php<br />
+			Line: 29<br />
+			Function: render			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\controllers\Projects.php<br />
+			Line: 475<br />
+			Function: pdf_create1			</p>
+
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\index.php<br />
+			Line: 318<br />
+			Function: require_once			</p>
+
+		
+	
+
+</div>
+<div style="border:1px solid #990000;padding-left:20px;margin:0 0 10px 0;">
+
+<h4>A PHP Error was encountered</h4>
+
+<p>Severity: Notice</p>
+<p>Message:  Undefined index: </p>
+<p>Filename: lib/class.pdf.php</p>
+<p>Line Number: 3098</p>
+
+
+	<p>Backtrace:</p>
+	
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\lib\class.pdf.php<br />
+			Line: 3098<br />
+			Function: _error_handler			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\cpdf_adapter.cls.php<br />
+			Line: 704<br />
+			Function: getFontHeight			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\font_metrics.cls.php<br />
+			Line: 127<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_decorator.cls.php<br />
+			Line: 90<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_decorator.cls.php<br />
+			Line: 429<br />
+			Function: get_margin_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\block_frame_reflower.cls.php<br />
+			Line: 725<br />
+			Function: check_page_break			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_reflower.cls.php<br />
+			Line: 138<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\dompdf.cls.php<br />
+			Line: 817<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\to_pdf_helper.php<br />
+			Line: 29<br />
+			Function: render			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\controllers\Projects.php<br />
+			Line: 475<br />
+			Function: pdf_create1			</p>
+
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\index.php<br />
+			Line: 318<br />
+			Function: require_once			</p>
+
+		
+	
+
+</div>
+<div style="border:1px solid #990000;padding-left:20px;margin:0 0 10px 0;">
+
+<h4>A PHP Error was encountered</h4>
+
+<p>Severity: Notice</p>
+<p>Message:  Undefined index: </p>
+<p>Filename: lib/class.pdf.php</p>
+<p>Line Number: 3098</p>
+
+
+	<p>Backtrace:</p>
+	
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\lib\class.pdf.php<br />
+			Line: 3098<br />
+			Function: _error_handler			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\cpdf_adapter.cls.php<br />
+			Line: 704<br />
+			Function: getFontHeight			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\font_metrics.cls.php<br />
+			Line: 127<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_reflower.cls.php<br />
+			Line: 168<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_reflower.cls.php<br />
+			Line: 333<br />
+			Function: _layout_line			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\block_frame_reflower.cls.php<br />
+			Line: 722<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_reflower.cls.php<br />
+			Line: 138<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\dompdf.cls.php<br />
+			Line: 817<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\to_pdf_helper.php<br />
+			Line: 29<br />
+			Function: render			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\controllers\Projects.php<br />
+			Line: 475<br />
+			Function: pdf_create1			</p>
+
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\index.php<br />
+			Line: 318<br />
+			Function: require_once			</p>
+
+		
+	
+
+</div>
+<div style="border:1px solid #990000;padding-left:20px;margin:0 0 10px 0;">
+
+<h4>A PHP Error was encountered</h4>
+
+<p>Severity: Notice</p>
+<p>Message:  Undefined index: </p>
+<p>Filename: lib/class.pdf.php</p>
+<p>Line Number: 3098</p>
+
+
+	<p>Backtrace:</p>
+	
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\lib\class.pdf.php<br />
+			Line: 3098<br />
+			Function: _error_handler			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\cpdf_adapter.cls.php<br />
+			Line: 704<br />
+			Function: getFontHeight			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\font_metrics.cls.php<br />
+			Line: 127<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_decorator.cls.php<br />
+			Line: 90<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_decorator.cls.php<br />
+			Line: 429<br />
+			Function: get_margin_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\block_frame_reflower.cls.php<br />
+			Line: 725<br />
+			Function: check_page_break			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_reflower.cls.php<br />
+			Line: 138<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\dompdf.cls.php<br />
+			Line: 817<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\to_pdf_helper.php<br />
+			Line: 29<br />
+			Function: render			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\controllers\Projects.php<br />
+			Line: 475<br />
+			Function: pdf_create1			</p>
+
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\index.php<br />
+			Line: 318<br />
+			Function: require_once			</p>
+
+		
+	
+
+</div>
+<div style="border:1px solid #990000;padding-left:20px;margin:0 0 10px 0;">
+
+<h4>A PHP Error was encountered</h4>
+
+<p>Severity: Notice</p>
+<p>Message:  Undefined index: </p>
+<p>Filename: lib/class.pdf.php</p>
+<p>Line Number: 3098</p>
+
+
+	<p>Backtrace:</p>
+	
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\lib\class.pdf.php<br />
+			Line: 3098<br />
+			Function: _error_handler			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\cpdf_adapter.cls.php<br />
+			Line: 704<br />
+			Function: getFontHeight			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\font_metrics.cls.php<br />
+			Line: 127<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_reflower.cls.php<br />
+			Line: 168<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_reflower.cls.php<br />
+			Line: 333<br />
+			Function: _layout_line			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\block_frame_reflower.cls.php<br />
+			Line: 722<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_reflower.cls.php<br />
+			Line: 138<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\dompdf.cls.php<br />
+			Line: 817<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\to_pdf_helper.php<br />
+			Line: 29<br />
+			Function: render			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\controllers\Projects.php<br />
+			Line: 475<br />
+			Function: pdf_create1			</p>
+
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\index.php<br />
+			Line: 318<br />
+			Function: require_once			</p>
+
+		
+	
+
+</div>
+<div style="border:1px solid #990000;padding-left:20px;margin:0 0 10px 0;">
+
+<h4>A PHP Error was encountered</h4>
+
+<p>Severity: Notice</p>
+<p>Message:  Undefined index: </p>
+<p>Filename: lib/class.pdf.php</p>
+<p>Line Number: 3098</p>
+
+
+	<p>Backtrace:</p>
+	
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\lib\class.pdf.php<br />
+			Line: 3098<br />
+			Function: _error_handler			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\cpdf_adapter.cls.php<br />
+			Line: 704<br />
+			Function: getFontHeight			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\font_metrics.cls.php<br />
+			Line: 127<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_decorator.cls.php<br />
+			Line: 90<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_decorator.cls.php<br />
+			Line: 429<br />
+			Function: get_margin_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\block_frame_reflower.cls.php<br />
+			Line: 725<br />
+			Function: check_page_break			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_reflower.cls.php<br />
+			Line: 138<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\dompdf.cls.php<br />
+			Line: 817<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\to_pdf_helper.php<br />
+			Line: 29<br />
+			Function: render			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\controllers\Projects.php<br />
+			Line: 475<br />
+			Function: pdf_create1			</p>
+
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\index.php<br />
+			Line: 318<br />
+			Function: require_once			</p>
+
+		
+	
+
+</div>
+<div style="border:1px solid #990000;padding-left:20px;margin:0 0 10px 0;">
+
+<h4>A PHP Error was encountered</h4>
+
+<p>Severity: Notice</p>
+<p>Message:  Undefined index: </p>
+<p>Filename: lib/class.pdf.php</p>
+<p>Line Number: 3098</p>
+
+
+	<p>Backtrace:</p>
+	
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\lib\class.pdf.php<br />
+			Line: 3098<br />
+			Function: _error_handler			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\cpdf_adapter.cls.php<br />
+			Line: 704<br />
+			Function: getFontHeight			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\font_metrics.cls.php<br />
+			Line: 127<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_reflower.cls.php<br />
+			Line: 168<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_reflower.cls.php<br />
+			Line: 333<br />
+			Function: _layout_line			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\block_frame_reflower.cls.php<br />
+			Line: 722<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_reflower.cls.php<br />
+			Line: 138<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\dompdf.cls.php<br />
+			Line: 817<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\to_pdf_helper.php<br />
+			Line: 29<br />
+			Function: render			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\controllers\Projects.php<br />
+			Line: 475<br />
+			Function: pdf_create1			</p>
+
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\index.php<br />
+			Line: 318<br />
+			Function: require_once			</p>
+
+		
+	
+
+</div>
+<div style="border:1px solid #990000;padding-left:20px;margin:0 0 10px 0;">
+
+<h4>A PHP Error was encountered</h4>
+
+<p>Severity: Notice</p>
+<p>Message:  Undefined index: </p>
+<p>Filename: lib/class.pdf.php</p>
+<p>Line Number: 3098</p>
+
+
+	<p>Backtrace:</p>
+	
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\lib\class.pdf.php<br />
+			Line: 3098<br />
+			Function: _error_handler			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\cpdf_adapter.cls.php<br />
+			Line: 704<br />
+			Function: getFontHeight			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\font_metrics.cls.php<br />
+			Line: 127<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_decorator.cls.php<br />
+			Line: 90<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_decorator.cls.php<br />
+			Line: 429<br />
+			Function: get_margin_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\block_frame_reflower.cls.php<br />
+			Line: 725<br />
+			Function: check_page_break			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_reflower.cls.php<br />
+			Line: 138<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\dompdf.cls.php<br />
+			Line: 817<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\to_pdf_helper.php<br />
+			Line: 29<br />
+			Function: render			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\controllers\Projects.php<br />
+			Line: 475<br />
+			Function: pdf_create1			</p>
+
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\index.php<br />
+			Line: 318<br />
+			Function: require_once			</p>
+
+		
+	
+
+</div>
+<div style="border:1px solid #990000;padding-left:20px;margin:0 0 10px 0;">
+
+<h4>A PHP Error was encountered</h4>
+
+<p>Severity: Notice</p>
+<p>Message:  Undefined index: </p>
+<p>Filename: lib/class.pdf.php</p>
+<p>Line Number: 3098</p>
+
+
+	<p>Backtrace:</p>
+	
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\lib\class.pdf.php<br />
+			Line: 3098<br />
+			Function: _error_handler			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\cpdf_adapter.cls.php<br />
+			Line: 704<br />
+			Function: getFontHeight			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\font_metrics.cls.php<br />
+			Line: 127<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_reflower.cls.php<br />
+			Line: 168<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_reflower.cls.php<br />
+			Line: 333<br />
+			Function: _layout_line			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\block_frame_reflower.cls.php<br />
+			Line: 722<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_reflower.cls.php<br />
+			Line: 138<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\dompdf.cls.php<br />
+			Line: 817<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\to_pdf_helper.php<br />
+			Line: 29<br />
+			Function: render			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\controllers\Projects.php<br />
+			Line: 475<br />
+			Function: pdf_create1			</p>
+
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\index.php<br />
+			Line: 318<br />
+			Function: require_once			</p>
+
+		
+	
+
+</div>
+<div style="border:1px solid #990000;padding-left:20px;margin:0 0 10px 0;">
+
+<h4>A PHP Error was encountered</h4>
+
+<p>Severity: Notice</p>
+<p>Message:  Undefined index: </p>
+<p>Filename: lib/class.pdf.php</p>
+<p>Line Number: 3098</p>
+
+
+	<p>Backtrace:</p>
+	
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\lib\class.pdf.php<br />
+			Line: 3098<br />
+			Function: _error_handler			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\cpdf_adapter.cls.php<br />
+			Line: 704<br />
+			Function: getFontHeight			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\font_metrics.cls.php<br />
+			Line: 127<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_decorator.cls.php<br />
+			Line: 90<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_decorator.cls.php<br />
+			Line: 429<br />
+			Function: get_margin_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\block_frame_reflower.cls.php<br />
+			Line: 725<br />
+			Function: check_page_break			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_reflower.cls.php<br />
+			Line: 138<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\dompdf.cls.php<br />
+			Line: 817<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\to_pdf_helper.php<br />
+			Line: 29<br />
+			Function: render			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\controllers\Projects.php<br />
+			Line: 475<br />
+			Function: pdf_create1			</p>
+
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\index.php<br />
+			Line: 318<br />
+			Function: require_once			</p>
+
+		
+	
+
+</div>
+<div style="border:1px solid #990000;padding-left:20px;margin:0 0 10px 0;">
+
+<h4>A PHP Error was encountered</h4>
+
+<p>Severity: Notice</p>
+<p>Message:  Undefined index: </p>
+<p>Filename: lib/class.pdf.php</p>
+<p>Line Number: 3098</p>
+
+
+	<p>Backtrace:</p>
+	
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\lib\class.pdf.php<br />
+			Line: 3098<br />
+			Function: _error_handler			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\cpdf_adapter.cls.php<br />
+			Line: 704<br />
+			Function: getFontHeight			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\font_metrics.cls.php<br />
+			Line: 127<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_reflower.cls.php<br />
+			Line: 168<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_reflower.cls.php<br />
+			Line: 333<br />
+			Function: _layout_line			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\block_frame_reflower.cls.php<br />
+			Line: 722<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_reflower.cls.php<br />
+			Line: 138<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\dompdf.cls.php<br />
+			Line: 817<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\to_pdf_helper.php<br />
+			Line: 29<br />
+			Function: render			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\controllers\Projects.php<br />
+			Line: 475<br />
+			Function: pdf_create1			</p>
+
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\index.php<br />
+			Line: 318<br />
+			Function: require_once			</p>
+
+		
+	
+
+</div>
+<div style="border:1px solid #990000;padding-left:20px;margin:0 0 10px 0;">
+
+<h4>A PHP Error was encountered</h4>
+
+<p>Severity: Notice</p>
+<p>Message:  Undefined index: </p>
+<p>Filename: lib/class.pdf.php</p>
+<p>Line Number: 3098</p>
+
+
+	<p>Backtrace:</p>
+	
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\lib\class.pdf.php<br />
+			Line: 3098<br />
+			Function: _error_handler			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\cpdf_adapter.cls.php<br />
+			Line: 704<br />
+			Function: getFontHeight			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\font_metrics.cls.php<br />
+			Line: 127<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_decorator.cls.php<br />
+			Line: 90<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_decorator.cls.php<br />
+			Line: 429<br />
+			Function: get_margin_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\block_frame_reflower.cls.php<br />
+			Line: 725<br />
+			Function: check_page_break			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_reflower.cls.php<br />
+			Line: 138<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\dompdf.cls.php<br />
+			Line: 817<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\to_pdf_helper.php<br />
+			Line: 29<br />
+			Function: render			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\controllers\Projects.php<br />
+			Line: 475<br />
+			Function: pdf_create1			</p>
+
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\index.php<br />
+			Line: 318<br />
+			Function: require_once			</p>
+
+		
+	
+
+</div>
+<div style="border:1px solid #990000;padding-left:20px;margin:0 0 10px 0;">
+
+<h4>A PHP Error was encountered</h4>
+
+<p>Severity: Notice</p>
+<p>Message:  Undefined index: </p>
+<p>Filename: lib/class.pdf.php</p>
+<p>Line Number: 3098</p>
+
+
+	<p>Backtrace:</p>
+	
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\lib\class.pdf.php<br />
+			Line: 3098<br />
+			Function: _error_handler			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\cpdf_adapter.cls.php<br />
+			Line: 704<br />
+			Function: getFontHeight			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\font_metrics.cls.php<br />
+			Line: 127<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_reflower.cls.php<br />
+			Line: 168<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_reflower.cls.php<br />
+			Line: 333<br />
+			Function: _layout_line			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\block_frame_reflower.cls.php<br />
+			Line: 722<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_reflower.cls.php<br />
+			Line: 138<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\dompdf.cls.php<br />
+			Line: 817<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\to_pdf_helper.php<br />
+			Line: 29<br />
+			Function: render			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\controllers\Projects.php<br />
+			Line: 475<br />
+			Function: pdf_create1			</p>
+
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\index.php<br />
+			Line: 318<br />
+			Function: require_once			</p>
+
+		
+	
+
+</div>
+<div style="border:1px solid #990000;padding-left:20px;margin:0 0 10px 0;">
+
+<h4>A PHP Error was encountered</h4>
+
+<p>Severity: Notice</p>
+<p>Message:  Undefined index: </p>
+<p>Filename: lib/class.pdf.php</p>
+<p>Line Number: 3098</p>
+
+
+	<p>Backtrace:</p>
+	
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\lib\class.pdf.php<br />
+			Line: 3098<br />
+			Function: _error_handler			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\cpdf_adapter.cls.php<br />
+			Line: 704<br />
+			Function: getFontHeight			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\font_metrics.cls.php<br />
+			Line: 127<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_decorator.cls.php<br />
+			Line: 90<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_decorator.cls.php<br />
+			Line: 429<br />
+			Function: get_margin_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\block_frame_reflower.cls.php<br />
+			Line: 725<br />
+			Function: check_page_break			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_reflower.cls.php<br />
+			Line: 138<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\dompdf.cls.php<br />
+			Line: 817<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\to_pdf_helper.php<br />
+			Line: 29<br />
+			Function: render			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\controllers\Projects.php<br />
+			Line: 475<br />
+			Function: pdf_create1			</p>
+
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\index.php<br />
+			Line: 318<br />
+			Function: require_once			</p>
+
+		
+	
+
+</div>
+<div style="border:1px solid #990000;padding-left:20px;margin:0 0 10px 0;">
+
+<h4>A PHP Error was encountered</h4>
+
+<p>Severity: Notice</p>
+<p>Message:  Undefined index: </p>
+<p>Filename: lib/class.pdf.php</p>
+<p>Line Number: 3098</p>
+
+
+	<p>Backtrace:</p>
+	
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\lib\class.pdf.php<br />
+			Line: 3098<br />
+			Function: _error_handler			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\cpdf_adapter.cls.php<br />
+			Line: 704<br />
+			Function: getFontHeight			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\font_metrics.cls.php<br />
+			Line: 127<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_reflower.cls.php<br />
+			Line: 168<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_reflower.cls.php<br />
+			Line: 333<br />
+			Function: _layout_line			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\block_frame_reflower.cls.php<br />
+			Line: 722<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_reflower.cls.php<br />
+			Line: 138<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\dompdf.cls.php<br />
+			Line: 817<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\to_pdf_helper.php<br />
+			Line: 29<br />
+			Function: render			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\controllers\Projects.php<br />
+			Line: 475<br />
+			Function: pdf_create1			</p>
+
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\index.php<br />
+			Line: 318<br />
+			Function: require_once			</p>
+
+		
+	
+
+</div>
+<div style="border:1px solid #990000;padding-left:20px;margin:0 0 10px 0;">
+
+<h4>A PHP Error was encountered</h4>
+
+<p>Severity: Notice</p>
+<p>Message:  Undefined index: </p>
+<p>Filename: lib/class.pdf.php</p>
+<p>Line Number: 3098</p>
+
+
+	<p>Backtrace:</p>
+	
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\lib\class.pdf.php<br />
+			Line: 3098<br />
+			Function: _error_handler			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\cpdf_adapter.cls.php<br />
+			Line: 704<br />
+			Function: getFontHeight			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\font_metrics.cls.php<br />
+			Line: 127<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_decorator.cls.php<br />
+			Line: 90<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_decorator.cls.php<br />
+			Line: 429<br />
+			Function: get_margin_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\block_frame_reflower.cls.php<br />
+			Line: 725<br />
+			Function: check_page_break			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_reflower.cls.php<br />
+			Line: 138<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\dompdf.cls.php<br />
+			Line: 817<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\to_pdf_helper.php<br />
+			Line: 29<br />
+			Function: render			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\controllers\Projects.php<br />
+			Line: 475<br />
+			Function: pdf_create1			</p>
+
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\index.php<br />
+			Line: 318<br />
+			Function: require_once			</p>
+
+		
+	
+
+</div>
+<div style="border:1px solid #990000;padding-left:20px;margin:0 0 10px 0;">
+
+<h4>A PHP Error was encountered</h4>
+
+<p>Severity: Notice</p>
+<p>Message:  Undefined index: </p>
+<p>Filename: lib/class.pdf.php</p>
+<p>Line Number: 3098</p>
+
+
+	<p>Backtrace:</p>
+	
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\lib\class.pdf.php<br />
+			Line: 3098<br />
+			Function: _error_handler			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\cpdf_adapter.cls.php<br />
+			Line: 704<br />
+			Function: getFontHeight			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\font_metrics.cls.php<br />
+			Line: 127<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_reflower.cls.php<br />
+			Line: 168<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_reflower.cls.php<br />
+			Line: 333<br />
+			Function: _layout_line			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\block_frame_reflower.cls.php<br />
+			Line: 722<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_reflower.cls.php<br />
+			Line: 138<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\dompdf.cls.php<br />
+			Line: 817<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\to_pdf_helper.php<br />
+			Line: 29<br />
+			Function: render			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\controllers\Projects.php<br />
+			Line: 475<br />
+			Function: pdf_create1			</p>
+
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\index.php<br />
+			Line: 318<br />
+			Function: require_once			</p>
+
+		
+	
+
+</div>
+<div style="border:1px solid #990000;padding-left:20px;margin:0 0 10px 0;">
+
+<h4>A PHP Error was encountered</h4>
+
+<p>Severity: Notice</p>
+<p>Message:  Undefined index: </p>
+<p>Filename: lib/class.pdf.php</p>
+<p>Line Number: 3098</p>
+
+
+	<p>Backtrace:</p>
+	
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\lib\class.pdf.php<br />
+			Line: 3098<br />
+			Function: _error_handler			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\cpdf_adapter.cls.php<br />
+			Line: 704<br />
+			Function: getFontHeight			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\font_metrics.cls.php<br />
+			Line: 127<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\text_frame_decorator.cls.php<br />
+			Line: 90<br />
+			Function: get_font_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_decorator.cls.php<br />
+			Line: 429<br />
+			Function: get_margin_height			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\block_frame_reflower.cls.php<br />
+			Line: 725<br />
+			Function: check_page_break			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\page_frame_reflower.cls.php<br />
+			Line: 138<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\frame_decorator.cls.php<br />
+			Line: 556<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\dompdf\include\dompdf.cls.php<br />
+			Line: 817<br />
+			Function: reflow			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\helpers\to_pdf_helper.php<br />
+			Line: 29<br />
+			Function: render			</p>
+
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\application\controllers\Projects.php<br />
+			Line: 475<br />
+			Function: pdf_create1			</p>
+
+		
+	
+		
+	
+		
+			<p style="margin-left:10px">
+			File: C:\xampp_new\htdocs\apsportal\index.php<br />
+			Line: 318<br />
+			Function: require_once			</p>
+
+		
+	
+
+</div>

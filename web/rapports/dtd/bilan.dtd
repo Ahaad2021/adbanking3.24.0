@@ -1,0 +1,25 @@
+<!-- DTD pour le bilan -->
+
+<!-- Element root -->
+<!ELEMENT bilan (header, compte*,agences,enreg_agence)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!ELEMENT compte (compte_actif, libel_actif, solde_actif, amort_actif, net_actif, compte_passif, libel_passif, solde_passif)>
+
+<!ELEMENT compte_actif (#PCDATA)>
+<!ELEMENT libel_actif (#PCDATA)>
+<!ELEMENT solde_actif (#PCDATA)>
+<!ELEMENT amort_actif (#PCDATA)>
+<!ELEMENT net_actif (#PCDATA)>
+<!ELEMENT compte_passif (#PCDATA)>
+<!ELEMENT libel_passif (#PCDATA)>
+<!ELEMENT solde_passif (#PCDATA)>
+
+<!ELEMENT agences (agences)>
+<!ELEMENT enreg_agence (id_ag,libel_ag,date_max)>
+<!ELEMENT id_ag (#PCDATA)>
+<!ELEMENT libel_ag (#PCDATA)>
+<!ELEMENT date_max (#PCDATA)>

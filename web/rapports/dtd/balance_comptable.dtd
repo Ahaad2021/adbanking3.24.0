@@ -1,0 +1,29 @@
+<!-- DTD pour la balance comptable -->
+
+<!-- Element root -->
+<!ELEMENT balance_comptable (header,comptable*,agences,enreg_agence)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!ELEMENT comptable (compte*)>
+<!ELEMENT compte (num, libel, solde_debut_deb, solde_debut_cre, total_debits, total_credits, calcul_debit, calcul_credit, solde_fin_deb, solde_fin_cre, variation)>
+
+<!ELEMENT num (#PCDATA)>
+<!ELEMENT libel (#PCDATA)>
+<!ELEMENT solde_debut_deb (#PCDATA)>
+<!ELEMENT solde_debut_cre (#PCDATA)>
+<!ELEMENT total_debits (#PCDATA)>
+<!ELEMENT total_credits (#PCDATA)>
+<!ELEMENT calcul_debit (#PCDATA)>
+<!ELEMENT calcul_credit (#PCDATA)>
+<!ELEMENT solde_fin_deb (#PCDATA)>
+<!ELEMENT solde_fin_cre (#PCDATA)>
+<!ELEMENT variation (#PCDATA)>
+
+<!ELEMENT agences (agences)>
+<!ELEMENT enreg_agence (id_ag,libel_ag,date_max)>
+<!ELEMENT id_ag (#PCDATA)>
+<!ELEMENT libel_ag (#PCDATA)>
+<!ELEMENT date_max (#PCDATA)>

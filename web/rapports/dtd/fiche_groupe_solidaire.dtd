@@ -1,0 +1,42 @@
+<!-- DTD pour la fiche d'un groupe solidaire -->
+
+<!-- Element root -->
+<!ELEMENT fiche_groupe_solidaire (header, header_contextuel?, fiche_gs, liste_membres)>
+
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- Corps -->
+<!ELEMENT fiche_gs (num_gi,etat_gi,stat_jur_gi,qualite_gi,anc_num_gi,date_adh_gi,date_cre_gi,gest_gi,lang_corres_gi,nom_gi,nbr_membre_gi,date_agrement_gi,adresse_gi,loc1_gi,loc2_gi,code_postal_gi,ville_gi,pays_gi,num_tel_gi,fax_gi,email_gi,sect_act_gi, zone)>
+<!ELEMENT num_gi (#PCDATA)>
+<!ELEMENT etat_gi (#PCDATA)>
+<!ELEMENT stat_jur_gi (#PCDATA)>
+<!ELEMENT qualite_gi (#PCDATA)>
+<!ELEMENT anc_num_gi (#PCDATA)>
+<!ELEMENT date_adh_gi (#PCDATA)>
+<!ELEMENT date_cre_gi (#PCDATA)>
+<!ELEMENT gest_gi (#PCDATA)>
+<!ELEMENT lang_corres_gi (#PCDATA)>
+<!ELEMENT nom_gi (#PCDATA)>
+<!ELEMENT nbr_membre_gi (#PCDATA)>
+<!ELEMENT date_agrement_gi (#PCDATA)>
+<!ELEMENT adresse_gi (#PCDATA)>
+<!ELEMENT loc1_gi (#PCDATA)>
+<!ELEMENT loc2_gi (#PCDATA)>
+<!ELEMENT code_postal_gi (#PCDATA)>
+<!ELEMENT ville_gi (#PCDATA)>
+<!ELEMENT pays_gi (#PCDATA)>
+<!ELEMENT num_tel_gi (#PCDATA)>
+<!ELEMENT fax_gi (#PCDATA)>
+<!ELEMENT email_gi (#PCDATA)>
+<!ELEMENT sect_act_gi (#PCDATA)>
+<!ELEMENT zone (#PCDATA)>
+
+<!ELEMENT  liste_membres (num_pp, nom_pp,date_adh_pp)>
+<!ELEMENT num_membre (#PCDATA)>
+<!ELEMENT nom_membre (#PCDATA)>
+<!ELEMENT date_adh_membre (#PCDATA)>
+
+

@@ -1,0 +1,39 @@
+<!-- DTD pour le rapport etats des chequiers imprimes -->
+
+        <!-- Element root -->
+        <!ELEMENT calc_int_recevoir (header, infos_synthetique, footer, header_contextuel, calc_int_recevoir_data)>
+
+        <!-- Un en-tete commun a tous -->
+        <!ENTITY % mod_header SYSTEM "header.dtd">
+        %mod_header;
+
+        <!ELEMENT infos_synthetique (total_int_recevoir)>
+
+
+
+        <!ELEMENT calc_int_recevoir_data (prod*)>
+        <!ELEMENT prod (prod_name, ligne_int_recevoir*,totals)>
+        <!ELEMENT prod_name (#PCDATA)>
+
+
+        <!ELEMENT ligne_int_recevoir (num_client, nom_client, num_dossier, capital, date_debloc,int_att_ech, int_att_ech, date_th,nb_jours, montant_int,int_non_paye,iar_cumule)>
+        <!ELEMENT num_client (#PCDATA)>
+        <!ELEMENT nom_client (#PCDATA)>
+        <!ELEMENT num_dossier (#PCDATA)>
+        <!ELEMENT capital (#PCDATA)>
+        <!ELEMENT date_debloc (#PCDATA)>
+        <!ELEMENT int_att_ech (#PCDATA)>
+        <!ELEMENT date_th (#PCDATA)>
+        <!ELEMENT nb_jours (#PCDATA)>
+        <!ELEMENT montant_int (#PCDATA)>
+        <!ELEMENT int_non_paye (#PCDATA)>
+        <!ELEMENT iar_cumule (#PCDATA)>
+
+        <!ELEMENT totals (total_cap_restant_du, total_int_attendu_ech, total_iar_echeance, total_int_non_paye,total_int_recevoir ) >
+        <!ELEMENT total_cap_restant_du (#PCDATA)>
+        <!ELEMENT total_int_attendu_ech (#PCDATA)>
+        <!ELEMENT total_iar_echeance (#PCDATA)>
+        <!ELEMENT total_int_non_paye (#PCDATA)>
+        <!ELEMENT total_int_recevoir (#PCDATA)>
+
+

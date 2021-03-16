@@ -1,0 +1,12 @@
+#
+#Tue Feb 19 14:59:57 MUT 2019
+DB_name=null
+DB_port=
+error_count=
+DB_user=null
+fichier_agences=/usr/share/adbanking/web/multiagence/properties/multiagence.csv
+DB_schema=null
+fichier_param=/usr/share/adbanking/web/multiagence/properties/adbanking.ini
+DB_pass=null
+max_id_log_multiagence=
+DB_host=null

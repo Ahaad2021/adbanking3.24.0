@@ -1,0 +1,25 @@
+<!-- DTD pour le rapport des etats d'execution budgetaire -->
+
+<!-- Element root -->
+<!ELEMENT budget_rapportbudget (header,infos_synthetiques,infos_etat)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!ELEMENT infos_synthetiques (devise)>
+<!ELEMENT devise (#PCDATA)>
+
+<!-- Corps -->
+<!ELEMENT infos_etat (type_budget)>
+<!ELEMENT type_budget (details*)>
+
+<!ELEMENT details (poste,niveau,description,trim_1,trim_2,trim_3, trim_4,budget_annuel)>
+<!ELEMENT poste (#PCDATA)>
+<!ELEMENT niveau (#PCDATA)>
+<!ELEMENT description (#PCDATA)>
+<!ELEMENT trim_1 (#PCDATA)>
+<!ELEMENT trim_2 (#PCDATA)>
+<!ELEMENT trim_3 (#PCDATA)>
+<!ELEMENT trim_4 (#PCDATA)>
+<!ELEMENT budget_annuel (#PCDATA)>

@@ -1,0 +1,1338 @@
+Historique des différentes versions d'ADbanking
+***********************************************
+Version 3.16.1
+-----------------
+-- Release date : 22 Janvier 2016
+
+--DA clients, améliorations et bogues fixés
+#632	Concaténation id agence, Agence dans le traitement de batch
+#635	Erreur lors de la souscription de Parts social ou transfert
+#640	Permettre le rajout de l'id agence dans le numéro compte complet
+#641	Champ Détail Objet de Crédits en Texte Libre et Liste Déroulante
+#642	Erreur sur le rapport concentration client
+#643	Mise en place de dossier de Crédits - Bouton Précédent
+#653	Validation du nombre de chiffres dans le numéro de téléphone pour les abonnements SMS
+
+Version 3.4
+-----------------
+-- Release date : 20 Juillet 2012
+
+--DA clients, améliorations et bogues fixés
+#23	Gestion du multilingue
+#31	Déboursement dégressif des crédits
+#26	Recouvrement automatique des crédits radiés
+#28	Gestion des chèques
+#9	Frais de dossier de crédit en pourcentage
+#32	Prolongation automatique des DAT
+#35	Gestion des comptes dormants
+#33	Champs personnalisés dans l'affiche client et  crédit
+#43	Rapport sur les transactions financières
+#34 Historisation des crédits et des comptes d'épargne
+#30 Amélioration du rééchelonnement de crédit
+#36 Vérification de la cohérence du logiciel
+#129 Amélioration du rapport concentration épargne
+
+Version 3.2.2-rc8
+-----------------
+-- Release date : 06 Décembre 2011
+
+--DA clients, améliorations et bogues fixés
+#6	rapports opérationnels à une date antérieure
+#3	Epargne à la source
+#20	Désactivation du passage en perte automatique impossible sur interface graphique
+#21	Modification des comptes des états de crédits impossible à l'interface graphique
+#16	Optimisation des rapports comptbles
+#10	Rapports BRB
+#7	Rapport BNR
+#13	Ajouts des codes java et jasper de l'outil de reporting
+#14	Affichage des rapports personnalisés: problème de compatibité
+
+Version 3.2-rc1
+-----------------
+-- Release date : 12 Décembre 2009
+
+--DA clients, améliorations et bogues fixés
+#1806 Correction des credits
+#1830 TVA - améliorations nécessaires
+#1831 déboursement dégressif - le remboursement n'est pas possible
+#1833 gestion des provisions - le montant des provisions ne tient pas compte des la garantie numéraire en cours
+#1834 provisions - rapports
+#1835 provisions - suivi du dossier de crédit
+#1836 provisions - validation
+#1837 dépôt par lot via fichier - prise en compte des commissions
+#1838 reprise épargne par lot - erreur
+#1839 pièces comptables - les nouvelles pièces comptables ne s'affichent pas
+#1840 registre des prêts - les intérêts restants dûs ne s'affichent pas
+#1841 utilisation garantie pour rembourser crédit - option non implémentée
+#1842 annulation du dossier de crédit ne marche pas
+#1843 rapport historique demande des crédits clients ne marche pas
+#1846 Transfert entre compte revoie une erreur interne
+#1848 Passage en perte de credit avec garantie encours
+#1868 Blocage des comptes
+
+Version 3.1
+-----------
+-- Release date : - (version de développement)
+--DA clients et améliorations
+
+#59 Informations imprimées lors d'une simulation d'échéancier
+#82 Calcul des provisions
+#88 Bilan comptable-Gestion des provisions
+#276 Indépendance d'ADbanking à la distribution Linux/UNIX
+#410 Finalisation et actualisation du multilingue
+#482 Dépôt par lot via fichier - Prise en compte d'éventuelles commissions s'il s'agit d'un virement de salaires
+#490 PAPME - Ordre de remboursement d'une échéance d'un DCR
+#549 UBPR - Déboursement progressif d'un crédit
+#563 Reprise épargne par lot
+#586 TMB - Abattement des intérêts et pénalités : modification de l'épargne nantie
+#596 TMB - Rapport bilan comptable : améliorations
+#598 TMB - Rapport journalier : informations classées par statut juridique
+#603 TMB - Rapport historique crédits soldés clients : ajout de la date de déboursement
+#605 TMB - Ajout d'un rapport sur l'épargne : dépôts initiaux
+#614 TMB - Ajout d'un rapport client : situation analytique pour l'épargne et le crédit
+#754 Rapport : MUTEC historique d'un compte d'épargne (CAT, DAT) fermé
+#764 TMB - Devises dans les rapports crédits
+#782 TMB ajout de nouveax types de pièces comptables dans la saisie des écritures libres
+#823 Ajout intérêts dus dans rapport registre des prêts
+#826 Améliorations rapport journalier
+#1176 Utilisation de la garantie pour rembourser le solde d'un crédit
+#1177 Groupes solidaire : empêcher l'appartenance à plusieurs groupes
+#1315 WAGES - Déboursement crédit par chèque
+#1328 TMB - Dépôt par lot : pour tous les comptes
+#1376 Annulation de crédit
+#1388 Amélioration rapport historique demande de crédits
+#1392 Reprise sur provisions
+#1404 Déboursement d'un crédit au guichet
+#1518 Génération lente des rapports : utilisation d'outils de reporting
+#1549 DA : Blocage des comptes
+#1577 CECAD calcul des intérêts sur le produit "épargne à la source"
+#1578 Gestion de la TVA
+#1609 TMB - Masquer le solde des comptes au guichet
+#1610 TMB - Montant maximum encaissé
+#1611 TMB - Interface NETBANK
+#1671 Suppression crédits repris
+#1802 Commentaires sur le client
+
+Version 3.0.5 
+----------------- 
+-- Release date : 18 mai 2009 
+ 
+-- Améliorations et bugs fixés 
+#1525 Réechelonnement 
+#1648 Gestion des ordres permanents 
+#1660 Etat rejetter dans Registre de prêt 
+#1663 le Grand livre du siège ne s'affiche pas 
+#1664 COOPEDU - réalisation de la garantie constituée en cours 
+#1667 Registre des pretsb errone 
+#1668 COOPEDU - rapport des crédits passés en perte 
+#1673 Enregistrement de l' opération dépôt par lot 
+#1677 La v2.8.9 n'a pas été correctement cloturée 
+#1678 Pas assez de mémoire lors de l'exécution du batch 
+#1683 Gestion des mandataires 
+#1685 TMB - Amélioration Interface NETBANK
+
+Version 3.0.4
+-----------------
+-- Release date : 19 mars 2009
+
+-- Améliorations et bugs fixés
+#1617 Income Statement - Rapports BNR
+#1618 Prelèvement sur compte débiteur
+#1620 rapport agence-brouillard de caisse journalier:rapport vide
+#1621 Le remboursement d'un crédit ne tient pas compte du montant minimum
+#1624 Comptabilité: Cloture d'exercice
+#1625 comptabilité:cloture periodique
+#1626 Creation d une nouvelle base
+#1628 Rapport crédit : Situation des risques
+#1629 rapport: generation des recus
+#1632 Date Remboursement non affiché
+#1633 Reprise de credit par lot: erreur interne lors de l'activation.
+#1635 Reechelonnement de credit
+#1636 Exportation du journal comptable
+#1642 Generation de CSV du registre des prets des groupes solidaires
+#1646 Calcul du bilan consolidé
+#1647 Gestion des frais en attente
+#1648 Gestion des ordres permanents
+#1649 Rapports registres de prêts
+#1652 Souscription nouvelle part sociale
+
+Version 3.0.3
+-----------------
+-- Release date : 03 décembre 2008
+
+-- Améliorations et bugs fixés :
+#268 Rapports compta-Exportation journal-Numéro de transaction
+#505 Affichage du plan comptable
+#606 TMB - Ajout d'un rapport sur les crédits : crédits octroyés
+#753 TMB - Ajout d'un rapport sur les crédits rééchelonnés
+#787 Après l'ajout d'un nouveau produit de crédit, aller au paramétrage des états
+#831 Commentaire lors de l'ajustement du solde d'un compte
+#982 Rapport sur l'épargne : liste des DAT et CAT
+#1308 Génération des rapports : suppression des text.xml
+#1377 Visualiser les crédits à radier dans les rapports
+#1381 Ajouter le solde initial et final sur le rapport grand livre - CECAD
+#1382 Anjouter les totaux sur le journal et le Grand-livre - CECAD
+#1412 Rapports concentration de l'épargne : sélection des comptes d'épargne
+#1456 Epargne : modification de l'intitulé d'un compte
+#1515 sacco plafond du montant payé par le guichetier
+#1554 Generation Rapports comptables avec niveau : Format BNR
+#1576 Rapports crédits : améliorations dans l'affichage du registre des prêts
+#1581 Tableau de résultats trimestriels: Non prise en compte des informations opérationnelles pour les agences
+#1584 Le grand livre affiche le même compte
+#1586 Comptabilité : Cloture d'exercice
+#1588 Rapports clients défectueux
+#1589 le rapport situation des risques semble erronné
+#1593 Mise à jour du nombre de jour de retard d'un dossier repris
+#1594 La situation des risques
+#1595 La liste des frais en attente
+#1596 Rapport agence - Ecritures libres
+#1598 Rapport BNR : Liste des 10 plus grands emprunteurs
+#1599 Rapport BNR : Prêts accordés aux directeurs emprunteurs
+#1600 Rapport BNR : Situation des risques par secteur d'activité
+#1602 Rapport BNR : Ratio de liquidité
+#1605 Rapport Comptable - Grand livre - 3.0.3-RC1
+
+Version 3.0.2
+-----------------
+-- Release date : 29 septembre 2008
+
+-- Améliorations et bugs fixés :
+#784 UBPR-RIM-IRIBA gestion des crédits passés en perte
+#1467 UBPR - correction à l'interface d'une erreur sur le crédit
+#1474 Tranfert entre comptes : Sortir un ordre de virement ou un reçu
+#1503 Brouillard de caisse journalier: Non prise en compte des toutes les transactions financières
+#1504 Brouillard de caisse journalier: Choix des guichets
+#1520 Reprise de crédits par lots : améliorations
+#1536 Nouveau refereciel comptable
+#1537 Guarantie attendue
+#1538 Mise en place d'un crédit : Date de déblocage
+#1539 Problème de déboursement avec frais de dossier
+#1540 Dépot des agences au siège
+#1542 Correction des dossiers de crédit:Mise à jour de la base de données
+#1543 Correction des dossiers de crédit: Annulation d'un dossier de crédit
+#1544 Ordres permanents : Historisation des écritures comptables par le batch
+#1545 Paramétrage: Durée minimale du mot de passe
+#1546 Nombre maximum de parts sociales
+#1547 Situation globale d'un client
+#1548 Reprise des crédits
+#1551 Affichage de la photo des mandataires
+#1552 Brouillard de caisse au siège
+#1556 supression remboursement
+#1557 Simulation échéancier théorique renvoie une Erreur
+#1559 Rapport crédits en retard
+#1561 Reprise crédit par lôt
+#1562 Radiation manuelle des crédits
+#1564 Duréée minimale du mot de passe
+#1565 le path du fop dans adbanking.ini
+#1566 Suppression remboursement
+#1567 Extrait de compte
+#1568 mobilisation de garantie matériel
+#1569 Reprise crédit individuel
+#1570 Rapport Généraliste des Clients
+#1572 rapport d'activité
+#1573 Mise en place dossier crédit solidaire
+#1579 Rapport situation des risques
+
+Version 3.0.2-rc1
+-----------------
+-- Release date : 31 Juillet 2008
+
+-- Améliorations et bugs fixés :
+#1467 UBPR - correction à l'interface d'une erreur sur le crédit
+#1474 Tranfert entre comptes : Sortir un ordre de virement ou un reçu
+#1503 Brouillard de caisse journalier: Non prise en compte des toutes les transactions financières
+#1504 Brouillard de caisse journalier: Choix des guichets
+#1516 Mise à jour 3.0 vers 3.0.1
+#1517 Consolidation au siège : Annulation des mouvements réciproques
+#1519 Consolidation au siège : différenciation des rapports du réseau
+#1521 Consolidation : duplication noms des opérations
+#1522 Rapport comptabilité:exportation balance ne marche pas
+#1523 Rapport d'activités:Méthode de calcul des champs
+#1524 Encours total de crédit: Montant différent entre deux rapports
+
+Version 3.0.1
+-------------
+--Release date : 23 mai 2008
+#1271	mobilisation garantie : problème à l'ecran Ado-6
+#1331	Rapport brouillard de caisse journalier : problème aves le traitement des attentes
+#1338	Rapport Epargne - Etat général des comptes : améliorations sur le produit	
+#1393	Rapport au siège : Ajout tous sur le selecteur
+#1430	Rapport des écritures libres : amélioration	
+#1431	Batch : problème de date de comptabilisation	
+#1432	Modification d'un dossier de crédit : erreur interne	
+#1461	Mise en place d'un crédit :Delai d'attente avant octroi d'un cédit
+#1462	Erreur après la mise à jour de la base de données: 2.8.x vers 3.0	
+#1464	UBPR - reprise des crédits	
+#1465	UBPR - déboursement par tranches
+#1468	Deuxieme consolidation : erreur de suppression
+#1469	la numérotation des comptes de type Rwanda ne marche pas
+#1470	Exportation du grand-livre dans csv	
+#1471	Reprise des clients : Création du compte des parts sociales
+#1472	Reprise des crédits : Importation des données dans la table ad_dcr
+#1473	Déboursement des crédits: l'option de prélévements des frais aprés le déboursement ne marche pas
+#1475	PROBÈME D'ADHESION: IMPOSSIBLE DE CRÉER UN NOUVEAU CLIENT	
+#1478	Modification d'un dossier de crédit: plusieurs boutons présents dans l'écran.	
+#1479	pénalités de crédit en retard	
+#1482	Problème dépôt par lot: virement de salaire	
+#1483	Iriba : blocage du batch sur le prélevement automatique	
+#1484	pb lors du Portage de la v2.8.9 vers la branche 3.0.1	
+#1486	Installation rpm V3.0 : repertoire backup non créé	
+#1487	Modification d'un dossier de crédit avec garantie.
+#1489	Problème avec l'ancien ticket #1443 de mot de passe rigoureux
+#1494	Modification de login : erreur interne	
+#1495	Extraits de compte : erreur interne	
+#1498	Mise à jour de adbanking.ini: Chemin d'accés de FOP	
+#1500	Chemin d'accées de fichiers de mise à jour de la base 2.X ne sont pas bons	
+#1501	Remboursement des crédits en perte pour les groupes solidaires à dossiers multiples	
+
+
+Version 3.0
+-----------
+-- Release date : 10 mars 2008
+#71    Mise à jour Trac (0.8.4 -> 0.9)
+#171    Mise à jour de l'encodeur Ioncube vers la version 6.5
+#276    Indépendance d'ADbanking à la distribution Linux/UNIX
+#327    COMORES-Ajout du logo de l'IMF dans les rapports
+#494    UBPR - Calcul des pénalités pour rupture anticipée de DAT
+#548    UBPR - Ordres permanents
+#552    UBPR - Frais sur compte destination lors d'un transfert groupé
+#557    MUTEC - Rapport sur les clients débiteurs les plus importants
+#560    Nouveau plan comptable PARMEC
+#564    Reprise crédit par lot
+#604    TMB - Rapport ajustements de caisse : ajout de la liste des ajustements
+#659    TMB - Produits d'épargne : pas de différé pour l'épargne nantie
+#675    Défection d'un membre d'un groupe solidaire
+#726    Rapport sur les adhérents
+#728    Rapport adhérent en attente de crédit
+#759    Génération d'une pièce comptable pour une écriture libre
+#765    Montant total remboursé dans le suivi du dossier de crédit
+#781    TMB & MUTEC ajout du numéro de transaction dans le grand-livre
+#810    Migration vers PHP5
+#814    Indépendance par rapport au répertoire utilisateur
+#815    Création d'un RPM pour Fedora 7
+#829    Impression des nouveaux soldes dans les reçus
+#882    Gestion de la licence
+#893    Prélèvement des frais liés au crédit directement sur le montant du crédit
+#921    Rapport comptable sur les écritures libres
+#1020    Date de déboursement souhaitée pour un crédit
+#1021    Contrôle des doubles affiliations
+#1023    Regroupement des crédits solidaires dans les rapports
+#1024    Rapport pour les appels de fonds
+#1025    Différé négatif sans diminution des intérêts dus
+#1026    Répartition des intérêts du différé sur toutes les échéances
+#1027    Pouvoir modifier la date d'un remboursement
+#1028    Arrondis sur première échéance au lieu de dernière
+#1044    Frais lors du déboursement d'un crédit
+#1054    Présentation des rapports: affichage des lignes des tableaux
+#1058    Regroupement et précisions sur l'appartenance à un GS dans les rapports crédit
+#1070    Groupe solidaire : paiement des parts sociales
+#1072    Reprise de crédits: Afficher nom du client sur l'échéancier de remboursement
+#1128    Rapport client, Export clients/comptes au format CSV: Ordonner par rapport au numéro du client
+#1170    Rapport historique crédits soldés clients : ajout d'informations
+#1171    Rapport encours de crédit les plus importants : ajout d'informations
+#1364    Déclassement d'un crédit en perte: passage en perte manuelle.
+#1366    Informations financières : suivi crédit.
+#1394    Ajout du pourcentage sur le rapport concentration sur les clients
+#1427    Libellé du new db
+
+
+Version 2.8.7
+-------------
+-- Release date : 31 décembre 2007
+
+-- Améliorations et bugs fixés :
+#1306 Calcul des intérêts sur épargne
+#1309 Gestion des mandants et personnes exterieurs
+#1320 Portage du nouveau Plan comptable sur la 2.8
+#1321 Portage vers la 2.8- préservation des noms des comptes
+#1324 Problème d'unicité de transaction
+#1325 Rapport brouillard de caisse journalier : problème aves le traitement des attentes
+#1362 Clôture d'exercice : problème d'arrondi
+
+
+Version 2.8.6
+-------------
+-- Release date : 23 octobre 2007
+
+-- Améliorations et bugs fixés :
+#1192 RPM : double chargement de ioncube_loader dans php.ini
+#1199 Reprise des clients sans anciens numéros et parts sociales
+#1200 Recherche des personnes extérieures
+#1201 Le Rapport concentration épargne ne s'affiche pas
+#1202 Informations financières : affichage incorrecte des informations sur les parts sociales aprés de nouvelles souscriptions
+#1206 Création de relation
+#1207 Remise en fonction de la garantie sur crédits solidaires
+#1212 Compte de Base Debiteur
+#1215 Rapport bilan comptable : problème d'équilibre actif-passif
+#1217	Contrôle sur les garanties mobilisées
+#1219 Change : problème d'arrondi
+#1239 Rapports crédits en perte : problème avec le montant
+#1248 Remboursement crédit en perte : problème en multidevise
+#1253 Batch : mauvais libellé d'écriture pour les intérêts d'un DAT
+#1263 Recherche d'un client
+#1265 Paramètres connexion BD et sauvegardes
+#1270 Deboursement DCR : erreur interne sur Dbd-8
+
+
+Version 2.8.5
+-------------
+-- Release date : 15 octobre 2007
+
+-- Améliorations et bugs fixés :
+#1084 Ouverture autre compte épargne
+#1094 le rapport "opération diverse de caisse" ne marche pas
+#1122 erreur interne lors de la modification d'un profil
+#1127 Rapport épargne : solde des comptes de base mouvementés dans la journée : le solde est tronqué
+#1137 Depôt Euro sur un compte
+#1140 transfert entre compte nantie et son compte de substitut
+#1141 Clôture DAT par le batch
+#1142 Reprise clients : création compte épargne et parts sociale
+#1143 Création client : blocage des parts sociale
+#1146 incohérence entre libellé et compte de l'opération 90
+#1148 Montant erroné sur le reçu de perception initial
+#1158 Reprise des crédits dans la 2.8.4
+#1159 Remboursement de crédit : problème de remboursement inférieur à 1
+#1164 Reprise responsable de groupes solidaires
+#1180 l'ancien numéro de client sous format text n'est pas accepté lors de la reprise des clients
+#1183 PHP warning dans traite_epargne de epargne.php
+
+
+Version 2.9.1
+-------------
+-- Release date : - (version de développement)
+
+-- Amélioration et bugs fixé :
+#327 Ajout du logo de l'IMF dans les rapports
+#557 Rapport sur les clients débiteurs les plus importants
+#604 Rapport ajustements de caisse : ajout de la liste des ajustements
+#728 Rapport adhérent en attente de crédit
+#1044 Frais lors du déboursement d'un crédit
+#1125 Création client: Passages des ecritures comptables incorrectes
+#1126 Consultation crédit: l'affichage de l'écheancier du crédit n'est pas correct
+#1129 Mobilisations des garanties matérielles et clients inactifs
+#1132 Affichage de l'arborescence gauche incorrect
+#1136 Consolidation comptable : les écritures comptables d'une des agences ne sont pas importées dans la base du siège
+#1138 Reprise de la comptabilité : reprise du plan comptable ne marche pas
+
+Version 2.9
+-----------
+-- Release date : - (version de développement)
+
+-- Amélioration et bugs fixé :
+#69 Ecritures comptables-Préservation du nom des comptes
+#160 Liste des clients ayant des frais en attente
+#227 Perception des frais d'adhésion par tranche
+#353 Consolidation portefeuille
+#355 Consolidation comptable
+#481 Prélèvement automatique de frais en attente après un dépôt sur le compte : suppression des triggers et appel dans le batch
+#491 Déclassement d'un crédit
+#554 Enregistrement de la raison de bloquage d'un compte
+#590 Informations financières : modifications sur le suivi de crédit
+#595 Ajout d'un rapport sur l'épargne : état général des comptes
+#599 Rapport brouillard de caisse : améliorations
+#600 Rapport crédits en retard : améliorations
+#602 Rapport statistiques et indicateurs d'agence : nombre total des membres des groupes informels
+#607 Retrait par chèque : ajout d'un reçu pour le client
+#613 Rapport concentration de l'épargne : totaux par devise
+#626 Crédits passés en perte au RIM
+#739 Ajout d'un rapport sur la répartition des clients par état
+#809 Division par 0 lorsque base_taux_epargne pas paramétré
+#835 Rapport d'activité
+#836 Gestion de la comptabilité du systéme FERLO
+#837 Demande d'autorisation pour recharge de carte FERLO
+#870 Gestion des id agence dans le cas du multiagences
+#871 Rapport d'activité du réseau
+#884 Adaptation des requêtes SQL à la consolidation
+#885 Outils de transfert des données pour la consolidation
+#886 Ajout de la version d'ADbanking dans la DB
+#887 Script de fusion des BD pour la consolidation
+#888 Sélecteur agence pour les rapports au siège
+#900 Traitements du batch et accès aux menus au siège du réseau
+#923 Export client/compte pour le systéme Ferlo
+#968 Position case à cocher Paiement par tranche parts sociales
+#998 Rapports : consommation mémoire FOP
+#1067 Menu Comptabilité : Création de nouvelles icônes
+
+
+Version 2.8.4
+-------------
+-- Release date : 10 août 2007
+
+-- Améliorations et bugs fixés :
+#804 Activer le mode debug par adbanking.ini
+#813 Adaptation de new_db à une utilisation multidistribution
+#834 ADbanking en HTTPS
+#841 Multidevise - Calcul de la commission de change
+#845 Gestion des Garanties
+#858 Rapport CLI-SOC
+#867 Reprise des clients : Paiement par tranche
+#889 Suppresion des OID de photo et de signature dans la DB
+#938 Gestion des comptes d'atttente pour la reprise du bilan
+#942 Reprise des photos et signatures à la reprise des clients
+#943 Scripts de mise à jour de la BD pour postgres 8
+#945 L'ajout des parts sociales ne marche pas
+#963 Groupes Solidaires dans fichier traduction.conf
+#964 Limite à 4000 entrées pour le rapport généraliste sur les clients
+#969 Abattement des intérêts et mise à 0
+#970 Nom gestionnaire dans critères de recherche des rapports
+#972 Rapport statistiques et indicateurs d'agence
+#973 Incohérence dans l'encours crédits entre les différents rapports crédits
+#974 Rapport registre de prêt
+#975 Retour après écran des garanties lors de l'approbation d'un crédit
+#977 Ecran de paramétrage d'une simulation d'échéancier
+#978 Améliorations du packaging RPM
+#979 Frais d'adhésion à 0 et encodage nouveau client
+#980 Fiche d'un client appartenant à 2 groupes différents
+#981 Affichage garanties uniquement si demandées
+#984 Reprise des crédits et informations stockées dans ad_etr et ad_sre
+#986 Affichage garantie encours
+#987 Création de compte
+#988 Date de calcul de l'état d'un crédit repris
+#990 Affichage de la date lors de l'approbation d'un dossier de crédit
+#991 Heure du cronjob pour le batch
+#993 Reprise credit activation de dossier: Clause SQL incorrect retour ecran 12
+#994 Contrôle sur l'adresse IP lors du login
+#995 Remboursement des crédits passés en perte pour les dossiers d'un groupe solidaire à dossiers multiples
+#996 Rapport Grand Livre : consommation mémoire FOP
+#997 Utilisation du JRE Sun par défaut
+#999 Ouverture compte devise étrangère et mauvais paramétrage
+#1001 Crédit actif par agent de crédit
+#1002 Ouverture d'un second compte en devise devise étrangère
+#1004 Problème d'arrondi dans les opérations avec un guichet
+#1006 Création d'un mandataire
+#1007 Recherche du compte destination pour un virement interne
+#1008 La modification du montant bloqué n'est pas pris en compte
+#1009 L'ajout d'une relation ne marche pas
+#1010 Nouvelle recherche dans écran de recherche d'une personne extérieure
+#1011 Retour sur premier écran de mise en place d'un DCR
+#1012 Lignes de totaux dans rapport crédits actifs par agent de crédit
+#1022 Warning dans rapport crédits passés en perte
+#1042 Affichage calendrier
+#1046 Modification des commissions
+#1047 Récupération des images dans la DB : problème avec les signatures
+#1048 le dépot et retrait ne marchent pas
+#1052 Incohérences dans le registre des prêts
+#1053 Incohérence rapports crédit
+#1056 La mise à jour vers la 2.8.4 produit une erreur
+
+
+Version 2.8.3
+-------------
+-- Release date : 19 juin 2007
+
+-- Améliorations et bugs fixés :
+#693 Echéanciers : problème d'arrondi
+#861 Reprise des clients : reprise des groupes et crédits solidaires
+#881 Rapport Concentration de l'épargne - EPA-CON
+#896 Mise à jour des comptes liés aux états de crédits
+#897 Inversion des colonnes Débit et Crédit dans le rapport brouillard de caisse
+#901 Impossible d'ouvrir un nouveau compte d'épargne
+#902 Problème avec fichiers signature lors de l'export des images
+#906 Création de groupe avec membre défectueux et retour
+#907 Remboursement de crédit passé en perte
+#908 Problème de modification du compte comptable associé à un état de crédit
+#909 Rapport registre des prêts : aucun crédit
+#910 Rapport liste des mouvements sur un compte d'épargne : erreur sur le solde
+#911 Rééchelonnement crédit solidaire
+#912 Date historique pour prélèvement frais de tenue de compte
+#913 Le montant minimum associé à un compte n'est pas pris en compte
+#914 Rapport Concentration de l'épargne incorrect
+#915 Variables et fonctions inutilisées
+#916 Reprise des crédits: Suppression d'un crédit
+#917 Rapport comptes d'épargne inactifs
+#918 Rapport crédits arrivant à échéance
+#920 Le login qui a octroyé un découvert n'apparaît pas dans le brouillard de caisse
+#922 Erreur sur la fonction prélèvement automatique
+#924 La fonction abattement des intérêts ne fonctionne pas
+#925 Erreur interne à la création d'un client (en cas de retour)
+#926 Casier judiciaire à vrai lors de la création d'un nouveau client
+#928 Le grand-livre ne sort pas
+#930 Nombre moyen de membre par groupe solidaire dans rapport statistiques et indicateurs d'agence
+
+
+Version 2.8.2
+-------------
+-- Release date : 9 mai 2007
+
+-- Améliorations et bugs fixés :
+#454 Menu Documents
+#801 Suppression références à /imgtmp/ et correction fiche client
+#807 Erreur de l'écriture libre libre impliquant plusieurs devises
+#812 Sauvegarde de DB : SQL pur
+#820 Batch automatique : divers problèmes
+#842 Fichier index.html : lien vers documentation technique non fonctionnel
+#843 Affichage photo client dans frame supérieur
+#844 Erreur interne lors d'ajustement encaisse
+#847 la fonctionnalité "abattement des intérêts" ne marche pas dans la 2.8.1
+#848 Reprise du bilan comptable : erreur d'arrondi
+#850 Script new_db : nécessite la commande which
+#851 Deboursement de fonds Crédit solidaire dossiers multiples
+#854 Génération des rapports avec données incorectes
+#856 Problème avec les rapports générés
+#857 Calcul montant du remboursement pour échéance avec pénalités
+#859 Impossible de rembourser un crédit solidaire à dossier multiple au guichet
+#864 Rapports crédit - CRD-MAX - Débiteurs les plus importants
+#866 Problèmes lors d'une nouvelle installation
+#868 Message sur la gestion de la licence
+#869 Remboursement crédit solidaire à dossier unique
+#872 Erreur de calcul lors du remboursement d'un crédit à dossier unique
+#873 Ajout d'un sous-compte comptable : problème de répartition du solde
+#874 Echéancier théorique de remboursement nul dans Ado-3
+#875 Probleme lors du remboursement d'une echeance d 'un credit solidaire à dossiers multiple.
+#877 reprise de crédits: création de dossier impossible
+#878 Création de client et paiement par tranche de la part sociale
+
+
+Version 2.8.1
+-------------
+-- Release date : 30 mars 2007
+
+-- Améliorations et bugs fixés :
+#627 L'historique des clients ne s'imprime pas en entier quand celui-ci dépasse 4 pages
+#652 Rapports clients/crédit par gestionnaire
+#668 Mise à jour manuel pour v2.8
+#785 Paramétrage états de crédit
+#816 Affichage menu navigation gauche Paramétrage
+#817 Erreur MAJ 2.6.x -> 2.8
+#818 Commit après 20 images exportées dans update 2.8
+#819 Problème avec anciens scripts de MAJ BD
+#821 Rapport registre des prêts vide
+#822 Les types ne sont pas correctement reconnus dans les exports CSV
+#832 Récupération d'erreur lors du choix d'un fichier image trop lourd
+#838 Problème affichage menu passage écritures libres
+
+
+Version 2.8
+-----------
+-- Release date : 8 mars 2007
+
+-- Améliorations et bugs fixés :
+#282 Perception des frais d'adhésion : solde null et message de confirmation
+#344 Validation des attentes-Affichage du libellé Traveler's cheque
+#629 Ecritures libres : problème d'extrait de compte
+#672 Dépôt par chèque et mise en attente ou crédit direct
+#698 Reçus : les demis reçus sont parfois de taille différente
+#740 Change : problème d'arrondi pour 1/taux
+#758 Consultation DAV par période ou par mouvements : sens inversés
+#768 Recupération des photos
+#773 Compte centralisateur associé à un état de crédit
+#777 Remboursement de crédit /dossier multiple
+#778 Initialisation des montants minimum des comptes
+#779 Ne pas écraser les fichiers de configuration système lors d'une installation ou mise à jour
+#780 Parametrage agence
+#786 Libellé durée de crédit pour un produit ayant une durée en semaines
+#788 Pas d'échéancier lors d'un déboursement sans approbation
+#789 Champ pour le responsable de groupe solidaire
+#790 Reprise crédit
+#792 consulatation client
+#793 Pas de prise en compte du différé en jours dans l'échéancier théorique
+#794 Différé en jour et crédits hebdomadaires
+#796 Tableau non alligné dans Rcr-4
+#798 Attestations de déboursement pour crédits solidaires à dossiers multiples
+#799 adbanking.ini disparaît après un rpm -U
+#800 Optimisation du batch
+#802 Erreur sur le trigger trig_preleve_frais_attente
+#803 Problème de performance lors de l'export des photos
+
+
+Version 2.8-rc2
+---------------
+-- Release date : 20 février 2007
+
+-- Améliorations et bugs fixés :
+#87 Clôture exercice-Message d'avertissement
+#124 Rapport concentration de l'épargne-Inclusion de comptes fermés
+#568 Gestion du fichier adbanking.ini lors d'une mise à jour du RPM
+#720 Impossible de modifier frais ouverture et/ou de femerture d'un produit d'épargne Libre
+#730 Rapport créditeurs les plus importants : améliorations
+#731 Rapport balance âgée du portefeuille à risque : divers problèmes
+#732 Rapport echéancier et suivi de remboursement : pas de titre
+#733 Rapport comptes d'épargne inactifs : améliorations
+#735 Rapport généraliste sur les clients : améliorations
+#736 Rapport situation globale d'un client : améliorations
+#738 Extraits de compte : ajout du nom du client
+#761 Affichage montant disponible lors du déboursement d'un crédit
+#763 Amélioration export CSV
+#766 Rapport liste des mouvements sur un compte d'épargne : jours inactifs
+#767 Amélioration rotation des fichiers log
+#771 Problème avec durée minimum avant octroi de crédit = 0
+#772 Problème avec la fonction isNumComplet
+#776 Erreur javascript mise en place dossier de crédit Ado-1
+
+
+Version 2.8-rc1
+---------------
+-- Release date : 3 février 2007
+
+-- Améliorations et bugs fixés :
+#73 Affichage du compte de résultat sur le bilan et le compte d'exploitation
+#128 Rapport débiteurs les plus importants-Informations incorrectes
+#129 Rapport registre des prêts-Critère de recherche localisation
+#153 Export des rapports au format Excel
+#170 Mise en place de dossier de crédit - check_fonction_105
+#193 Affichage des montants à l'I/F utilisateur
+#203 Mise en place de dossier de crédit - Ajout d'une garantie
+#238 Ouverture de compte par transfert-Champ durée minimum entre 2 retraits
+#262 Fréquence de paiement du capital
+#290 Remboursement crédit : problème d'arrondi
+#309 Vérification du paramétrage des données importantes
+#322 Modification rémunération part sociale
+#339 Paramétrage produits de crédits - Comptes associés aux états
+#369 Paramétrage des parts sociales-Suppression des champs inutiles
+#388 Login et autorisation avant reprise des crédits
+#413 Paramétrage des états de crédit : modification du libellé
+#415 Reçus : les demis reçus sont parfois de taille différente
+#417 Paramétrage de l'agence : amélioration des libellés et code swift
+#440 Clôture périodique automatique et batch 31/12
+#451 Ouverture de compte d'épargne-Versement dans une autre devise-Message de confirmation erroné
+#473 Impression échéancier réel
+#476 Calcul automatique des montants d'adhésion
+#495 Souscrire partiellement les parts sociales sans tenir compte de la valeur nominale
+#497 Solde minimum pour rémunération DAV
+#527 Modification du stockage des photos et signatures
+#540 Vérification client lors d'un dépôt par lot
+#547 Modifier le montant minimum compte par compte
+#551 Flexibilité dans l'ordre de remboursement des échéances
+#555 Découvert : disponible demandé par client
+#591 Produits de crédit : association à un statut juridique
+#597 Produits de crédit : paramétrage plus souple des garanties
+#601 Rapport registre des prêts : améliorations
+#611 Rapport crédits arrivant à échéance : afficher le total dû
+#619 Pièce justificative opération diverse de caisse
+#622 Nouvelle recherche dans écran de recherche d'un client/compte et personne extérieure
+#623 Compte de versement des interêts lors de la reprise d'un DAT
+#624 Affichage de la remarque dépôt ou retrait sur le reçu pour les B.P.
+#632 Gestion profils : login avec guichet et possibilité d'ouvrir et de fermer une agence
+#650 Fiche client d'un groupe solidaire : liste des membres
+#660 Différé en échéances modifiable alors que le crédit a déjà été déboursé
+#661 Affichage de la devise dans la simulation d'un crédit
+#662 Création d'un groupe solidaire et état des membres
+#666 Migration des GI de catégorie 2 et 3 vers des GS
+#667 Attestation de (dé|rem)boursement pour un crédit solidaire de cas 2
+#669 2 fois la clé rapide 9 dans le menu Guichet (Gen-6)
+#670 Modif de logos sur la page de garde
+#671 Retour en arrière sur erreur lors de l'ajout d'un compte comptable
+#673 TMB - Rapport créditeurs les plus importants : ajout d'une colonne rang
+#681 Ajout d'un écran de modification de compte
+#683 Largeur des colonnes dans le rapport crédit en pertes
+#687 Rapport Régistre des prêts : bug
+#692 Configuration de la mémoire utilisée par la JRE lors de la génération des rapports
+#695 Rapport bilan comptable : comptes actif-passif
+#696 Script build-cdrepo-adbanking.sh : prise en compte de php-mbstring
+#700 Affichage du munu 'Mise en place de dossier'
+#701 Annulation dossier de crédit : message de warning
+#702 Gestion des images
+#703 Javascipt: Calcul Automatique Somme à payer
+#704 Plantage du batch par appel de la fonction affiche()
+#706 Affichage des menus crédit
+#707 Association Produit de crédit - Statut juridique
+#708 Mise en place dossier de crédit: Groupe solidaire catégorie 2
+#709 Transfert des assurances
+#710 Pas de champ responsable à la création d'un groupe solidaire
+#711 Refus depôt sur un compte ayant des frais en attente
+#712 Refus remboursement crédit en perte
+#714 Affichage de la liste des membres d'un GS
+#722 Modification d'un groupe solidaire
+#742 Mise en place d'un dossier de crédit : problème d'accès au menu
+#743 Déboursement de crédit : problème avec l'assurance
+#757 Remboursement d'une échéance
+#760 Pas de prélèvement des frais de tenue de compte
+
+
+Version 2.6.7
+-------------
+-- Release date : 9 janvier 2007
+
+-- Améliorations et bugs fixés :
+#56  Précision sur l'affichage des remboursement dans Rcr-3
+#419 Temps de connexion : l'admin dispose de moins de 24 minutes
+#580 Rapport bilan comptable : comptes actif-passif
+#582 Reçu de retrait : problème avec le chèque guichet
+#609 Rapport journalier : comptabilisation des ouvertures de compte
+#636 Affichage des photos des mandataires
+#641 Rapport statistiques et indicateurs d'agence : nombres d'emprunteurs erronés
+#642 Echéanciers : problème d'arrondi
+#643 Echéanciers : différences entre les échéanciers théoriques et réels
+#644 Ecritures libres : problème d'arrondi
+#645 Paramétrage agence : problème javascript avec la numérotation des comptes
+#657 MICROFI-SA : Passage écriture sur compte client
+#663 Reprise des crédits: Accolades mal positionnées
+#664 Reprise des crédits: Changement de la périodicité de remboursement
+#674 Apostrophes dans les noms de profils
+#677 Rapport statistiques et indicateurs d'agence : encours de crédit erroné
+#678 Rapport crédits en retard : portefeuille total erroné
+#679 Ajustement d'encaisse : problème de comptabilité
+#682 Ecritures libres : erreur lors de la validation
+#686 Affichage des informations d'un mandataire : les photos ne s'affichent pas
+
+
+Version 2.7
+-----------
+-- Release date : - (version de développement)
+
+-- Amélioration et bugs fixé :
+#190 Gestion des crédits solidaires
+#231 Lancement du batch par cron
+#324 Suspension du comptage des pénalités
+#366 Typographie ADbanking
+#405 Inclure dans le RPM le script de chargement d'un BD sauvegardée
+#478 Commission crédit direct lors du dépôt d'un chèque
+#487 et #320 Numérotation comptes et clients
+#545 Remboursement crédit en perte : capital, intérêts et pénalités
+#575 Batch : le RPM n'installe pas le fichier batch.sh
+#621 Paramétrage des profils: Erreur interne
+
+
+Version 2.6.6
+-------------
+-- Release date : 23 novembre 2006
+
+-- Améliorations et bugs fixés :
+#578 Menu documents, fonctions chèquier pour client supprimé
+#584 Rapport consolidation de l'épargne : problème de sélection
+#608 Rapport statistiques et indicateurs d'agence : total des clients erroné
+#610 Rapport registre des prêts : divers problèmes
+#612 Ajustement encaisse : problème de comptabilité
+#628 Rapport brouillard de caisse : le rapport ne s'affiche pas
+#630 Rapport liste des mouvements sur un compte d'épargne : problème avec la colonne solde
+#633 Rapports clients: Fiche client ne marche pas
+#634 Rééchelonnements : problème multidevise
+
+
+Version 2.6.5
+-------------
+-- Release date : 18 octobre 2006
+
+-- Améliorations et bugs fixés :
+#11  Mise à niveau rééchelonnement / moratoire
+#572 Consultation dossier de crédit : amélioration affichage des garanties
+mobilisées
+#573 Reprise crédit : la mobilisation des garanties ne s'effectue plus
+#576 Duplication du champs num_complet_cpte des comptes de garanties
+#577 Atteinte du maximum dans ad_mouvement_seq
+#579 TMB - Erreur interne sur écriture libre
+#583 Rapport brouillard de caisse : liste des transactions incomplète
+#585 Mise à jour 2.6.4 : problème avec le code ville et le code agence
+
+
+Version 2.6.4
+-------------
+-- Release date : 15 septembre 2006
+
+-- Améliorations et bugs fixés :
+#127 Rapport échéancier et suivi du remboursement-Crédit en perte
+#480 Saut de page et extraits de compte
+#509 Amélioration de la reprise des crédits
+#558 Demande de rééchelonnements : impossible d'accéder au menu
+#559 Déconnexion login sans guichet
+#565 Fermeture d'un DAT avec solde insuffisant
+#567 Le système ne crée pas les numéros de comptes de base lors de la reprise des clients
+
+
+Version 2.6.3
+-------------
+-- Release date : 23 août 2006
+
+-- Améliorations et bugs fixés :
+#380 Gestion des clients-Finalisation défection client sans ayant-droit avec crédit en perte
+#459 Rapport situation MN/ME - Formatage champ numéro de compte
+#460 Depôt par lot - Modification tireur
+#471 Affichage rapport Historique crédits soldés clients
+#521 Reprise crédit : mobilisation des garanties numéraires
+#522 Reprise crédit : recherche compte de prélèvement de la garantie numéraire
+#532 Remboursement de garantie numéraire à la fin d'un crédit
+#533 Retrait sur compte de solde insuffisant par passage écritures libre
+
+
+Version 2.6.2
+-------------
+-- Release date : 9 août 2006
+
+-- Améliorations et bugs fixés :
+#5   Espace disque et sauvegardes de la base de données
+#178 Prise en compte des champs de type OID lors du backup de la DB
+#496 Remboursement automatique avec compte de solde insuffisant : compte devient négatif
+#519 Reprise des clients : problème avec la compte de PS et l'utilisation de l'ancien numéro de client
+#523 Rapport crédit : Echéancier et suivi de remboursement
+#524 Perception minimale frais d'adhésion
+#525 Frais de fermeture sur défection client
+#526 Calcul intérêts débiteurs
+#530 Affichage par date des mouvements d'un compte client
+
+
+Version 2.6.1
+-------------
+-- Release date : 12 juillet 2006
+
+-- Améliorations et bugs fixés :
+#199 Message de confirmation d'un retrait en travelers cheque avec frais de découvert
+#250 Reprise des clients-Champs non obligatoires
+#266 Plan comptable - Modification de compte
+#336 Reprise de l'épargne et gestion des extraits de compte
+#338 Gestion des opérations-Suppression des opérations non utilisées
+#392 Boutons fermer peu intuitif dans le gestionaire des images
+#404 Libellé dépôt par chèque
+#411 Tables de paramétrage : trier les entrées dans les listbox
+#416 Gestion du plan comptable : ajout d'une colonne sens comptable.
+#418 Dépôt par lot via fichier : désactivation pour profil avec gestion de la caisse centrale
+#424 Reprise de la comptabilité : problème avec les apostrophes
+#439 Envoi d'argent
+#448 Défection client démissionnaire-Encaissement sur balance négative
+#468 Compte à terme sans intérêt et choix du compte de clôture
+#486 Des messages de warning lors de l'ouverture d'une session
+#499 Gestion de la licence : nombre de clients actifs
+#501 Reprise de l'épargne : recup_epargne.php
+#502 reprise des parts sociales : recup_ps.php
+#508 Historisation de la reprise des crédits-Type de fonction incorrect
+#511 Reprise clients et écritures comptable
+#512 Dépôt en devise étrangère
+#514 Perception des frais de dossier de découvert
+#515 Reprise crédit : Ajout avaliseur
+
+
+Version 2.4.3
+-------------
+-- Release date : 26 juin 2006
+
+-- Améliorations et bugs fixés :
+#504 Solder un crédit après réalisation de la garantie
+
+
+Version 2.6
+-------------
+-- Release date : 19 mai 2006
+
+-- Améliorations et bugs fixés :
+#183 Génération des rapports de batch est parfois défaillante
+#259 Dépôt sur un compte-Dépôt par chèque ou ordre de paiement
+#264 Ajustement solde d'un compte de devise étrangère
+#265 Gestion épargne-Retrait en cash-Frais de retrait
+#329 Dépôt de chèque-Traitement de l'attente-Double comptabilisation des frais de dépôt
+#332 Rapports agence-Ajustement encaisse
+#345 Batch-Prélèvement automatique de crédit
+#346 Dépôt par lot-Prélèvement d'une commission
+#365 Gestion des relations-Modification des relations-Ecran vide
+#367 Génération rapports sans contenu
+#370 Largeurs en % dans les rapports
+#372 Nettoyage des scripts de mise à jour
+#376 Remplacement de la fonction modulo par la fonction fmod
+#386 Icône fonction dépôt par lot avec fichier et chèquiers
+#393 Paramétrage des comptes associés aux états de crédit-Libellé
+#400 Institution de crédit direct, blocage de compte et compte lié à un crédit
+#409 Paramétrage des localisations : problème avec la barre de titre du tableau
+#414 Paramétrage des produits d'épargne : problème avec le titre Paramétrage compte à terme
+#422 Création d'un code utilisateur : désactiver le choix du compte comptable si pas guichet
+#423 Passage d'un ODC de compte : désactivation du billetage
+#435 Erreur montant extrait lors de la création d'un compte par transfert
+#438 Réalisation de la garantie
+#441 Ecritures utilisateurs et compte de guichet
+#442 Modification autre mot de passe
+#443 Modification du logo de la DGDC de la page d'accueil
+#455 Dépôt par lot fichier-Confirmation du montant total erronée
+#456 Rapport historique des crédits soldés-Warnings
+#457 Rapport historique demandes de crédit-Critère client
+#458 Rapport ajustement encaisse-Warnings
+#461 Traitement des attentes-Critères de recherche date-Lien non fonctionnel
+#462 Rapport extraits de compte-Affichage du numéro du dernier extrait imprimé
+#464 client_exist à la création d'un nouveau client
+#467 Déboursement crédit avec prélèvement automatique autorisé
+#469 Génération du rapport Historique Crédits soldés est défaillant
+#472 Affichage devise dans rapport Balance agée portefeuille à risque
+#474 Consultation client : warning PHP
+#475 Menu Création client dans le frame de gauche n'est pas cliquable
+
+
+Version 2.5
+-------------
+-- Release date : - (version de développement)
+
+-- Améliorations et bugs fixés :
+#169 Création client-Renseignement de la date de création à l'interface
+#177 Création de client-Spécification de la nationalité
+#224 Gestion du découvert-Frais de découvert en pourcentage
+#225 Gestion du découvert-Annulation automatique de l'autorisation de découvert
+#226 Impression de chèques
+#257 Autorisation de découvert-Types de comptes autorisés
+#263 Retrait cash avec reçu-Affichage du découvert autorisé
+#313 Ecritures comptables-Affichage du nom et prénom du client à mouvementer
+#315 Reprise des crédits en perte
+#316 Reprise des clients inactifs ayant fait l'objet d'une défection
+#317 Rémunération de l'épargne-Solde le plus bas en temps réel
+#319 Création client-Impression de la fiche du client
+#425 Mise en surbrillance de la date du jour dans le calendrier
+#426 Présentation de la consultation d'un compte
+#427 Choix du numéro de client
+#428 Extraits de comptes pour l'ajustement du solde d'un compte d'épargne
+#429 Gestion des ODC pour l'admin
+#430 Amélioration du reçu déboursement crédit
+#431 Numérotation des comptes des clients au format du Rwanda
+#432 Problème avec le compte d'épargne nantie lors du dernier remboursement d'un crédit
+#433 Découvert par défaut du produit
+#436 Ajout ASBL dans les catégories de PM
+#437 Gestion des groupes de caution solidaire et de cautionnement mutuel
+#445 Passage écritures libres avec des comptes comptables de devises différentes
+#453 Impression fiche clients : fichiers manquants
+
+
+Version 2.4.2
+-------------
+-- Release date : 3 avril 2006
+
+-- Améliorations et bugs fixés :
+#54 Erreur interne après MAJ timeout d'un profil
+#343 Création client-Création des mandataires
+#385 Paramétrage compte de substitut des parts sociales pour une Mutuelle d'épargne et de crédit
+#389 Amélioration de la fonction modulo (utilisation de fmod)
+#390 Gestion des mandataires : erreur interne
+#391 Reprise des clients
+#394 Reprise des crédits : Cacher la génération intelligente et certaines informations sur le DCR
+#395 Saisie écritures libres : affichage du compte principal du journal s'il n'a pas de sous-comptes
+#396 Saisie écritures libres : il faut interdire de choisir un compte interne fermé
+#399 Warning PHP au paramétrage de la table des parts sociales
+#403 Nombre de membres d'un groupe informel
+
+
+Version 2.4.1
+-------------
+-- Release date : 24 mars 2006
+
+-- Améliorations et bugs fixés :
+#164    Problème avec le bouton Ajouter ligne de Passage écritures libres
+#218    Informations financières client-Frais en attente
+#221    Versement des salaires
+#245    Rapports agence-Rapports ajustements de caisse
+#260    Journal comptable-Bordure du cadre
+#267    Mandataires : warning php
+#270    Clôture exercice-Edition d'une balance après inventaire
+#277    Gestion des utilisateurs-Ajout d'un utilisateur
+#279    Annulation d'un crédit en attente de décision avec garantie numéraire
+#285    Mise en place d'un crédit avec périodicité quotidienne
+#286    Ajout d'un produit de crédit : intérêts pris au début ou à la fin
+#291    Warning PHP à la création des mandataires après avoir créé un client personne morale
+#292    Mouvements comptables à la reprise des comptes de base
+#293    Division par zéro dans le batch
+#294    Gestion des codes utilisateurs : problème lors d'un ajout
+#295    Modification de la devise d'un compte comptable : erreur interne
+#296    Reprise de la comptabilité : sens et compartiment d'un sous-compte
+#297    Reprise de la comptabilité : sens et compartiment d'un compte de substitution
+#298    Reprise de la comptabilité : problème lors de l'insertion dans la DB
+#299    Prélèvement des frais débiteurs-Adaptation multidevise
+#302    Gestion du plan comptable-Modification compte-Erreur interne
+#308    Reprise des données-Assistant de reprise-Pièces d'identité
+#310    Reprise du bilan - Ecriture de reprise du bilan
+#314    Paramétrage de produit de crédit : fréquence de paiement
+#318    Reprise du bilan
+#330    Problème sur le compte des clients actifs à l'ouverture d'agence
+#331    Rapports agence-Prévision des liquidités
+#333    Rapports compta-Compte de résultat-Warning Php
+#334    Erreur SQL à la création d'un extrait de compte
+#356    Reprise de la comptabilité : problème de devise
+#357    Numérotation de compte type RDC
+#358    Paramétrage de l'agence : problème de choix des comptes comptables
+#359    Problème d'affichage du Brouillard pour toutes les devises
+#363    Alignement colonne ''variation'' dans la balance comptable
+#364    Rapport ''Situation intermédiaire MN/ME''
+#375    Amélioration de la fonction modulo
+
+
+Version 2.2.7
+-------------
+-- Release date : 13 mars 2006
+
+-- Améliorations et bugs fixés :
+#229    Prélèvement des frais débiteurs
+
+
+Version 2.2.6
+-------------
+-- Release date : 2 mars 2006
+
+-- Améliorations et bugs fixés :
+#220    Versement des salaires
+
+
+Version 2.2.5
+-------------
+-- Release date : 1 mars 2006
+
+-- Améliorations et bugs fixés :
+
+
+Version 2.2.4
+-------------
+-- Release date : 22 février 2006
+
+-- Améliorations et bugs fixés :
+#217    Traitement batch-Frais de tenue de compte
+#230    Reprise des comptes d'épargne-Erreur interne
+#269    Clôture exercice-Virement des soldes des comptes de gestion
+#271    Compte de résultat-Calcul du résultat
+#272    Bilan comptable-Bilan après clôture exercice
+#273    Clôture périodique en fin d'exercice-Impression du détail
+#280    Clôture exercice-Impression de la balance avant inventaire
+#287    Mise à jour db de 2.2.3 vers 2.2.4
+
+
+Version 2.4
+-------------
+-- Release date : 15 février 2006
+
+-- Améliorations et bugs fixés :
+#26    Rapport batch
+#50    Gestion des fichiers multilingues
+#68    Plan comptable - Création de plusieurs sous-comptes
+#76    Solde d'un crédit dont la garantie est à constituer au fur et à mesure
+#103    Affichage rapport de batch : fichier inexistant
+#133    Tests DA garanties multiples.
+#134    Remboursement de la dernière échéance d'un crédit avec garantie en cours
+#145    Nommage des scripts de db/update
+#149    Encodage dans l'écran Dcp-2 (dépôt)
+#151    Garanties mobilisées dans le module de reprise des crédits
+#162    Blocage et déblocage de compte-Erreur interne
+#163    Amélioration de l'identification de l'auteur d'une transaction
+#176    Modification client-Changement de qualité - Erreur fatale
+#182    Génération des rapports de batch est parfois défaillante
+#185    Solde d'un crédit par remboursement de plusieurs échéances avec un montant
+#186    Création client-Renseignement du revenu annuel à l'interface
+#191    Mise à jour 2.2 -> 2.4
+#192    Warning à la création d'un client (Acl-4) et menu vide
+#194    Ajout d'une personne extérieure-Date d'expiration pièce d'identité
+#195    Ajout d'une personne extérieure-Code postal
+#196    Modification d'une personne extérieure-Libellé de l'écran
+#198    Calcul des intérêts de l'épargne lors du batch
+#200    Gestion des relations-Personnes morales et groupes informels
+#201    Menu clientèle-Informations financières
+#202    Information du rapport de batch à l'arrêt d'un compte
+#204    Dépôt en espèces en devise de référence dans un compte en devise étrangère
+#205    Calcul de la période de rémunération de l'épargne
+#207    Calcul du solde moyen sur une période
+#209    Rémunération d'un CAT/DAT sans mode ni fréquence de calcul des intérêts
+#210    Erreur interne lors d'un dépôt par chèque extérieur ou ordre de paiement
+#211    Message de confirmation dépôt express avec frais
+#212    Retrait cash sur compte de base en devise étrangère avec frais modifiés
+#213    Menu gestion des clients-Perception des frais d'adhésion
+#214    Modification frais de retrait et mise jour solde disponible
+#215    Défection d'un client par démission-Warning PHP
+#216    Erreur interne lors retrait en traveler's chèque en devise étrangère entraînant un découvert
+#223    Reprise des clients : problème sur l'utilisation de l'ancien id client
+#234    Finalisation défection client décédé-Prise en compte de l'ayant-droit
+#235    Ouverture de compte-Versement minimum
+#236    Rémunération épargne-Compte de versement des intérêts
+#237    Rémunération d'un CAT si rupture avant terme
+#239    Clôture d'un CAT/DAT avant terme
+#241    Arrondis lors de la clôture d'un CAT/DAT avant terme
+#242    Dépôt sur compte d'épargne-Chèque extérieur
+#243    Extrait de compte manquant pour les intérêts lors de la clôture d'un CAT/DAT
+#247    Solde à l'ouverture d'un compte d'épargne avec frais d'ouverture
+#249    Création client : faire un check access sur le bouton "Créer les relations"
+#251    Comptes d'épargne DAT-Clôture à l'interface
+#252    Ajout des icônes manquantes
+#256    Ouverture de compte par transfert-Affichage de warning Php
+#261    Ajustement du solde d'un compte d'épargne
+
+
+Version 2.3.2
+-------------
+-- Release date : - (version de développement)
+
+-- Améliorations et bugs fixés :
+#110    Reprise des données-Mise à jour des modules
+#157    Révision Rémunération épargne - Stabilisation DA
+#167    Suppression du mode de paiement dans le paramétrage du produit d'épargne
+
+
+Version 2.3.1
+-------------
+-- Release date : - (version de développement)
+
+-- Améliorations et bugs fixés :
+#8    Révision Rémunération épargne
+#62    Fréquence de remboursement du capital et reprise de crédit
+#65    Système d'activation par clé
+#80    Frais de tenue de compte
+#155    Harmoniser le prélèvement des frais de tenue de compte,début de la période doit être début de l'exercice
+
+
+Version 2.3
+-------------
+-- Release date : - (version de développement)
+
+-- Améliorations et bugs fixés :
+#9    Analyse rémunération épargne
+#10    Design rémunération épargne
+#28    Restitution de la garantie à un garant externe en cas de défection
+#42    Reprise des numéros de compte existants lors de la reprise des données
+#45    Extraits de compte
+#46    Rendre le compte de base non obligatoire
+#47    Gestion des mandataires
+#49    Permettre d'encoder les références d'un non client los d'une transaction
+#60    Ajout de la gestion des non clients
+#64    Identification de l'auteur d'une transaction
+#96    Ajout d'un rapport sur les ajustements de caisse
+#97    Supprimer les soldes sur les reçus dans certaines conditions
+#98    Remboursement de crédit-Gestion de l'arrondi
+#99    Balance comptable-Appel de fonction calculSoldeNonRecursif
+#121    Problème avec le solde réel et le solde disponible
+
+
+Version 2.2.3
+-------------
+-- Release date : 26 janvier 2006
+
+-- Améliorations et bugs fixés :
+#51    Présentation du journal comptable
+#148    Erreur dans creationreferenceextraiteft lors d'un dépôt en espèces
+#154    Problème avec le solde réel et le solde disponible
+#179    Appel fautif à extrac() dans module reprises
+#188    Problème script mise à jour v1->v2
+
+
+Version 2.2.2
+-------------
+-- Release date : 2 janvier 2006
+
+-- Améliorations et bugs fixés :
+#111    Création des icônes
+#141    Reprise des photos et des signatures lors de la reprise des clients
+#142    Reclassement d'un crédit dans une devise != de la devise de référence
+#146    Erreurs psql dans update2.0.2 et update2.2
+
+
+Version 2.2.1
+-------------
+-- Release date : 27 décembre 2005
+
+-- Améliorations et bugs fixés :
+#135    Encodage des sources du RPM avec ionCube
+#136    Le libellé du retrait en espèce était incorrect.
+#137    Prélèvement des frais en attente
+
+
+Version 2.2
+-----------
+-- Release date : 19 décembre 2005
+
+-- Améliorations et bugs fixés :
+#63    Gestion du répertoire image/imgtmp/ à l'installation (RPM)
+#72    Journal comptable-Totaux débits et crédits
+#78    Plan comptable-Gestion des sous-comptes avec LIKE
+#105    Clôture de compte-Versement au guichet
+#114    Rapport généraliste des clients-Code gestionnaire
+#120    Clôture périodique
+
+
+Version 2.1
+-----------
+-- Release date : - (version de développement)
+
+-- Améliorations et bugs fixés :
+#2    Simulation défection clientèle
+#7    Crédits multiples
+#13    Script de mise à jour de la base de données
+#14    Création compte de crédit à l'approbation
+#15    Approbation crédit sans passage par le comité de crédit
+#17    Garanties multiples
+#18    Mise en attente de chèque en monodevise
+#19    Arrondi de l'échéancier lors des remboursements
+#24    Logos et icônes ne s'affichent pas
+#25    Débit du compte d'un client et blocage du compte de base
+#29    Abbatement des intérêts
+#30    Paiement intérêts
+#33    Ajout de la photo et de la signature du client
+#34    Amélioration des ODC
+#35    Affichage devise dans détail d'un produit de crédit
+#36    Billetage sur remboursement de crédit
+#40    Bloquer / débloquer un compte
+#41    Prise en compte de la nouvelle nomenclature de numérotation des comptes RDC
+#43    Bug si exécution du batch à partir de cron
+#44    Mise à jour modules de reprise des données pour la version 2.1
+#61    Clôtures comptables périodiques
+#70    Grand-livre comptable
+#74    Remboursement de la garantie lors de la clôture d'un crédit.
+#75    Solde d'un crédit dont la garantie est à constituer au fur et à mesure
+#79    Rémunération de l'épargne-Prélèvements automatiques
+#81    Journal comptable-Affichage des écritures avant conversion DB de V1 à V2
+#83    Grand-livre : tri de l'affichage des écritures
+#90    Sauvegarde de la BD avec user Apache
+#91    Remboursement de crédit-Passage du solde du compte en négatif
+#92    Réécriture des fonctions de calcul de solde
+#101    Mise en place de dossier de crédit-Warning Php
+#102    Remboursement de crédit-Valeurs incorrectes
+#104    Abattement intérêts et pénalités-Warning Php
+
+
+Version pre2.1
+--------------
+-- Release date : - (version de développement)
+
+-- Bugs fixés (Référence version 2.0) :
+	* Calcul du montant maximum lors de l'ouverture d'un compte #103
+	* Uniformisation de l'impression du rapport de batch #126
+	* Génération de très gros rapports #107 et #252 (voir notes pour adapter la configuration d'apache/PHP à ce sujet)
+	* Prise en compte de l'expiration de session PHP #204
+	* Messages d'erreur dans le batch #270
+	* Suppression de l'affichage du champ inutile "Base taux épargne" dans le paramétrage d'une agence #189
+	* Désactivation du lien "Détail produit" lorsqu'aucun produit d'épargne n'est sélectionné #182
+
+
+Version 2.0.2
+-------------
+-- Release date : 20 juillet 2005
+
+-- Bugs fixés (Référence version 2.0) :
+	* Virement solde comptes internes lors du paramétrage d'un produit d'épargne
+	* Rejet OP : le compte comptable était mouvementé mais pas le compte interne
+	* Rejet d'un OP vers l'extérieur avec change
+	* Introduction du numéro de compte lors de la création d 'un tireur/béénficiaire
+	* Recherche d'un tireur/bénéficiaire : prise en compte de la catégorie
+	* Encaissement frais de rejet OP (client): prise en compte du change
+	* Confirmation du montant encaissé lors d'un envoi d'argent
+	* Mise à disposition : erreur interne si on ne fournit pas les frais pris par le
+	  correspondant
+	* Paiement d'une mise à disposition : ajout champ confirmation montant décaissé
+	* Ajout des numéros de trandactions dans tous les écrans de confirmation
+	* Batch : message d'erreur plus explicite en cas de faute sur le prélèvement des
+	  intérêts débiteurs
+	* Batch : adaptation perception frais de tenue de compte et intérêts
+	* débiteurs
+	* Lien recherche de clients #140
+	* Création de client #178
+	* Impression de reçus #181 #184
+	* Recherche de clients #168
+	* Correction de différentes fautes d'orthographe
+	* Message plus explicite lors d'erreurs sur le prélèvement d'intérêts
+	  débiteurs
+	* Affichage du menu de traitement des attentes et mise à jour des
+	  menus sur le frame de gauche
+	* Ouverture de comptes clients différents avec le même numéro de compte
+	* Prise en compte création classe comptable 0
+
+-- Améliorations :
+	* Révision du module de récupération des données
+	* Adaptation du plan comptable : sous-comptes de compartiments différents
+	* Ecritures comptables utilisateurs en multidevise
+	* Amélioration production RPM ADbanking
+
+
+Version 2.0.1
+-------------
+-- Release date : 02 juin 2005
+
+-- Bugs fixés :
+	* Archivage des clients en attente de validation (#141)
+	* Passage en perte de crédits (#135)
+	* Remboursement d'un crédit avec garantie constituée en cours (#158)
+	* Attentes de crédits (#164)
+	* Approbation de crédit (#156)
+	* Déboursement de crédits (#157)
+	* Correction raccourci clavier sur autorisation découvert
+	* Suppression de l'entrée de menu 'Traitement chèques'
+	* Suppression de la première exécution du batch à la création d'une nouvelle agence
+	* Problème de date de valeur pour l'éclatement automatique d'écritures entre 2 journaux comptables (#152)
+	* Suppression de la notion de région UEMOA / RWANDA dans adbanking.ini
+	* Transfert d'une garantie avec montant nul
+
+-- Améliorations :
+	* Paramétrage du numéro de l'agence et des dates du premier exercice quand on crée l'agence
+	* Script de convesion de la base de données pour passer de la version 1.0.7 à la version 2.0
+	* Modification du compte de garantie quand on modifie un produit de crédit

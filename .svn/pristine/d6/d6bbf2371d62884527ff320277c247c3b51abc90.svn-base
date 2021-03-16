@@ -1,0 +1,910 @@
+<?php
+
+/**
+ * Gestion des logins
+ * @package Parametrage
+ */
+
+require_once 'lib/dbProcedures/utilisateurs.php';
+require_once 'lib/dbProcedures/parametrage.php';
+require_once 'lib/misc/divers.php';
+require_once 'lib/dbProcedures/historique.php';
+require_once 'lib/dbProcedures/bdlib.php';
+
+require_once 'lib/html/HTML_GEN2.php';
+require_once 'lib/html/FILL_HTML_GEN2.php';
+
+//Recup var globales
+if (isset($id_utilisateur)) {
+  $SESSION_VARS['id_utilisateur'] = $id_utilisateur;
+  $SESSION_VARS['nom_utilisateur'] = get_utilisateur_nom($id_utilisateur);
+}
+if (isset($logins)) $SESSION_VARS['logins'] = $logins;
+
+function get_fct_libel($libel_courant="", $profil_courant=NULL) {
+  /*
+    Renvoie la fonction javascript qui gère le libellé enabled en fonction du profil
+  */
+  $profils = get_profils_guichet(); //Renvoie un tableau contenant tous les profils ayant un guichet associé
+
+  $retour = "\ndocument.ADForm.HTML_GEN_LSB_cptecpta.disabled = true;\n";
+
+  $retour = "\nfunction verif_libel(){\n";
+
+  if (sizeof($profils)>0) {//Si au-moins un profil a un guichet
+    if ($libel_courant != "") {
+      $retour .= "if (document.ADForm.HTML_GEN_LSB_profil.value == $profil_courant){";
+      $retour .= "document.ADForm.libelGuichet.value = '$libel_courant';";
+      $retour .= "document.ADForm.libelGuichet.disabled = false;";
+      $retour .= "}";
+      $retour .= "else";
+    }
+    $retour .= "  if (";
+    reset($profils);
+    while (list($key, $value) = each($profils)) { //Pour chaque profil avec guichet
+      $value=addslashes($value);
+      $retour .= "(document.ADForm.HTML_GEN_LSB_profil.value == $value) ||";
+    }
+    $retour = substr($retour, 0, strlen($retour)-3); //Enlève le ' ||' final
+    $retour .= "  ){\n"; //Début if : si guichet associé
+    $retour .= "    document.ADForm.libelGuichet.value = '';\n";
+    $retour .= "    document.ADForm.libelGuichet.disabled = false;\n";
+
+    $retour .= "    document.ADForm.HTML_GEN_LSB_cptecpta.value = 0;\n";
+    $retour .= "    document.ADForm.HTML_GEN_LSB_cptecpta.disabled = false;\n";
+
+    $retour .= "  }\n"; //Fin du if
+    $retour .= "  else{\n"; //Si aucun guichet associé
+  }
+
+  $retour .= "    document.ADForm.libelGuichet.value = '"._("Pas de guichet")."';\n";
+  $retour .= "    document.ADForm.libelGuichet.disabled = true;\n";
+
+  $retour .= "    document.ADForm.HTML_GEN_LSB_cptecpta.value = 0;\n";
+  $retour .= "    document.ADForm.HTML_GEN_LSB_cptecpta.disabled = true;\n";
+
+  if (sizeof($profils)>0) {//Si au-moins un profil a un guichet
+    $retour .= "  }\n"; //Fin du sinon
+  }
+  $retour .= "}\n";//Fin function
+  return $retour;
+}
+
+//Ecrans
+if ($global_nom_ecran == "Glo-1") {
+
+  $MyPage = new HTML_GEN2(_("Gestion des codes utilisateurs"));
+
+  $logins = get_logins_and_utilisateurs();
+
+  //Javascript
+  $js = "function updateLogins(){\n";
+  $js .= "for (i=0; i < document.ADForm.HTML_GEN_LSB_logins.length; ++i) document.ADForm.HTML_GEN_LSB_logins.options[i] = null;\n"; //Vide les choix
+  $js .= "document.ADForm.HTML_GEN_LSB_logins.length = 0;";
+  $js .= "document.ADForm.HTML_GEN_LSB_logins.options[document.ADForm.HTML_GEN_LSB_logins.length] = new Option('[Aucun]', 0, true, true);\n"; //[Aucun]
+  $js .= "document.ADForm.HTML_GEN_LSB_logins.selectedIndex = 0; document.ADForm.HTML_GEN_LSB_logins.length = 1; \n";
+  reset($logins);
+  while (list(,$value) = each($logins)) {
+    $login=addslashes($value['login']);
+    $js .= "if (document.ADForm.HTML_GEN_LSB_id_utilisateur.value == ".$value['id_utilisateur']."){\n";
+    $js .= "document.ADForm.HTML_GEN_LSB_logins.options[document.ADForm.HTML_GEN_LSB_logins.length] = new Option('".$login."', '".$login."', false, false);\n";
+    $js .= "}\n";
+  }
+  $js .= "}\n";
+  $MyPage->addJS(JSP_FORM, "js1", $js);
+
+  //Javascript2
+  $js2 = "";
+  //  $js2 .= "\t document.ADForm.butCons.disabled = false;document.ADForm.butMod.disabled = false;document.ADForm.butSup.disabled = false;\n;document.ADForm.modAssoc.disabled = false;";
+  $js2 .= "\t document.ADForm.butCons.disabled = false;document.ADForm.butMod.disabled = false;document.ADForm.butSup.disabled = false;\n;";
+  if (check_access(288)) $js2 .= "document.ADForm.butAj.disabled = true;"; //Ajouter
+  if (check_access(289)) $js2 .= "document.ADForm.butCons.disabled = true;"; //Consulter
+  if (check_access(290)) $js2 .= "document.ADForm.butMod.disabled = true;"; //Modifier
+  if (check_access(291)) $js2 .= "document.ADForm.butSup.disabled = true;";//Supprimer
+//  if (check_access(297)) $js2 .= "document.ADForm.modAssoc.disabled = true;";//Modifier association
+
+  $js2 .= "function activateButtons(){\n";
+  $js2 .= "activate = ((document.ADForm.HTML_GEN_LSB_id_utilisateur.value != 0) && (document.ADForm.HTML_GEN_LSB_logins.value != 0));";
+  $js2 .= "activate2 = (activate && (document.ADForm.HTML_GEN_LSB_logins.value != 'admin'));";
+  $js2 .= "if (document.ADForm.HTML_GEN_LSB_logins.value == '$global_nom_login') activate2 = false;";
+
+  if (check_access(288)) $js2 .= "document.ADForm.butAj.disabled = ((document.ADForm.HTML_GEN_LSB_id_utilisateur.value == 0) || (document.ADForm.HTML_GEN_LSB_id_utilisateur.value == 1));";
+  if (check_access(289)) $js2 .= "document.ADForm.butCons.disabled = !activate;";
+  if (check_access(290)) $js2 .= "document.ADForm.butMod.disabled = !activate2;";
+  if (check_access(291)) $js2 .= "document.ADForm.butSup.disabled = !activate2;\n";
+  // if (check_access(297)) $js2 .= "document.ADForm.modAssoc.disabled = !activate2;";
+
+
+  //  $js2 .= "\tif (document.ADForm.HTML_GEN_LSB_logins.value == 'admin') {document.ADForm.butCons.disabled = false;document.ADForm.butMod.disabled = true;document.ADForm.butSup.disabled = true;\n;document.ADForm.modAssoc.disabled = true;} ";
+
+  $js2 .= "\tif (document.ADForm.HTML_GEN_LSB_logins.value == 'admin') {document.ADForm.butCons.disabled = false;document.ADForm.butMod.disabled = true;document.ADForm.butSup.disabled = true;\n;} ";
+
+  $js2 .= "}\n";
+  $MyPage->addJS(JSP_FORM, "js2", $js2);
+
+  //Champs utilisateurs
+  $MyPage->addTable("ad_log", OPER_INCLUDE, array("id_utilisateur"));
+  $MyPage->setFieldProperties("id_utilisateur", FIELDP_JS_EVENT, array("onchange"=>"updateLogins();activateButtons();"));
+
+  //Champs logins
+  $MyPage->addField("logins", _("Codes utilisateur"), TYPC_LSB);
+  $MyPage->setFieldProperties("logins", FIELDP_IS_REQUIRED, true);
+  $MyPage->setFieldProperties("logins", FIELDP_ADD_CHOICES, array("0"=>"["._("Aucun")."]"));
+  $MyPage->setFieldProperties("logins", FIELDP_JS_EVENT, array("onchange"=>"activateButtons();"));
+
+  //Boutons
+  $MyPage->addButton("logins", "butCons", _("Consulter"), TYPB_SUBMIT);
+  $MyPage->setButtonProperties("butCons", BUTP_PROCHAIN_ECRAN, "Clo-1");
+  $MyPage->setButtonProperties("butCons", BUTP_AXS, 289);
+  $MyPage->addButton("logins", "butMod", _("Modifier"), TYPB_SUBMIT);
+  $MyPage->setButtonProperties("butMod", BUTP_PROCHAIN_ECRAN, "Mlo-1");
+  $MyPage->setButtonProperties("butMod", BUTP_AXS, 290);
+  // $MyPage->addButton("logins", "modAssoc", _("Modifier association profil"), TYPB_SUBMIT); // FIXME:Que se passe-t-il si l'utilisateur n'avait pas de guichet et qu'on lui assigne un profil avec guichet ? -> pour l'instant, l'accès à cette fonction interdit pour cette raison
+//  $MyPage->setButtonProperties("modAssoc", BUTP_PROCHAIN_ECRAN, "Mlp-1");
+//  $MyPage->setButtonProperties("modAssoc", BUTP_AXS, 297);
+  $MyPage->addButton("logins", "butSup", _("Supprimer"), TYPB_SUBMIT);
+  $MyPage->setButtonProperties("butSup", BUTP_PROCHAIN_ECRAN, "Slo-1");
+  $MyPage->setButtonProperties("butSup", BUTP_AXS, 291);
+
+  //Break
+  $MyPage->addHTMLExtraCode("break", "<br>");
+
+  //Bouton ajouter
+  $MyPage->addFormButton(1,1, "butAj", _("Créer un nouveau code utilisateur"), TYPB_SUBMIT);
+  $MyPage->setFormButtonProperties("butAj", BUTP_CHECK_FORM, false);
+  $MyPage->setFormButtonProperties("butAj", BUTP_AXS, 288);
+  $MyPage->setFormButtonProperties("butAj", BUTP_JS_EVENT, array("onclick"=>"if (document.ADForm.HTML_GEN_LSB_id_utilisateur.value == 0){ADFormValid = false; alert('"._("Vous devez sélectionner un utilisateur avant de pouvoir créer un code utilisateur !")."');}"));
+  $MyPage->setFormButtonProperties("butAj", BUTP_PROCHAIN_ECRAN, "Alo-1");
+
+  //Bouton retour
+  $MyPage->addFormButton(2,1, "butRet", _("Retour"), TYPB_SUBMIT);
+  $MyPage->setFormButtonProperties("butRet", BUTP_CHECK_FORM, false);
+  $MyPage->setFormButtonProperties("butRet", BUTP_PROCHAIN_ECRAN, "Gen-12");
+
+  //HTML
+  $MyPage->buildHTML();
+  echo $MyPage->getHTML();
+}
+else if ($global_nom_ecran == "Clo-1") {
+  global $global_id_agence;
+  //Consultation login
+  //FIXME : vérifier si pb de fusion entre version compta et TMB
+  ajout_historique(289,NULL, $SESSION_VARS['logins'], $global_nom_login, date("r"), NULL); //Consultation
+
+  $info = get_login_full_info(addslashes($SESSION_VARS['logins']));
+
+  $MyPage = new HTML_GEN2(_("Consultation login"));
+  $AG =  getAgenceDatas($global_id_agence);
+  if($AG['duree_pwd'] > 0){
+    if (isEngraisChimiques()) {
+      $liste_champ = array("login", "pwd_non_expire", "have_left_frame", "billet_req", "depasse_plafond_retrait", "depasse_plafond_depot", "langue","is_agent_ec", "profil");
+    }
+    else if (isFusion()){
+        $liste_champ = array("login", "pwd_non_expire", "have_left_frame", "billet_req", "depasse_plafond_retrait", "depasse_plafond_depot", "langue", "profil","n_coopec","n_agence","n_guichet");
+    }
+    else{
+      $liste_champ = array("login", "pwd_non_expire", "have_left_frame", "billet_req", "depasse_plafond_retrait", "depasse_plafond_depot", "langue", "profil");
+    }
+  }else{
+    if (isEngraisChimiques()) {
+      $liste_champ = array("login", "have_left_frame", "billet_req", "depasse_plafond_retrait", "depasse_plafond_depot", "langue","is_agent_ec", "profil");
+    }
+    else if (isFusion()){
+        $liste_champ = array("login", "have_left_frame", "billet_req", "depasse_plafond_retrait", "depasse_plafond_depot", "langue", "profil","n_coopec","n_agence","n_guichet");
+    }
+    else{
+      $liste_champ = array("login", "have_left_frame", "billet_req", "depasse_plafond_retrait", "depasse_plafond_depot", "langue", "profil");
+    }
+  }
+  $MyPage->addTable('ad_log',OPER_INCLUDE,$liste_champ);
+
+  //Champs utilisateur
+  $MyPage->addField("uti", _("Utilisateur"), TYPC_TXT, $SESSION_VARS['nom_utilisateur']);
+
+  //Champs guichet container
+  $MyPage->addField("guic", _("Guichet"), TYPC_CNT);
+  //Champs guichet
+  $MyPage->addField("gui", _("Existence"), TYPC_BOL, $info['guichet']);
+  $MyPage->makeNested("guic", "gui");
+
+  $defaultVal = new FILL_HTML_GEN2();
+  $defaultVal->addFillClause("log","ad_log");
+  $defaultVal->addCondition("log","login",$SESSION_VARS['logins']);
+  $defaultVal->addManyFillFields("log", OPER_INCLUDE, $liste_champ);
+
+  if ($info['guichet']) {
+    $MyPage->addTable('ad_gui',OPER_INCLUDE,array("libel_gui","date_crea","utilis_crea","date_modif","utilis_modif","cpte_cpta_gui"));
+    $defaultVal->addFillClause("gui","ad_gui");
+    $defaultVal->addCondition("gui","id_gui",$info['guichet']);
+    $defaultVal->addCondition("gui","id_ag",$global_id_agence);
+    $defaultVal->addManyFillFields("gui", OPER_INCLUDE, array("libel_gui","date_crea","utilis_crea","date_modif","utilis_modif","cpte_cpta_gui"));
+
+    $MyPage->makeNested("guic", "libel_gui");
+    $MyPage->makeNested("guic", "date_crea");
+    $MyPage->makeNested("guic", "utilis_crea");
+    $MyPage->makeNested("guic", "date_modif");
+    $MyPage->makeNested("guic", "utilis_modif");
+    $MyPage->makeNested("guic", "cpte_cpta_gui");
+
+    //Champs date encaisse
+    $MyPage->addField("dtegui", _("Date encaisse"), TYPC_TXT, pg2phpdate($info['date_enc'])); //FIXME: date_enc n'est pas dans le vecteur $info
+    $MyPage->makeNested("guic", "dtegui");
+
+    //Montant encaisse
+    $MyPage->addField("mntgui", _("Montant encaisse"), TYPC_MNT, $info['encaisse']*(-1));
+    $MyPage->makeNested("guic", "mntgui");
+    
+    //Vérifier le nombre de tentative de conexion
+    ($info['login_attempt'] >= 5) ? $blocked = true : $blocked = false;
+        
+    //Champs statut du login container
+    $MyPage->addField("blockCNT", _("Le code utilisateur est bloqué?"), TYPC_CNT);
+    //Champs statut du login (bloqué)
+    $MyPage->addField("bloc", _(" "), TYPC_BOL,$blocked);
+    $MyPage->makeNested("blockCNT", "bloc");
+  }
+
+  $MyPage->setFieldProperties("*", FIELDP_IS_LABEL, true);
+  //Bouton
+  $MyPage->addFormButton(1,1,"butret", _("Retour"), TYPB_SUBMIT);
+  $MyPage->setFormButtonProperties("butret", BUTP_PROCHAIN_ECRAN, "Glo-1");
+  $MyPage->setFormButtonProperties("butret", BUTP_KEY, KEYB_ENTER);
+
+  $defaultVal->fill($MyPage);
+
+  //HTML
+  $MyPage->buildHTML();
+  echo $MyPage->getHTML();
+} else if ($global_nom_ecran == "Mlo-1") {
+  global $global_id_agence;
+  //Modification login
+  if ($SESSION_VARS['logins'] == 'admin') {
+    $html_err = new HTML_erreur(_("Refus de la modification.")." ");
+    $html_err->setMessage(_("On ne peut pas modifier le login de l'administrateur."));
+    $html_err->addButton("BUTTON_OK", 'Gen-12');
+    $html_err->buildHTML();
+    echo $html_err->HTML_code;
+    exit();
+
+  }
+
+  $info = get_login_full_info(addslashes($SESSION_VARS['logins']));
+  $SESSION_VARS = array_merge($SESSION_VARS, $info);
+
+  $MyPage = new HTML_GEN2(_("Modification login"));
+  //recuperation des données de l'agence'
+  $AG = getAgenceDatas($global_id_agence);
+  //test sur la durée de vie du mot de passe
+  if($AG['duree_pwd'] > 0){
+    if (isEngraisChimiques()) {
+      $liste_champ = array("login", "profil", "pwd_non_expire", "have_left_frame", "billet_req", "langue", "is_agent_ec","n_agence");
+      $ordre_champ = array("profil", "login", "pwd1", "pwd2", "pwd_non_expire", "have_left_frame", "billet_req", "uti", "langue", "is_agent_ec", "guic","n_agence");
+    }else{
+      $liste_champ = array("login", "profil", "pwd_non_expire", "have_left_frame", "billet_req", "langue","n_agence");
+      $ordre_champ = array("profil", "login", "pwd1", "pwd2", "pwd_non_expire", "have_left_frame", "billet_req", "uti", "langue", "guic","n_agence");
+    }
+  }else{
+    if (isEngraisChimiques()) {
+      $liste_champ = array("login", "profil", "have_left_frame", "billet_req", "langue", "is_agent_ec","n_agence");
+      $ordre_champ = array("profil", "login", "pwd1", "pwd2", "have_left_frame", "billet_req", "uti", "langue", "is_agent_ec", "guic","n_agence");
+    }else{
+      $liste_champ = array("login", "profil", "have_left_frame", "billet_req", "langue","n_agence");
+      $ordre_champ = array("profil", "login", "pwd1", "pwd2", "have_left_frame", "billet_req", "uti", "langue",  "guic","n_agence");
+    }
+  }
+  //contrôle sur les montants maximum de dépôt et retrait
+  if($AG['plafond_retrait_guichet'] == 't' && $AG['plafond_depot_guichet'] == 't'){
+    if (isEngraisChimiques()) {
+      $liste_champ = array("login", "profil", "pwd_non_expire", "have_left_frame", "billet_req", "depasse_plafond_retrait", "depasse_plafond_depot", "langue", "is_agent_ec");
+      $ordre_champ = array("profil", "login", "pwd1", "pwd2", "pwd_non_expire", "have_left_frame", "billet_req", "depasse_plafond_retrait", "depasse_plafond_depot", "uti", "langue", "is_agent_ec", "guic","n_agence");
+    }
+    else{
+      $liste_champ = array("login", "profil", "pwd_non_expire", "have_left_frame", "billet_req", "depasse_plafond_retrait", "depasse_plafond_depot", "langue","n_agence");
+      $ordre_champ = array("profil", "login", "pwd1", "pwd2", "pwd_non_expire", "have_left_frame", "billet_req", "depasse_plafond_retrait", "depasse_plafond_depot", "uti", "langue", "guic","n_agence");
+    }
+  } else if($AG['plafond_retrait_guichet'] == 't' && $AG['plafond_depot_guichet'] == 'f') {
+    if (isEngraisChimiques()) {
+      $liste_champ = array("login", "profil", "pwd_non_expire", "have_left_frame", "billet_req", "depasse_plafond_retrait", "langue", "is_agent_ec","n_agence");
+      $ordre_champ = array("profil", "login", "pwd1", "pwd2", "pwd_non_expire", "have_left_frame", "billet_req", "depasse_plafond_retrait", "uti", "langue", "is_agent_ec", "guic","n_agence");
+    } else {
+      if (isEngraisChimiques()) {
+        $liste_champ = array("login", "profil", "pwd_non_expire", "have_left_frame", "billet_req", "depasse_plafond_retrait", "langue","n_agence");
+        $ordre_champ = array("profil", "login", "pwd1", "pwd2", "pwd_non_expire", "have_left_frame", "billet_req", "depasse_plafond_retrait", "uti", "langue", "guic","n_agence");
+      }
+    }
+  }
+   else if($AG['plafond_retrait_guichet'] == 'f' && $AG['plafond_depot_guichet'] == 't'){
+    if (isEngraisChimiques()) {
+        $liste_champ = array("login", "profil", "pwd_non_expire", "have_left_frame", "billet_req", "depasse_plafond_depot", "langue", "is_agent_ec","n_agence");
+        $ordre_champ = array("profil", "login", "pwd1", "pwd2", "pwd_non_expire", "have_left_frame", "billet_req", "depasse_plafond_depot", "uti", "langue", "is_agent_ec", "guic","n_agence");
+      }else{
+      $liste_champ = array("login", "profil", "pwd_non_expire", "have_left_frame", "billet_req", "depasse_plafond_depot", "langue","n_agence");
+      $ordre_champ = array("profil", "login", "pwd1", "pwd2", "pwd_non_expire", "have_left_frame", "billet_req", "depasse_plafond_depot", "uti", "langue",  "guic","n_agence");
+      }
+
+  }
+
+  $MyPage->addTable('ad_log',OPER_INCLUDE,$liste_champ);
+	debug($liste_champ, "liste des champs ad_log");
+  //Champs utilisateur
+  $MyPage->addField("uti", _("Utilisateur"), TYPC_TXT, $SESSION_VARS['nom_utilisateur']);
+
+  //Champs mot de passe 1
+  $MyPage->addField("pwd1", _("Nouveau mot de passe"), TYPC_PWD);
+  //Champs mot de passe 2
+  $MyPage->addField("pwd2", _("Confirmation nouveau mot de passe"), TYPC_PWD);
+
+  //Champs guichet container
+  $MyPage->addField("guic", _("Guichet"), TYPC_CNT);
+  //Champs guichet
+  $MyPage->addField("gui", _("Existence"), TYPC_BOL, $info['guichet']);
+  $MyPage->makeNested("guic", "gui");
+  
+  //Vérifier le nombre tentative de conexion
+  ($info['login_attempt'] >= 5) ? $blocked = true : $blocked = false;
+    
+  //Champs statut du login container
+  $MyPage->addField("blockCNT", _("Le code utilisateur est bloqué?"), TYPC_CNT);
+  //Champs statut du login (bloqué)
+  $MyPage->addField("bloc", _(" "), TYPC_BOL,$blocked);
+  $MyPage->makeNested("blockCNT", "bloc"); 
+
+  $defaultVal = new FILL_HTML_GEN2();
+  $defaultVal->addFillClause("log","ad_log");
+  $defaultVal->addCondition("log","login",$SESSION_VARS['logins']);
+  $defaultVal->addManyFillFields("log", OPER_INCLUDE, $liste_champ);
+
+
+  /********************************************************/
+  $n_agence = $info["n_agence"];
+  $n_guichet = $info["n_guichet"];
+    $nivArrayFenacobu = getNivFenacobuArray("type_niveau > 1");
+    // --> Sélection des champs à afficher dans id_loc
+    reset($nivArrayFenacobu);
+    $includeChoicesFenacobu = array();
+    while (list (, $value_fenacobu) = each($nivArrayFenacobu)) {
+        if ($value_fenacobu['type_niveau'] == 2)
+            array_push($includeChoicesFenacobu, $value_fenacobu['id']);
+        //$arrayDisplay[$value_rwanda['id'] ] =$value_rwanda['libelle_localisation'];
+
+    }
+
+    $MyPage->addField("n_guichet", _("Niveau guichet"), TYPC_LSB);
+
+    //$MyPage->setFieldProperties("province", FIELDP_HAS_CHOICE_TOUS, false);
+    // $MyPage->setFieldProperties("province", FIELDP_HAS_CHOICE_AUCUN, true);
+    $MyPage->setFieldProperties("n_agence", FIELDP_INCLUDE_CHOICES, $includeChoicesFenacobu);;
+    $MyPage->setFieldProperties("n_agence", FIELDP_IS_REQUIRED, true);
+    $MyPage->setFieldProperties("n_agence", FIELDP_DEFAULT, $info['n_agence']);
+
+    $jsCodeNivFenacobu = "function displayNivFenacobu() {\n";
+    $jsCodeNivFenacobu .= "for (i=0; i < document.ADForm.HTML_GEN_LSB_n_guichet.length; ++i) document.ADForm.HTML_GEN_LSB_n_guichet.options[i] = null;\n"; //Vide les choix
+    $jsCodeNivFenacobu .= "document.ADForm.HTML_GEN_LSB_n_guichet.length = 0;";
+    $jsCodeNivFenacobu .= "document.ADForm.HTML_GEN_LSB_n_guichet.options[document.ADForm.HTML_GEN_LSB_n_guichet.length] = new Option('[Aucun]', 0, true, true);\n"; //[Aucun]
+    $jsCodeNivFenacobu .= "document.ADForm.HTML_GEN_LSB_n_guichet.selectedIndex = 0; document.ADForm.HTML_GEN_LSB_n_guichet.length = 1; \n";
+    reset($nivArrayFenacobu);
+    while (list (, $value_fenacobu) = each($nivArrayFenacobu)) {
+        if ($value_fenacobu['parent'] != '') {
+            $jsCodeNivFenacobu .= "\tif (document.ADForm.HTML_GEN_LSB_n_agence.value == " . $value_fenacobu['parent'] . ")\n";
+            $jsCodeNivFenacobu .= "\t\tdocument.ADForm.HTML_GEN_LSB_n_guichet.options[document.ADForm.HTML_GEN_LSB_n_guichet.length] = new Option('" . $value_fenacobu['libelle_localisation'] . "', '" . $value_fenacobu['id'] . "', false, false);\n";
+        }
+    }
+    $jsCodeNivFenacobu .= "\n}";
+    // --> Ajout de la fonction dans le formulaire
+    $MyPage->addJS(JSP_FORM, "jsCodeNivFenacobu", $jsCodeNivFenacobu);
+    // --> ajout des champs
+
+    //AT-150
+    // --> Page reloaded Constrution des choix disponibles pour le district
+    if (isset($n_agence) && isset($n_guichet)){ //AT-150 page reloaded take value from posted data
+        $choices = array();
+        reset($nivArrayFenacobu);
+        while (list(, $value) = each($nivArrayFenacobu)) {
+            if ($value['parent'] == $n_agence)
+                $choices[$value['id']] = $value['libelle_localisation'];
+        }print_rn($choices);
+        $MyPage->setFieldProperties("n_guichet", FIELDP_ADD_CHOICES, $choices);
+        $MyPage->setFieldProperties("n_guichet", FIELDP_DEFAULT, $info['n_guichet']);
+    }
+    else{
+        $MyPage->setFieldProperties("n_guichet", FIELDP_ADD_CHOICES, array(
+            "0" => "[Aucun]"
+        ));
+    }
+    $MyPage->setFieldProperties("n_guichet", FIELDP_IS_REQUIRED, true);
+    $MyPage->setFieldProperties("n_agence", FIELDP_JS_EVENT, array("onchange" => "displayNivFenacobu()"));
+
+
+/******************************************************************/
+
+  if ($info['guichet']) {
+    $MyPage->addTable('ad_gui',OPER_INCLUDE,array("libel_gui","date_crea","utilis_crea","date_modif","utilis_modif"));
+
+    $defaultVal->addFillClause("gui","ad_gui");
+    $defaultVal->addCondition("gui","id_gui",$info['guichet']);
+    $defaultVal->addCondition("gui","id_ag",$global_id_agence);
+    $defaultVal->addManyFillFields("gui", OPER_INCLUDE, array("libel_gui","date_crea","utilis_crea","date_modif","utilis_modif"));
+
+    $MyPage->makeNested("guic", "libel_gui");
+    $MyPage->makeNested("guic", "date_crea");
+    $MyPage->makeNested("guic", "utilis_crea");
+    $MyPage->makeNested("guic", "date_modif");
+    $MyPage->makeNested("guic", "utilis_modif");
+
+    // Le compte comptable associé
+    $liste=array();
+    $comptes = getComptesComptables();
+    if (isset($comptes))
+      foreach($comptes as $key=>$value)
+      $liste[$value["num_cpte_comptable"]]=$value["num_cpte_comptable"]." ".$value["libel_cpte_comptable"];
+
+    $MyPage->addField("cpte_compta",_("Compte comptable"), TYPC_LSB, $SESSION_VARS['cpte_cpta_gui']);
+    $MyPage->setFieldProperties("cpte_compta", FIELDP_ADD_CHOICES, $liste);
+    $MyPage->setFieldProperties("cpte_compta", FIELDP_HAS_CHOICE_AUCUN, true);
+    $MyPage->setFieldProperties("cpte_compta", FIELDP_IS_REQUIRED, true);
+    $MyPage->makeNested("guic", "cpte_compta");
+
+    /*
+     // Le solde du compte comptable associé
+    $encaisse = $comptes[$SESSION_VARS['cpte_cpta_gui']]["solde"];
+    $MyPage->addField("solde","Solde du compte", TYPC_TXT, afficheMontant(abs($encaisse),false));
+    $MyPage->setFieldProperties("solde", FIELDP_IS_LABEL, true);
+    $MyPage->makeNested("guic", "solde");
+
+    */
+  }
+
+  // Ordre d'affichage des champs
+  $MyPage->setOrder(NULL, $ordre_champ);
+
+  //Javascript pour vérifier que le login n'existe pas encore
+  $liste_login = get_logins(); //Récupère la liste des logins existants
+  $i = 0;
+  while (list($key, $value) = each($liste_login)) {
+    ++$i;
+    if ($value != $SESSION_VARS['logins']) {
+      $value=addslashes($value);
+      $MyPage->addJS(JSP_BEGIN_CHECK, "js12$i", "if (document.ADForm.login.value == '$value'){ msg += '"._("Cet identificateur de login existe déjà !")."\\n'; ADFormValid = false;}\n");
+    }
+  }
+
+  //Javascript vérification mot de passe
+  $js = "if (document.ADForm.pwd1.value != document.ADForm.pwd2.value) {msg += '"._("Les mots de passe doivent être identiques !")."\\n'; ADFormValid = false;}\n";
+  $nbre_car_min=$AG["nbre_car_min_pwd"];
+  if($nbre_car_min>0){
+
+  	$js.="if (document.ADForm.pwd1.value.length>0 && document.ADForm.pwd1.value.length <$nbre_car_min)" .
+  		" {msg+= '".sprintf(_("la longueur minimale du mot de passe doit être de %s caractères !"),$nbre_car_min)."\\n'; ADFormValid = false;}";
+
+
+  }
+  $MyPage->addJS(JSP_BEGIN_CHECK, "js1", $js);
+
+  //Boutons
+  $MyPage->addFormButton(1,1,"valid", _("Valider"), TYPB_SUBMIT);
+  $MyPage->setFormButtonProperties("valid", BUTP_PROCHAIN_ECRAN, "Mlo-2");
+  $MyPage->addFormButton(1,2,"annul", _("Annuler"), TYPB_SUBMIT);
+  $MyPage->setFormButtonProperties("annul", BUTP_PROCHAIN_ECRAN, "Glo-1");
+  $MyPage->setFormButtonProperties("annul", BUTP_CHECK_FORM, false);
+
+  $MyPage->setFieldProperties(array("uti","profil"),FIELDP_IS_LABEL,true);
+  $MyPage->setFieldProperties(array("login","have_left_frame","billet_req","langue"), 	FIELDP_IS_LABEL,false);
+  if ($info['guichet'])
+    $MyPage->setFieldProperties("libel_gui",					FIELDP_IS_LABEL,false);
+
+  //HTML
+  $defaultVal->fill($MyPage);
+  $MyPage->buildHTML();
+  echo $MyPage->getHTML();
+} else if ($global_nom_ecran == "Mlo-2") { //Modification login, confirmation
+  //Modif login
+  $DATA['guichet'] = $SESSION_VARS['guichet'];
+  $DATA['libel_gui'] = $libel_gui;
+  $DATA['date_modif_gui'] = date("d/m/Y");
+  $DATA['utilis_modif_gui'] = $global_id_utilisateur;
+  $DATA['login'] = strtolower($login);
+  $DATA['cpte_cpta_gui'] = $HTML_GEN_LSB_cpte_compta;
+  if ($pwd1 != '')
+    $DATA['pwd'] = $pwd1;
+  $DATA['have_left_frame'] = isset($have_left_frame);
+  $DATA['billet_req'] = isset($billet_req);
+  $DATA['depasse_plafond_retrait'] = isset($depasse_plafond_retrait);
+  $DATA['depasse_plafond_depot'] = isset($depasse_plafond_depot);
+  $DATA['pwd_non_expire'] = isset($pwd_non_expire);
+  $DATA['langue'] = $langue;
+  if (isEngraisChimiques()) {
+    $DATA['is_agent_ec'] = $is_agent_ec;
+  }
+  
+  (!$bloc) ? $DATA['login_attempt'] = 0 : $DATA['login_attempt'] = 5; 
+ 
+  $retour = modif_login($SESSION_VARS['logins'], $DATA);
+
+  if ($retour < 0) {//Si erreur
+    switch ($retour) {
+    case -1 :
+      $msg = sprintf(_("Soit le login '%s' est connecté soit le compte comptable n'est pas renseigné ou il est déjà associé à un autre guichet !"),$SESSION_VARS['logins']);
+      break;
+    default :
+      $msg = _("Erreur inconnue")." (#{$retour}) !";
+      break;
+    }
+    //HTML
+    $MyPage = new HTML_erreur(_("Erreur modification")." '".$SESSION_VARS['logins']."'");
+    $MyPage->setMessage($msg);
+    $MyPage->addButton(BUTTON_OK, "Glo-1");
+
+    $MyPage->buildHTML();
+    echo $MyPage->HTML_code;
+  } else {
+    //HTML
+    $MyPage = new HTML_message(_("Confirmation modification")." '".$DATA['login']."'");
+    $MyPage->setMessage(sprintf(_("Le login '%s' a été modifié avec succès !"),$DATA['login']));
+    $MyPage->addButton(BUTTON_OK, "Glo-1");
+
+    $MyPage->buildHTML();
+    echo $MyPage->HTML_code;
+  }
+} else if ($global_nom_ecran == "Slo-1") { //Suppression login
+  if ($SESSION_VARS['logins'] == 'admin') {
+    $html_err = new HTML_erreur(_("Refus de la suppression.")." ");
+    $html_err->setMessage(_("On ne peut pas supprimer le login de l'administrateur."));
+    $html_err->addButton("BUTTON_OK", 'Gen-12');
+    $html_err->buildHTML();
+    echo $html_err->HTML_code;
+    exit();
+  }
+
+  // Vérifie que l'encaisse est null si le login est associé à un guichet
+  if (!isEncaisseNul($SESSION_VARS['logins'])) {
+    $MyPage = new HTML_erreur(_("Erreur suppression login"));
+    $MyPage->setMessage(sprintf(_("Le code utilisateur '%s' possède un guichet dont l'encaisse est non nulle : impossible de le supprimer !"),$SESSION_VARS['logins']));
+    $MyPage->addButton(BUTTON_OK, "Glo-1");
+
+    $MyPage->buildHTML();
+    echo $MyPage->HTML_code;
+  } else {
+    $MyPage = new HTML_message(_("Demande confirmation suppression"));
+    $MyPage->setMessage(sprintf(_("Etes-vous sûr de vouloir supprimer le login '%s' ?"),$SESSION_VARS['logins']));
+    $MyPage->addButton(BUTTON_OUI, "Slo-2");
+    $MyPage->addButton(BUTTON_NON, "Glo-1");
+
+    $MyPage->buildHTML();
+    echo $MyPage->HTML_code;
+  }
+} else if ($global_nom_ecran == "Slo-2") { //Suppression login, confirmation
+  $retour = del_login($SESSION_VARS['logins']);
+  if ($retour == -1) { //Si login loggé
+    $MyPage = new HTML_erreur(_("Erreur suppression")." '".$SESSION_VARS['logins']."'");
+    $MyPage->setMessage(sprintf(_("Le login '%s' est loggé sur le système : vous ne pouvez pas le supprimer !"),$SESSION_VARS['logins']));
+    $MyPage->addButton(BUTTON_OK, "Glo-1");
+
+    $MyPage->buildHTML();
+    echo $MyPage->HTML_code;
+  } else if ($retour == -2) { //Si login encaisse != 0
+    $MyPage = new HTML_erreur(_("Erreur suppression")." '".$SESSION_VARS['logins']."'");
+    $MyPage->setMessage(sprintf(_("Le guichet associé au login '%s' possède un encaisse différent de 0 (zéro). Vous ne pouvez donc pas supprimer ce login !"),$SESSION_VARS['logins']));
+    $MyPage->addButton(BUTTON_OK, "Glo-1");
+
+    $MyPage->buildHTML();
+    echo $MyPage->HTML_code;
+  } else {
+    //HTML
+    $MyPage = new HTML_message(_("Confirmation suppression")." '".$SESSION_VARS['logins']."'");
+    $MyPage->setMessage(_("Le login '%s' a été supprimé avec succès !"),$SESSION_VARS['logins']);
+    $MyPage->addButton(BUTTON_OK, "Glo-1");
+
+    $MyPage->buildHTML();
+    echo $MyPage->HTML_code;
+  }
+} else if ($global_nom_ecran == "Alo-1") { //Ajout login
+
+  $MyPage = new HTML_GEN2(_("Création d'un login pour l'utilisateur")." '".$SESSION_VARS['nom_utilisateur']."'");
+  // recuperation des données de l'agence'
+  $AG=getAgenceDatas($global_id_agence);
+  if($AG['duree_pwd']>0){ // verifier si on definit la durée de mot de passe, alors mettre le champs pwd_non_expire
+    if (isEngraisChimiques()) {
+      $liste_champ = array("login", "profil", "pwd_non_expire", "have_left_frame", "billet_req", "langue", "is_agent_ec","n_agence");
+      $liste_champ_ord = array("idu", "nome", "login", "profil", "langue", "pwd1", "pwd2", "pwd_non_expire", "is_agent_ec");
+    }
+    else if (isFusion()) {
+        $liste_champ = array("login", "profil", "pwd_non_expire", "have_left_frame", "billet_req", "langue", "n_agence");
+        $liste_champ_ord = array("idu", "nome", "login", "profil", "langue", "pwd1", "pwd2", "pwd_non_expire", "n_agence");
+    }else{
+      $liste_champ = array("login", "profil", "pwd_non_expire", "have_left_frame", "billet_req", "langue","n_agence");
+      $liste_champ_ord = array("idu", "nome", "login", "profil", "langue", "pwd1", "pwd2", "pwd_non_expire");
+    }
+  }else{
+    if (isEngraisChimiques()) {
+      $liste_champ = array("login", "profil", "have_left_frame", "billet_req", "langue", "is_agent_ec","n_agence");
+      $liste_champ_ord = array("idu", "nome", "login", "profil", "langue", "pwd1", "pwd2", "is_agent_ec");
+    }
+    else if (isFusion()) {
+        $liste_champ = array("login", "profil", "pwd_non_expire", "have_left_frame", "billet_req", "langue", "n_agence");
+        $liste_champ_ord = array("idu", "nome", "login", "profil", "langue", "pwd1", "pwd2", "pwd_non_expire", "n_agence");
+    }
+    else{
+      $liste_champ = array("login", "profil", "have_left_frame", "billet_req", "langue","n_agence");
+      $liste_champ_ord = array("idu", "nome", "login", "profil", "langue", "pwd1", "pwd2");
+    }
+  }
+  $MyPage->addTable("ad_log", OPER_INCLUDE, $liste_champ);
+  $MyPage->setFieldProperties("have_left_frame", FIELDP_DEFAULT, true);
+
+  //Javascript pour vérifier que le login n'existe pas encore
+  $liste_login = get_logins(); //Récupère la liste des logins existants
+  $i=0;
+  while (list($key, $value) = each($liste_login)) {
+    $value=addslashes($value);
+    $MyPage->addJS(JSP_BEGIN_CHECK, "js12$i", "if (document.ADForm.login.value == '$value'){ msg += '"._("Cet identificateur de login existe déjà !")."\\n'; ADFormValid = false;}\n");
+    ++$i;
+  }
+
+  //Javascript pour vérifier que le libellé du guichet n'existe pas
+  $liste_libel_guichet = get_libels_guichets(); //Récupère la liste des libellés de guichets
+  $i=0;
+  while (list($key, $value) = each($liste_libel_guichet)) {
+    $value=addslashes($value);
+    $MyPage->addJS(JSP_BEGIN_CHECK, "js40$i", "if (document.ADForm.libelGuichet.value == '$value'){ msg += '"._("Ce libellé de guichet existe déjà !")."\\n'; ADFormValid = false;}\n");
+    ++$i;
+  }
+
+
+
+
+  // ajout des champs de niveau de l'agence ------------------------------------------------------------------------------------------
+    if (isFusion()) {
+        $nivArrayFenacobu = getNivFenacobuArray("type_niveau > 1");
+        print_rn($nivArrayFenacobu);
+        // --> Sélection des champs à afficher dans id_loc
+        reset($nivArrayFenacobu);
+        $includeChoicesFenacobu = array();
+        while (list (, $value_fenacobu) = each($nivArrayFenacobu)) {
+            if ($value_fenacobu['type_niveau'] == 2)
+                array_push($includeChoicesFenacobu, $value_fenacobu['id']);
+            //$arrayDisplay[$value_rwanda['id'] ] =$value_rwanda['libelle_localisation'];
+
+        }
+        print_rn($includeChoicesFenacobu);
+
+        $MyPage->addField("n_guichet", _("Niveau guichet"), TYPC_LSB);
+
+        //$MyPage->setFieldProperties("province", FIELDP_HAS_CHOICE_TOUS, false);
+        // $MyPage->setFieldProperties("province", FIELDP_HAS_CHOICE_AUCUN, true);
+        $MyPage->setFieldProperties("n_agence", FIELDP_INCLUDE_CHOICES, $includeChoicesFenacobu);;
+        $MyPage->setFieldProperties("n_agence", FIELDP_IS_REQUIRED, true);
+
+        $jsCodeNivFenacobu = "function displayNivFenacobu() {\n";
+        $jsCodeNivFenacobu .= "for (i=0; i < document.ADForm.HTML_GEN_LSB_n_guichet.length; ++i) document.ADForm.HTML_GEN_LSB_n_guichet.options[i] = null;\n"; //Vide les choix
+        $jsCodeNivFenacobu .= "document.ADForm.HTML_GEN_LSB_n_guichet.length = 0;";
+        $jsCodeNivFenacobu .= "document.ADForm.HTML_GEN_LSB_n_guichet.options[document.ADForm.HTML_GEN_LSB_n_guichet.length] = new Option('[Aucun]', 0, true, true);\n"; //[Aucun]
+        $jsCodeNivFenacobu .= "document.ADForm.HTML_GEN_LSB_n_guichet.selectedIndex = 0; document.ADForm.HTML_GEN_LSB_n_guichet.length = 1; \n";
+        reset($nivArrayFenacobu);
+        while (list (, $value_fenacobu) = each($nivArrayFenacobu)) {
+            if ($value_fenacobu['parent'] != '') {
+                $jsCodeNivFenacobu .= "\tif (document.ADForm.HTML_GEN_LSB_n_agence.value == " . $value_fenacobu['parent'] . ")\n";
+                $jsCodeNivFenacobu .= "\t\tdocument.ADForm.HTML_GEN_LSB_n_guichet.options[document.ADForm.HTML_GEN_LSB_n_guichet.length] = new Option('" . $value_fenacobu['libelle_localisation'] . "', '" . $value_fenacobu['id'] . "', false, false);\n";
+            }
+        }
+        $jsCodeNivFenacobu .= "\n}";
+        // --> Ajout de la fonction dans le formulaire
+        $MyPage->addJS(JSP_FORM, "jsCodeNivFenacobu", $jsCodeNivFenacobu);
+        // --> ajout des champs
+
+        //AT-150
+        // --> Page reloaded Constrution des choix disponibles pour le district
+        if (isset($n_agence) && isset($n_guichet)) { //AT-150 page reloaded take value from posted data
+            $choices = array();
+            reset($nivArrayFenacobu);
+            while (list(, $value) = each($nivArrayFenacobu)) {
+                if ($value['parent'] == $n_agence)
+                    $choices[$value['id']] = $value['libelle_localisation'];
+            }
+            $MyPage->setFieldProperties("n_guichet", FIELDP_ADD_CHOICES, $choices);
+            $MyPage->setFieldProperties("n_guichet", FIELDP_DEFAULT, $n_guichet);
+            $MyPage->setFieldProperties("n_guichet", FIELDP_HAS_CHOICE_AUCUN, true);
+        } else {
+            $MyPage->setFieldProperties("n_guichet", FIELDP_ADD_CHOICES, array(
+                "0" => "[Aucun]"
+            ));
+        }
+        $MyPage->setFieldProperties("n_guichet", FIELDP_IS_REQUIRED, true);
+        $MyPage->setFieldProperties("n_agence", FIELDP_JS_EVENT, array("onchange" => "displayNivFenacobu()"));
+    }
+  // fin
+
+  //Javascript pour champs profil
+  $MyPage->addJS(JSP_FORM, "js11", get_fct_libel());
+  $MyPage->setFieldProperties("profil", FIELDP_JS_EVENT, array("onchange"=>"verif_libel()"));
+  //Champs id_uti
+  $MyPage->addField("idu", _("Identificateur utilisateur"), TYPC_INT);
+  $MyPage->setFieldProperties("idu", FIELDP_DEFAULT, $SESSION_VARS['id_utilisateur']);
+  $MyPage->setFieldProperties("idu", FIELDP_IS_LABEL, true);
+  //Champs Nom
+  $MyPage->addField("nome", _("Utilisateur"), TYPC_TXT);
+  $MyPage->setFieldProperties("nome", FIELDP_DEFAULT, $SESSION_VARS['nom_utilisateur']);
+  $MyPage->setFieldProperties("nome", FIELDP_IS_LABEL, true);
+  //Champs mot de passe 1
+  $MyPage->addField("pwd1", _("Mot de passe"), TYPC_PWD);
+  $MyPage->setFieldProperties("pwd1", FIELDP_IS_REQUIRED, true);
+  //Champs mot de passe 2
+  $MyPage->addField("pwd2", _("Ré-entrez le mot de passe"), TYPC_PWD);
+  $MyPage->setFieldProperties("pwd2", FIELDP_IS_REQUIRED, true);
+  //Contrôle JS : pwd1 ?= pwd2
+  //Javascript vérification mot de passe
+  $js = "if (document.ADForm.pwd1.value != document.ADForm.pwd2.value) {msg += '"._("Les mots de passe doivent être identiques !")."\\n'; ADFormValid = false;}\n";
+  $nbre_car_min=$AG["nbre_car_min_pwd"];
+  if($nbre_car_min>0){
+
+  	$js.="if (document.ADForm.pwd1.value.length>0 && document.ADForm.pwd1.value.length <$nbre_car_min)" .
+  		" {msg+= '-".sprintf(_("la longueur minimale du mot de passe doit être de %s caractères !"),$nbre_car_min)."\\n'; ADFormValid = false;}";
+
+
+  }
+  $MyPage->addJS(JSP_BEGIN_CHECK, "js2", "if (document.ADForm.pwd1.value != document.ADForm.pwd2.value) {msg += '"._("Les mots de passe ne sont pas équivalents")."\\n'; ADFormValid = false;}");
+  //Champs guichet
+  $MyPage->addField("libelGuichet", _("Libellé du guichet"), TYPC_TXT);
+  $MyPage->setFieldProperties("libelGuichet", FIELDP_IS_LABEL, true);
+  $MyPage->setFieldProperties("libelGuichet", FIELDP_DEFAULT, "Pas de guichet");
+  $MyPage->setFieldProperties("libelGuichet", FIELDP_IS_REQUIRED, true);
+  //N° de compte comptable à associer au guichet
+  $MyPage->addTableRefField("cptecpta",_("Numéro de compte"), "ad_cpt_comptable");
+  // $MyPage->setFieldProperties("cptecpta", FIELDP_IS_REQUIRED, true);
+  $MyPage->setFieldProperties("cptecpta", FIELDP_HAS_CHOICE_AUCUN, true);
+  $MyPage->setFieldProperties("cptecpta", FIELDP_IS_LABEL, true);
+  if ($global_multidevise)
+    $include = getNomsComptesComptables(	array(  "devise"        => NULL,
+                                         "compart_cpte"  => 1    // Actif
+                                              ));
+  else
+    $include = getNomsComptesComptables(array("compart_cpte"  => 1));   // Comptes d'Actif
+
+  $MyPage->setFieldProperties("cptecpta",FIELDP_INCLUDE_CHOICES, array_keys($include));
+
+  //Ordre
+    if (isFusion()){
+        $MyPage->setOrder(NULL, array("idu", "nome", "login", "profil", "langue","pwd1", "pwd2","n_agence","n_guichet"));
+    }else{
+        $MyPage->setOrder(NULL, array("idu", "nome", "login", "profil", "langue","pwd1", "pwd2"));
+    }
+
+
+  //Boutons
+  $MyPage->addFormButton(1,1,"butok",_("Valider"), TYPB_SUBMIT);
+  $MyPage->setFormButtonProperties("butok", BUTP_PROCHAIN_ECRAN, "Alo-2");
+  $MyPage->addFormButton(1,2,"butno",_("Annuler"), TYPB_SUBMIT);
+  $MyPage->setFormButtonProperties("butno", BUTP_PROCHAIN_ECRAN, "Glo-1");
+  $MyPage->setFormButtonProperties("butno", BUTP_CHECK_FORM, false);
+
+  $MyPage->buildHTML();
+  echo $MyPage->getHTML();
+} else if ($global_nom_ecran == "Alo-2") {
+  if ($pwd1 != $pwd2) {
+    $html_err = new HTML_erreur(_("Echec du traitement.")." ");
+    $html_err->setMessage(_("Les mots de passe ne sont pas identiques"));
+    $html_err->addButton("BUTTON_OK", 'Glo-1');
+    $html_err->buildHTML();
+    echo $html_err->HTML_code;
+    exit();
+
+  }
+
+  $DATA['id_utilisateur'] = $SESSION_VARS['id_utilisateur'];
+  $DATA['login'] = $login;
+  $DATA['pwd'] = $pwd1;
+  $DATA['profil'] = $profil;
+  $profils_avec_guichet = get_profils_guichet(); //Renvoie un tableau contenant tous les profils ayant un guichet associé
+  $DATA['guichet'] = in_array($profil, $profils_avec_guichet);//Présence d'un guichet ?
+  $DATA['libelGuichet'] = $libelGuichet;
+  $DATA['date'] = date("d/m/Y");
+  $DATA['utilis'] = $global_id_utilisateur;
+  $DATA['have_left_frame'] = isset($have_left_frame);
+  $DATA['billet_req'] = isset($billet_req);
+  $DATA['cptecpta_gui'] = $cptecpta;
+  $DATA['langue'] = $langue;
+  if (isEngraisChimiques()) {
+    if ($is_agent_ec == 1){
+      $DATA['is_agent_ec'] = 't';
+    }else{
+      $DATA['is_agent_ec'] = 'f';
+    }
+  }
+  if (isFusion()) {
+      $DATA['n_agence'] = $n_agence;
+      $DATA['n_guichet'] = $n_guichet;
+  }
+
+  $retour = ajout_login($DATA);
+
+  if ($retour) {
+    $MyPage = new HTML_message(_('Confirmation création login'));
+    $MyPage->setMessage(sprintf(_("Le login '%s' pour l'utilisateur '%s' a été créé avec succès !"),$DATA['login'],$SESSION_VARS['nom_utilisateur']));
+    $MyPage->addButton(BUTTON_OK, "Glo-1");
+  } else {
+    $MyPage = new HTML_erreur(_("Echec création login")." '".$DATA['login']."'");
+    $MyPage->setMessage(_("Le login n'a pas été créé ! Il faut choisir un compte comptable qui n'est pas associé à un autre guichet"));
+    $MyPage->addButton(BUTTON_OK, "Alo-1");
+  }
+
+  $MyPage->buildHTML();
+  echo $MyPage->HTML_code;
+} else if ($global_nom_ecran == "Mlp-1") {
+  if ($SESSION_VARS['logins'] == 'admin') {
+    $html_err = new HTML_erreur(_("Refus de la modification.")." ");
+    $html_err->setMessage(_("On ne peut pas modifier le login de l'administrateur."));
+    $html_err->addButton("BUTTON_OK", 'Gen-12');
+    $html_err->buildHTML();
+    echo $html_err->HTML_code;
+    exit();
+
+  }
+  $info = get_login_full_info(addslashes($SESSION_VARS['logins']));
+  $SESSION_VARS = array_merge($SESSION_VARS, $info);
+
+  $MyPage = new HTML_GEN2(_("Modification association profil au login"));
+
+  //Javascript pour vérifier que le libellé du guichet n'existe pas
+  $liste_libel_guichet = get_libels_guichets(); //Récupère la liste des libellés de guichets
+  $i=0;
+  while (list($key, $value) = each($liste_libel_guichet)) {
+    if ($key != $info['guichet']) {
+      $value=addslashes($value);
+      $MyPage->addJS(JSP_BEGIN_CHECK, "js40$i", "if (document.ADForm.libelGuichet.value == '$value'){ msg += '"._("Ce libellé de guichet existe déjà !")."\\n'; ADFormValid = false;}\n");
+      ++$i;
+    }
+  }
+
+  //Champs utilisateur
+  $MyPage->addField("uti", _("Utilisateur"), TYPC_TXT);
+  $MyPage->setFieldProperties("uti", FIELDP_IS_LABEL, true);
+  $MyPage->setFieldProperties("uti", FIELDP_DEFAULT, $SESSION_VARS['nom_utilisateur']);
+  //Champs login
+  $MyPage->addField("log", _("Login"), TYPC_TXT);
+  $MyPage->setFieldProperties("log", FIELDP_IS_LABEL, true);
+  $MyPage->setFieldProperties("log", FIELDP_DEFAULT, $SESSION_VARS['logins']);
+  //Champs profil
+  $MyPage->addTableRefField("profil", "Profil", "adsys_profils");
+  $MyPage->setFieldProperties("profil", FIELDP_DEFAULT, $info['profil']);
+  $MyPage->addJS(JSP_FORM, "js11", get_fct_libel($info['libel_gui'], $info['profil']));
+  $MyPage->setFieldProperties("profil", FIELDP_JS_EVENT, array("onchange"=>"verif_libel()"));
+  //Champs libelGuichet
+  $MyPage->addField("libelGuichet", _("Libellé du guichet"), TYPC_TXT);
+  $MyPage->setFieldProperties("libelGuichet", FIELDP_DEFAULT, $info['libel_gui']);
+  $MyPage->setFieldProperties("libelGuichet", FIELDP_IS_REQUIRED, true);
+
+  //Boutons
+  $MyPage->addFormButton(1,1,"valid", _("Valider"), TYPB_SUBMIT);
+  $MyPage->setFormButtonProperties("valid", BUTP_PROCHAIN_ECRAN, "Mlp-2");
+  $MyPage->addFormButton(1,2,"annul", _("Annuler"), TYPB_SUBMIT);
+  $MyPage->setFormButtonProperties("annul", BUTP_PROCHAIN_ECRAN, "Glo-1");
+  $MyPage->setFormButtonProperties("annul", BUTP_CHECK_FORM, false);
+
+  //HTML
+  $MyPage->buildHTML();
+  echo $MyPage->getHTML();
+} else if ($global_nom_ecran == "Mlp-2") {
+  $DATA['id_utilisateur'] = get_login_utilisateur($login);
+  $DATA['login'] = $login;
+  $DATA['libelGuichet'] = $libelGuichet;
+  $DATA['date'] = date("d/m/Y");
+  $DATA['utilis'] = $global_id_utilisateur;
+
+  $retour = change_login_profil($SESSION_VARS['logins'], $SESSION_VARS['profil'], $profil, $DATA);
+  if ($retour == -1) {
+    $MyPage = new HTML_erreur(_("Erreur modification association profil du login '").$SESSION_VARS['logins']."'");
+    $MyPage->setMessage(_("Vous ne pouvez supprimer le guichet d'un login dont l'encaisse n'est pas nul !"));
+    $MyPage->addButton(BUTTON_OK, "Glo-1");
+
+    $MyPage->buildHTML();
+    echo $MyPage->HTML_code;
+  } else {
+    $MyPage = new HTML_message(_("Confirmation"));
+    $MyPage->setMessage(sprintf(_("Le profil associé au login '%s' a été modifié avec succès !"),$SESSION_VARS['logins']));
+    $MyPage->addButton(BUTTON_OK, "Glo-1");
+
+    $MyPage->buildHTML();
+    echo $MyPage->HTML_code;
+  }
+} else signalErreur(__FILE__,__LINE__,__FUNCTION__); // "Nom d'écran inconnu : '$global_nom_ecran'"
+
+?>

@@ -1,0 +1,52 @@
+<!-- DTD pour la liste des societaires de l'institution -->
+
+<!-- Element root -->
+<!ELEMENT liste_societaires (liste_societaires_init , liste_societaires_comp)>
+
+<!-- Element subroot -->
+<!ELEMENT liste_societaires_init (header,header_contextuel, total, detail_stat_jur*)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!ELEMENT total (nbre_soc, nbre_ps, nbre_ps_lib , capital_social, capital_social_souscrites, capital_social_lib, capital_social_restant, valeurnominale, pp, pm, gi, gs)>
+
+<!ELEMENT detail_stat_jur (client*, nbre_ps, nbre_soc, nbre_ps_lib)>
+<!ATTLIST detail_stat_jur type CDATA #REQUIRED>
+
+<!ELEMENT  client (id_client, nom, nbre_ps ,nbre_ps_lib ,solde_ps_sous, solde_ps_lib, solde_ps_restant)>
+
+<!ELEMENT nbre_soc (#PCDATA)>
+<!ELEMENT nbre_ps (#PCDATA)>
+<!ELEMENT nbre_ps_lib (#PCDATA)>
+<!ELEMENT capital_social (#PCDATA)>
+<!ELEMENT id_client (#PCDATA)>
+<!ELEMENT nom (#PCDATA)>
+<!ELEMENT solde_ps_sous (#PCDATA)>
+<!ELEMENT solde_ps_lib (#PCDATA)>
+<!ELEMENT solde_ps_restant (#PCDATA)>
+
+<!-- Element subroot -->
+<!ELEMENT liste_societaires_comp (header,header_contextuel_comp, total_comp, detail_stat_jur_comp*)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!ELEMENT total_comp (nbre_soc_comp, nbre_ps_comp, nbre_ps_lib_comp , capital_social_comp, capital_social_souscrites_comp, capital_social_lib_comp, capital_social_restant_comp, valeurnominale_comp, pp, pm, gi, gs)>
+
+<!ELEMENT detail_stat_jur_comp (client_comp*, nbre_ps_comp, nbre_soc_comp, nbre_ps_lib_comp)>
+<!ATTLIST detail_stat_jur_comp typecomp CDATA #REQUIRED>
+
+<!ELEMENT  client_comp (id_client_comp, nom_comp, nbre_ps_comp ,nbre_ps_lib_comp ,solde_ps_sous_comp, solde_ps_lib_comp, solde_ps_restant_comp)>
+
+<!ELEMENT nbre_soc_comp (#PCDATA)>
+<!ELEMENT nbre_ps_comp (#PCDATA)>
+<!ELEMENT nbre_ps_lib_comp (#PCDATA)>
+<!ELEMENT capital_social_comp (#PCDATA)>
+<!ELEMENT id_client_comp (#PCDATA)>
+<!ELEMENT nom_comp (#PCDATA)>
+<!ELEMENT solde_ps_sous_comp (#PCDATA)>
+<!ELEMENT solde_ps_lib_comp (#PCDATA)>
+<!ELEMENT solde_ps_restant_comp (#PCDATA)>

@@ -1,0 +1,28 @@
+<!-- DTD pour la liste des societaires de l'institution -->
+
+<!-- Element root -->
+<!ELEMENT liste_client_compte (header, detail_client_compte*)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!ELEMENT detail_client_compte (client*)>
+<!ATTLIST detail_client_compte type CDATA #REQUIRED>
+
+<!ELEMENT  client (id_client, nom, date_naiss,sexe, type_piece,numero_piece,adresse,telephone,telecopie,portable,email,compte,pays,ville)>
+
+<!ELEMENT id_client (#PCDATA)>
+<!ELEMENT nom (#PCDATA)>
+<!ELEMENT date_naiss (#PCDATA)>
+<!ELEMENT sexe (#PCDATA)>
+<!ELEMENT type_piece (#PCDATA)>
+<!ELEMENT numero_piece (#PCDATA)>
+<!ELEMENT adresse (#PCDATA)>
+<!ELEMENT telephone (#PCDATA)>
+<!ELEMENT telecopie (#PCDATA)>
+<!ELEMENT portable (#PCDATA)>
+<!ELEMENT email (#PCDATA)>
+<!ELEMENT compte (#PCDATA)>
+<!ELEMENT pays (#PCDATA)>
+<!ELEMENT ville (#PCDATA)>

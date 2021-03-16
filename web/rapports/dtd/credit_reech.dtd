@@ -1,0 +1,57 @@
+<!-- DTD pour le rapport de l'historique des demandes de credits clients -->
+
+
+<!-- Element root -->
+<!ELEMENT credit_reech (header, header_contextuel, ligneCredit*)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- En-tete contextuel -->
+<!-- En-tete contextuel -->
+<!ELEMENT header_contextuel (criteres_recherche, infos_synthetiques*, globalInfos)>
+<!ELEMENT infos_synthetiques (libel, valeur)>
+<!ELEMENT libel (#PCDATA)>
+<!ELEMENT valeur (#PCDATA)>
+
+<!ELEMENT globalInfos (mnt_tot_crd_reech, encours_crd_reech, mnt_tot_oct)>
+<!ELEMENT mnt_tot_crd_reech (#PCDATA)>
+<!ELEMENT encours_crd_reech (#PCDATA)>
+<!ELEMENT mnt_tot_oct (#PCDATA)>
+
+<!-- Criteres de recherche commun -->
+<!ENTITY % mod_criteres SYSTEM "criteres_recherche.dtd">
+%mod_criteres;
+
+<!ELEMENT ligneCredit (lib_prod, infosCreditSolidiaire*, detailCredit*, xml_total)>
+<!ELEMENT lib_prod (#PCDATA)>
+
+<!ELEMENT infosCreditSolidiaire (no_dossier, num_client, nom_client,  mnt_dem, mnt_octr, devise, date_oct, duree, agent_gest, duree,libel_prod)>
+<!ELEMENT detailCredit (no_dossier, num_client, nom_client, mnt_octr, cap_att, cap_rest, lib_prod, devise, lib_etat, cre_nbre_reech, list_mnt_reech*, list_date_reech*)>
+
+<!ELEMENT no_dossier (#PCDATA)>
+<!ELEMENT num_client (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT mnt_octr (#PCDATA)>
+<!ELEMENT cap_att (#PCDATA)>
+<!ELEMENT cap_rest (#PCDATA)>
+<!ELEMENT lib_prod (#PCDATA)>
+<!ELEMENT devise (#PCDATA)>
+<!ELEMENT lib_etat (#PCDATA)>
+<!ELEMENT cre_nbre_reech (#PCDATA)>
+<!ELEMENT list_mnt_reech (mnt_reech)>
+<!ELEMENT mnt_reech (#PCDATA)>
+
+<!ELEMENT list_date_reech (date_reech)>
+<!ELEMENT date_reech (#PCDATA)>
+
+<!ELEMENT mnt_reech (#PCDATA)>
+<!ELEMENT date_reech (#PCDATA)>
+
+<!ELEMENT xml_total (tot_mnt_octr, tot_cap_att, tot_cap_rest,tot_mnt_reech)>
+<!ELEMENT tot_mnt_octr (#PCDATA)>
+<!ELEMENT tot_cap_att (#PCDATA)>
+<!ELEMENT tot_cap_rest (#PCDATA)>
+<!ELEMENT tot_mnt_reech (#PCDATA)>
+

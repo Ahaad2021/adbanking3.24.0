@@ -1,0 +1,27 @@
+<!-- DTD pour le rapport etats des chequiers imprimes -->
+
+<!-- Element root -->
+<!ELEMENT calc_int_paye (header, infos_synthetique, footer, header_contextuel, calc_int_paye_data)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!ELEMENT infos_synthetique (total_int_paye)>
+<!ELEMENT total_int_paye (#PCDATA)>
+
+<!ELEMENT calc_int_paye_data (prod*)>
+<!ELEMENT prod (total_int_prod, prod_name, ligne_int_paye*)>
+<!ELEMENT total_int_prod (#PCDATA)>
+<!ELEMENT prod_name (#PCDATA)>
+
+
+<!ELEMENT ligne_int_paye (num_client, num_cpte, nom_client, capital, date_ouvert, dat_date_fin, nb_jours_echus, montant_int)>
+<!ELEMENT num_client (#PCDATA)>
+<!ELEMENT num_cpte (#PCDATA)>
+<!ELEMENT nom_client (#PCDATA)>
+<!ELEMENT capital (#PCDATA)>
+<!ELEMENT date_ouvert (#PCDATA)>
+<!ELEMENT dat_date_fin (#PCDATA)>
+<!ELEMENT nb_jours_echus (#PCDATA)>
+<!ELEMENT montant_int (#PCDATA)>

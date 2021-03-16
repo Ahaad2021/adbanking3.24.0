@@ -1,0 +1,27 @@
+<!-- DTD pour le rapport de l'equilibre inventaire / comptabilite -->
+
+<!-- Element root -->
+<!ELEMENT equilibre_inventaire_comptabilite (header, footer, header_contextuel, ecarts)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!ELEMENT ecarts (ecart*)>
+
+<!ELEMENT ecart (date_ecart, numero_compte_comptable, libel_cpte_comptable, devise, solde_cpte_int, solde_cpte_comptable, ecart, login, id_his, id_doss, cre_etat, solde_credit, solde_cpt, ecart_credits)>
+
+<!ELEMENT date_ecart (#PCDATA)>
+<!ELEMENT numero_compte_comptable (#PCDATA)>
+<!ELEMENT libel_cpte_comptable (#PCDATA)>
+<!ELEMENT devise (#PCDATA)>
+<!ELEMENT solde_cpte_int (#PCDATA)>
+<!ELEMENT solde_cpte_comptable (#PCDATA)>
+<!ELEMENT ecart (#PCDATA)>
+<!ELEMENT login (#PCDATA)>
+<!ELEMENT id_his (#PCDATA)>
+<!ELEMENT id_doss (#PCDATA)>
+<!ELEMENT cre_etat (#PCDATA)>
+<!ELEMENT solde_credit (#PCDATA)>
+<!ELEMENT solde_cpt (#PCDATA)>
+<!ELEMENT ecart_credits (#PCDATA)>

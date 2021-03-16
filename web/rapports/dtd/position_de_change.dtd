@@ -1,0 +1,18 @@
+<!-- DTD pour Simulation intermédiaire  -->
+
+<!-- Element root -->
+<!ELEMENT position_de_change (header, devise*)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!ELEMENT devise (code,libel,pos_net,taux_jour,cv,var_taux,taux_moyen)>
+
+<!ELEMENT code (#PCDATA)>
+<!ELEMENT libel (#PCDATA)>
+<!ELEMENT pos_net (#PCDATA)>
+<!ELEMENT taux_jour (#PCDATA)>
+<!ELEMENT cv (#PCDATA)>
+<!ELEMENT var_taux (#PCDATA)>
+<!ELEMENT taux_moyen (#PCDATA)>

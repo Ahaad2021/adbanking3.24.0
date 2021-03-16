@@ -1,0 +1,95 @@
+<!-- DTD pour le rapport activite de l'agence -->
+
+<!-- Element root -->
+<!ELEMENT activite_agence (header, infos_globales, clients, credits, epargnes,enreg_agence)>
+
+<!-- Un en-tete commun a tous -->
+<!--<!ENTITY % mod_header SYSTEM "header.dtd">-->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+
+%mod_header;
+<!--Infos globales -->
+<!ELEMENT infos_globales (debut_periode, fin_periode)>
+<!ELEMENT debut_periode (#PCDATA)>
+<!ELEMENT fin_periode (#PCDATA)>
+
+<!ELEMENT enreg_agence (id_ag,libel_ag,date_max)>
+<!ELEMENT id_ag (#PCDATA)>
+<!ELEMENT libel_ag (#PCDATA)>
+<!ELEMENT date_max (#PCDATA)>
+<!-- Corps -->
+<!ELEMENT clients (nbre_hom_deb, nbre_fem_deb, nbre_pm_deb, nbre_hom_fin, nbre_fem_fin, nbre_pm_fin, date_deb, date_fin, total_client_fin, total_client_deb, diff_hom, diff_fem, diff_tot, diff_pm, prc_hom, prc_fem, prc_pm, prc_tot)>
+<!ELEMENT nbre_hom_fin (#PCDATA)>
+<!ELEMENT nbre_fem_fin (#PCDATA)>
+<!ELEMENT nbre_pm_fin (#PCDATA)>
+<!ELEMENT date_fin (#PCDATA)>
+<!ELEMENT total_client_fin (#PCDATA)>
+<!ELEMENT total_client_deb (#PCDATA)>
+<!ELEMENT nbre_hom_deb (#PCDATA)>
+<!ELEMENT nbre_fem_deb (#PCDATA)>
+<!ELEMENT nbre_pm_deb (#PCDATA)>
+<!ELEMENT date_debut (#PCDATA)>
+<!ELEMENT diff_hom (#PCDATA)>
+<!ELEMENT diff_fem (#PCDATA)>
+<!ELEMENT diff_tot (#PCDATA)>
+<!ELEMENT diff_pm (#PCDATA)>
+<!ELEMENT prc_hom (#PCDATA)>
+<!ELEMENT prc_fem (#PCDATA)>
+<!ELEMENT prc_pm (#PCDATA)>
+<!ELEMENT prc_tot (#PCDATA)>
+
+<!ELEMENT credits (cred_jan,mnt_jan,cre_fev,mnt_fev,cred_mars,mnt_mars,cred_av,mnt_av,cred_mai,mnt_mai,cred_juin,mnt_juin,cred_jui,mnt_jui,cred_aout, mnt_aout, cred_sept,mnt_sept,cred_oc,mnt_oc,cred_nov,mnt_nov,cred_dec,mnt_dec, cred_tot, mnt_tot)>
+<!ELEMENT cred_jan (#PCDATA)>
+<!ELEMENT cred_fev (#PCDATA)>
+<!ELEMENT cred_mars (#PCDATA)>
+<!ELEMENT cred_av (#PCDATA)>
+<!ELEMENT cred_mai (#PCDATA)>
+<!ELEMENT cred_juin (#PCDATA)>
+<!ELEMENT cred_jui (#PCDATA)>
+<!ELEMENT cred_aout (#PCDATA)>
+<!ELEMENT cred_sept (#PCDATA)>
+<!ELEMENT cred_oc (#PCDATA)>
+<!ELEMENT cred_nov (#PCDATA)>
+<!ELEMENT cred_dec (#PCDATA)>
+<!ELEMENT mnt_jan (#PCDATA)>
+<!ELEMENT mnt_fev (#PCDATA)>
+<!ELEMENT mnt_mars (#PCDATA)>
+<!ELEMENT mnt_av (#PCDATA)>
+<!ELEMENT mnt_mai (#PCDATA)>
+<!ELEMENT mnt_juin (#PCDATA)>
+<!ELEMENT mnt_jui (#PCDATA)>
+<!ELEMENT mnt_aout (#PCDATA)>
+<!ELEMENT mnt_sept (#PCDATA)>
+<!ELEMENT mnt_oc (#PCDATA)>
+<!ELEMENT mnt_nov (#PCDATA)>
+<!ELEMENT mnt_dec (#PCDATA)>
+<!ELEMENT mnt_tot (#PCDATA)>
+<!ELEMENT cred_tot (#PCDATA)>
+
+<!ELEMENT epargnes (epargne_jan,encour_jan,epargne_fev,encour_fev,epargned_mars,encour_mars,epargned_av,encour_av,epargned_mai,encour_mai,epargned_juin,encour_juin,epargned_jui,encour_jui,epargned_aout, encour_aout, epargned_sept,encour_sept,epargned_oc,encour_oc,epargned_nov,encour_nov,epargned_dec,encour_dec, encour_tot, epargne_tot)>
+<!ELEMENT epargne_jan (#PCDATA)>
+<!ELEMENT epargne_fev (#PCDATA)>
+<!ELEMENT epargne_mars (#PCDATA)>
+<!ELEMENT epargne_av (#PCDATA)>
+<!ELEMENT epargne_mai (#PCDATA)>
+<!ELEMENT epargne_juin (#PCDATA)>
+<!ELEMENT epargne_jui (#PCDATA)>
+<!ELEMENT epargne_aout (#PCDATA)>
+<!ELEMENT epargne_sept (#PCDATA)>
+<!ELEMENT epargne_oc (#PCDATA)>
+<!ELEMENT epargne_nov (#PCDATA)>
+<!ELEMENT epargne_dec (#PCDATA)>
+<!ELEMENT encour_jan (#PCDATA)>
+<!ELEMENT encour_fev (#PCDATA)>
+<!ELEMENT encour_mars (#PCDATA)>
+<!ELEMENT encour_av (#PCDATA)>
+<!ELEMENT encour_mai (#PCDATA)>
+<!ELEMENT encour_juin (#PCDATA)>
+<!ELEMENT encour_jui (#PCDATA)>
+<!ELEMENT encour_aout (#PCDATA)>
+<!ELEMENT encour_sept (#PCDATA)>
+<!ELEMENT encour_oc (#PCDATA)>
+<!ELEMENT encour_nov (#PCDATA)>
+<!ELEMENT encour_dec (#PCDATA)>
+<!ELEMENT encour_tot (#PCDATA)>
+<!ELEMENT epargne_tot (#PCDATA)>

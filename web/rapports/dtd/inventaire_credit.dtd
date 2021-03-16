@@ -1,0 +1,47 @@
+<!-- DTD pour les recus (retrait, depot et depot cheque) -->
+
+        <!-- Element root -->
+        <!ELEMENT inventaire_credit (header,header_contextuel, body)>
+
+
+        <!-- Un en-tete commun a tous -->
+        <!ENTITY % mod_header SYSTEM "header.dtd">
+        %mod_header;
+
+        <!-- En-tete contextuel -->
+        <!ELEMENT header_contextuel (informations_synthetiques)>
+
+        <!ENTITY % mod_criteres SYSTEM "informations_synthetiques.dtd">
+        %mod_criteres;
+
+        <!-- Corps -->
+        <!ELEMENT body (produit_credit*)>
+
+        <!ELEMENT produit_credit (credit,etat_tous,etat_radie,ligne_credit*,totals)>
+        <!ELEMENT credit (#PCDATA)>
+        <!ELEMENT etat_tous (#PCDATA)>
+        <!ELEMENT etat_radie (#PCDATA)>
+
+        <!ELEMENT ligne_credit (num_client, num_dossier, nom_client, cap_deb, cap_deb_prd, cap_remb_en_cours_period, interet_ord_remb_en_cours_period, interet_ret_remb_en_cours_period, mnt_total_remb_en_cours_period, cap_rest_du_fin_period, etat_dossier)>
+
+        <!ELEMENT num_client (#PCDATA)>
+        <!ELEMENT num_dossier (#PCDATA)>
+        <!ELEMENT nom_client (#PCDATA)>
+        <!ELEMENT cap_deb (#PCDATA)>
+        <!ELEMENT cap_deb_prd (#PCDATA)>
+        <!ELEMENT cap_remb_en_cours_period (#PCDATA)>
+        <!ELEMENT interet_ord_remb_en_cours_period (#PCDATA)>
+        <!ELEMENT interet_ret_remb_en_cours_period (#PCDATA)>
+        <!ELEMENT mnt_total_remb_en_cours_period (#PCDATA)>
+        <!ELEMENT cap_rest_du_fin_period (#PCDATA)>
+        <!ELEMENT etat_dossier (#PCDATA)>
+
+        <!ELEMENT totals (tot_cap_deb,tot_cap_deb_prd,tot_cap_remb_en_cours_period,tot_interet_ord_remb_en_cours_period,tot_interet_ret_remb_en_cours_period,tot_mnt_total_remb_en_cours_period,tot_cap_rest_du_fin_period)>
+
+        <!ELEMENT tot_cap_deb (#PCDATA)>
+        <!ELEMENT tot_cap_deb_prd (#PCDATA)>
+        <!ELEMENT tot_cap_remb_en_cours_period (#PCDATA)>
+        <!ELEMENT tot_interet_ord_remb_en_cours_period (#PCDATA)>
+        <!ELEMENT tot_interet_ret_remb_en_cours_period (#PCDATA)>
+        <!ELEMENT tot_mnt_total_remb_en_cours_period (#PCDATA)>
+        <!ELEMENT tot_cap_rest_du_fin_period (#PCDATA)>

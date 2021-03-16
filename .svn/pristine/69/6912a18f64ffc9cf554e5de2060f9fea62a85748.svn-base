@@ -1,0 +1,20 @@
+<!-- DTD pour une cloture periodique -->
+
+<!-- Element root -->
+<!ELEMENT cloture_periodique (header, header_contextuel, compte*)>
+
+<!-- Un en-tete commun a tous -->
+<!ENTITY % mod_header SYSTEM "header.dtd">
+%mod_header;
+
+<!-- En-tete contextuel -->
+<!ELEMENT header_contextuel (id_cloture,date_cloture,id_exo)>
+<!ELEMENT id_cloture (#PCDATA)>
+<!ELEMENT date_cloture (#PCDATA)>
+<!ELEMENT id_exo (#PCDATA)>
+
+<!ELEMENT compte (num, libel, solde_debit, solde_credit)>
+<!ELEMENT num (#PCDATA)>
+<!ELEMENT libel (#PCDATA)>
+<!ELEMENT solde_debit (#PCDATA)>
+<!ELEMENT solde_credit (#PCDATA)>

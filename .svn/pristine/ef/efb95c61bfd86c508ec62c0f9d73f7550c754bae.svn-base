@@ -1,0 +1,87 @@
+[main]
+cachedir=-yumcache
+reposdir=
+keepcache=1
+debuglevel=1
+logfile=revisor-yum.log
+pkgpolicy=newest
+distroverpkg=redhat-release
+tolerant=1
+exactarch=1
+obsoletes=1
+gpgcheck=1
+plugins=0
+metadata_expire=15
+installroot=/var/tmp/revisor
+
+[fedora]
+name=Fedora 7 - Moonshine - i386
+#baseurl=http://localrepo/fedora/releases/7/Everything/i386/os/
+mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=fedora-7&arch=i386
+enabled=1
+gpgcheck=1
+
+[fedora-debuginfo]
+name=Fedora 7 - Moonshine - Debug - i386
+#baseurl=http://localrepo/fedora/releases/7/Everything/i386/debug/
+mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=fedora-debug-7&arch=i386
+enabled=0
+gpgcheck=1
+
+[fedora-source]
+name=Fedora 7 - Moonshine - Source
+#baseurl=http://localrepo/fedora/releases/7/Everything/source/SRPMS/
+mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=fedora-source-7&arch=i386
+enabled=0
+gpgcheck=1
+
+[updates]
+name=Fedora 7 - i386 - Updates
+#baseurl=http://localrepo/fedora/updates/7/i386/
+mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=updates-released-f7&arch=i386
+exclude=yum yum-updatesd rpm-build rpm-libs rpm rpm-devel rpm-python rpmdevtools popt kyum
+enabled=0
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora
+
+[updates-debuginfo]
+name=Fedora 7 - i386 - Updates - Debug
+#baseurl=http://localrepo/fedora/updates/7/i386/debug/
+mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=updates-released-debug-f7&arch=i386
+enabled=0
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora
+
+[updates-source]
+name=Fedora 7 - Updates Source
+#baseurl=http://localrepo/fedora/updates/7/SRPMS/
+mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=updates-released-source-f7&arch=i386
+enabled=0
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora
+
+[updates-testing]
+name=Fedora 7 - i386 - Test Updates
+#baseurl=http://localrepo/fedora/updates/testing/7/i386/
+mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=updates-testing-f7&arch=i386
+exclude=yum yum-updatesd rpm-build rpm-libs rpm rpm-devel rpm-python rpmdevtools popt kyum
+enabled=0
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-test
+
+[updates-testing-debuginfo]
+name=Fedora 7 - i386 - Test Updates Debug
+#baseurl=http://localrepo/fedora/updates/testing/7/i386/debug/
+mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=updates-testing-debug-f7&arch=i386
+enabled=0
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-test
+
+[updates-testing-source]
+name=Fedora 7 - Test Updates Source
+#baseurl=http://localrepo/fedora/updates/testing/7/SRPMS/
+mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=updates-testing-source-f7&arch=i386
+enabled=0
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-test
+
