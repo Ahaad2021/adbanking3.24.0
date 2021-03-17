@@ -46,7 +46,7 @@ if (($global_nom_ecran == "Vgu-1") || ($global_nom_ecran == "Vtg-1")) {
   $MyPage->addField("date_min", _("Date min"), TYPC_DTE);//test
 
   //Champs date fin
-  $MyPage->addField("date_max", _("Date max"), TYPC_DTE);
+  $MyPage->addField("date_max", _("Date max"), TYPC_DTE);// test Rajessen
 
   //Champs n° transaction min[B
   $MyPage->addField("trans_min", _("N° transaction min"), TYPC_INT);
