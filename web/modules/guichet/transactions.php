@@ -43,7 +43,7 @@ if (($global_nom_ecran == "Vgu-1") || ($global_nom_ecran == "Vtg-1")) {
   $MyPage->setLinkProperties("rechercher", LINKP_JS_EVENT, array("onclick" => "OpenBrw('../modules/clients/rech_client.php?m_agc=".$_REQUEST['m_agc']."&field_name=num_client', '"._("Recherche")."');return false;"));
 
   //Champs date début
-  $MyPage->addField("date_min", _("Date min"), TYPC_DTE);
+  $MyPage->addField("date_min", _("Date min"), TYPC_DTE);//test
 
   //Champs date fin
   $MyPage->addField("date_max", _("Date max"), TYPC_DTE);
