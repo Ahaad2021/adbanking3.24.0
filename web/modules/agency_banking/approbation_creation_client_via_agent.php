@@ -46,7 +46,7 @@ if ($global_nom_ecran == "Acc-1"){
         $table->add_cell(new TABLE_cell("<a href=" . $PHP_SELF . "?m_agc=" . $_REQUEST['m_agc'] . "&prochain_ecran=" . $prochain_ecran . "&id_client=" . $id_client . ">Valider/Refuser la demande</a>"));
         $table->set_row_property("height", "35px");
     }
-	//test
+	//test2
     echo $table->gen_HTML();
 }
 
